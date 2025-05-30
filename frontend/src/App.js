@@ -33,6 +33,7 @@ function App() {
   const [showSignUpModal, setShowSignUpModal] = useState(false);
   const [compareList, setCompareList] = useState([]);
   const [searchFilters, setSearchFilters] = useState(null);
+  const [currentListingId, setCurrentListingId] = useState(null);
 
   useEffect(() => {
     // Check if user is logged in on component mount
