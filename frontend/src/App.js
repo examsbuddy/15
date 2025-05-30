@@ -22,6 +22,8 @@ import {
 function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isPostAdOpen, setIsPostAdOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('auth_token'));
 
   const renderContent = () => {
     switch (activeTab) {
@@ -35,16 +37,7 @@ function App() {
           </>
         );
       case 'my-ads':
-        return (
-          <div className="pt-20 pb-24 md:pb-8">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">My Ads</h2>
-                <p className="text-gray-600">Your posted advertisements will appear here</p>
-              </div>
-            </div>
-          </div>
-        );
+        return <MyAdsPage />;
       case 'used-phones':
         return (
           <div className="pt-20 pb-24 md:pb-8">
@@ -101,16 +94,7 @@ function App() {
           </div>
         );
       case 'profile':
-        return (
-          <div className="pt-20 pb-24 md:pb-8">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Profile</h2>
-                <p className="text-gray-600">Manage your account settings and preferences</p>
-              </div>
-            </div>
-          </div>
-        );
+        return <ProfileDashboard />;
       case 'reviews':
         return <ReviewsPage />;
       case 'videos':
