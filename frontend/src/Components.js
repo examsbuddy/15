@@ -4249,83 +4249,147 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
                 {filteredListings.map((listing, index) => (
                   <div 
                     key={listing.id || index} 
-                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group"
                     onClick={() => onViewListing && onViewListing(listing.id)}
                   >
+                    {/* Photo/Thumbnail */}
+                    <div className="aspect-video bg-gray-100 relative overflow-hidden">
+                      {listing.photos && listing.photos.length > 0 ? (
+                        <img 
+                          src={listing.photos[0]} 
+                          alt={`${listing.brand} ${listing.model}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <Smartphone className="w-16 h-16 text-gray-400" />
+                        </div>
+                      )}
+                      {/* Photo count indicator */}
+                      {listing.photos && listing.photos.length > 1 && (
+                        <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded-full text-xs">
+                          +{listing.photos.length - 1} photos
+                        </div>
+                      )}
+                      {/* Featured badge */}
+                      {listing.is_featured && (
+                        <div className="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                          Featured
+                        </div>
+                      )}
+                    </div>
+
                     <div className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900">
+                      {/* Title and Price */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
                             {listing.brand} {listing.model}
                           </h3>
-                          <p className="text-2xl font-bold text-green-600">
-                            ₨ {listing.price.toLocaleString()}
-                          </p>
+                          {listing.color && (
+                            <p className="text-sm text-gray-500">{listing.color}</p>
+                          )}
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          listing.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
-                          listing.condition === 'Very Good' ? 'bg-blue-100 text-blue-800' :
-                          listing.condition === 'Good' ? 'bg-yellow-100 text-yellow-800' :
+                        <div className="text-right">
+                          <p className="text-xl font-bold text-green-600">
+                            ₨{listing.price.toLocaleString()}
+                          </p>
+                          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                            listing.condition === 'New' ? 'bg-green-100 text-green-800' :
+                            listing.condition === 'Like New' ? 'bg-blue-100 text-blue-800' :
+                            listing.condition === 'Excellent' ? 'bg-emerald-100 text-emerald-800' :
+                            listing.condition === 'Very Good' ? 'bg-cyan-100 text-cyan-800' :
+                            listing.condition === 'Good' ? 'bg-yellow-100 text-yellow-800' :
+                            listing.condition === 'Fair' ? 'bg-orange-100 text-orange-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {listing.condition}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Quick Specs */}
+                      <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <span className="text-gray-600">Storage:</span>
+                          <span className="font-medium">{listing.storage}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span className="text-gray-600">RAM:</span>
+                          <span className="font-medium">{listing.ram}</span>
+                        </div>
+                        {listing.battery && (
+                          <div className="flex items-center space-x-2">
+                            <Battery className="w-3 h-3 text-gray-400" />
+                            <span className="text-gray-600">Battery:</span>
+                            <span className="font-medium">{listing.battery}</span>
+                          </div>
+                        )}
+                        {listing.network && (
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <span className="text-gray-600">Network:</span>
+                            <span className="font-medium">{listing.network}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Location and Time */}
+                      <div className="flex items-center justify-between text-sm border-t pt-4">
+                        <div className="flex items-center space-x-2 text-gray-600">
+                          <MapPin className="w-4 h-4" />
+                          <span>{listing.city}</span>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-1 text-gray-500">
+                            <Eye className="w-4 h-4" />
+                            <span>{listing.views || 0} views</span>
+                          </div>
+                          <div className="flex items-center space-x-1 text-gray-500">
+                            <Clock className="w-4 h-4" />
+                            <span>{getTimeAgo(listing.created_at)}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Seller Type Badge */}
+                      <div className="mt-3 flex items-center justify-between">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          listing.seller_type === 'Shop Owner' ? 'bg-blue-100 text-blue-800' :
+                          listing.seller_type === 'Verified Seller' ? 'bg-green-100 text-green-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
-                          {listing.condition}
+                          {listing.seller_type === 'Shop Owner' && <Shield className="w-3 h-3 mr-1" />}
+                          {listing.seller_type === 'Verified Seller' && <CheckCircle className="w-3 h-3 mr-1" />}
+                          {listing.seller_type}
                         </span>
+                        
+                        {listing.features && listing.features.length > 0 && (
+                          <div className="text-xs text-gray-500">
+                            +{listing.features.length} features
+                          </div>
+                        )}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                        <div>
-                          <span className="text-gray-600">Storage:</span>
-                          <p className="font-medium">{listing.storage}</p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">RAM:</span>
-                          <p className="font-medium">{listing.ram}</p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">City:</span>
-                          <p className="font-medium">{listing.city}</p>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">Views:</span>
-                          <p className="font-medium">{listing.views}</p>
-                        </div>
-                      </div>
-
-                      <p className="text-gray-700 text-sm mb-4 line-clamp-2">
-                        {listing.description}
-                      </p>
-
+                      {/* Main Highlights */}
                       {listing.features && listing.features.length > 0 && (
-                        <div className="mb-4">
-                          <div className="flex flex-wrap gap-2">
-                            {listing.features.slice(0, 3).map((feature, featureIndex) => (
-                              <span key={featureIndex} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                        <div className="mt-3">
+                          <div className="flex flex-wrap gap-1">
+                            {listing.features.slice(0, 3).map((feature, idx) => (
+                              <span key={idx} className="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
                                 {feature}
                               </span>
                             ))}
                             {listing.features.length > 3 && (
-                              <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                              <span className="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
                                 +{listing.features.length - 3} more
                               </span>
                             )}
                           </div>
                         </div>
                       )}
-
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                        <div className="text-sm text-gray-600">
-                          <p className="font-medium">{listing.seller_name}</p>
-                          <p>{listing.seller_phone}</p>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                            Call
-                          </button>
-                          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                            Message
-                          </button>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 ))}
