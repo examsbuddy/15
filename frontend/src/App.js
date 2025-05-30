@@ -1,169 +1,170 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import {
-  DesktopHeader,
-  MobileHeader,
-  BottomNavigation,
-  HeroSection,
-  QuickCategories,
-  FeaturedPhones,
-  SellingSection,
+import { 
+  Header, 
+  MobileBottomNav, 
+  HeroSection, 
+  CompareSection,
+  SellSection, 
+  FeaturedShopsSection,
+  OurOfferingsSection,
+  BrowseSection, 
+  AccessoriesSection,
+  ContentCardsSection,
+  FeaturedPhones, 
   Footer,
-  PostAdModal,
-  ReviewsPage,
-  VideosPage,
-  ForumsPage,
-  BlogPage,
-  ProfileDashboard,
-  MyAdsPage,
-  LoginModal
+  PriceDropAlertsModal,
+  CompareModal
 } from './Components';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('home');
-  const [isPostAdOpen, setIsPostAdOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('auth_token'));
+  const [currentPage, setCurrentPage] = useState('home');
+  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showPriceAlertsModal, setShowPriceAlertsModal] = useState(false);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [compareList, setCompareList] = useState([]);
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'home':
-        return (
-          <>
-            <HeroSection />
-            <QuickCategories />
-            <FeaturedPhones />
-            <SellingSection />
-          </>
-        );
-      case 'my-ads':
-        return <MyAdsPage />;
-      case 'used-phones':
-        return (
-          <div className="pt-20 pb-24 md:pb-8">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Used Phones</h2>
-                <p className="text-gray-600">Browse thousands of used mobile phones</p>
-              </div>
-            </div>
-          </div>
-        );
-      case 'new-phones':
-        return (
-          <div className="pt-20 pb-24 md:pb-8">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">New Phones</h2>
-                <p className="text-gray-600">Discover the latest mobile phones</p>
-              </div>
-            </div>
-          </div>
-        );
-      case 'accessories':
-        return (
-          <div className="pt-20 pb-24 md:pb-8">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Accessories</h2>
-                <p className="text-gray-600">Find phone cases, chargers, and more</p>
-              </div>
-            </div>
-          </div>
-        );
-      case 'search':
-        return (
-          <div className="pt-20 pb-24 md:pb-8">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Search</h2>
-                <p className="text-gray-600">Advanced search functionality</p>
-              </div>
-            </div>
-          </div>
-        );
-      case 'chat':
-        return (
-          <div className="pt-20 pb-24 md:pb-8">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Messages</h2>
-                <p className="text-gray-600">Your chat conversations with buyers and sellers</p>
-              </div>
-            </div>
-          </div>
-        );
-      case 'profile':
-        return <ProfileDashboard />;
-      case 'reviews':
-        return <ReviewsPage />;
-      case 'videos':
-        return <VideosPage />;
-      case 'forums':
-        return <ForumsPage />;
-      case 'blog':
-        return <BlogPage />;
-      default:
-        return (
-          <>
-            <HeroSection />
-            <QuickCategories />
-            <FeaturedPhones />
-            <SellingSection />
-          </>
-        );
+  useEffect(() => {
+    // Check if user is logged in on component mount
+    const token = localStorage.getItem('phoneflip_token');
+    const userData = localStorage.getItem('phoneflip_user');
+    
+    if (token && userData) {
+      setUser(JSON.parse(userData));
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogin = (userData, token) => {
+    setUser(userData);
+    setIsLoggedIn(true);
+    localStorage.setItem('phoneflip_token', token);
+    localStorage.setItem('phoneflip_user', JSON.stringify(userData));
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setIsLoggedIn(false);
+    localStorage.removeItem('phoneflip_token');
+    localStorage.removeItem('phoneflip_user');
+    setCurrentPage('home');
+  };
+
+  const addToCompare = (phone) => {
+    if (compareList.length < 3 && !compareList.find(p => p.id === phone.id)) {
+      setCompareList([...compareList, phone]);
     }
   };
 
+  const removeFromCompare = (phoneId) => {
+    setCompareList(compareList.filter(p => p.id !== phoneId));
+  };
+
+  // Mobile view detection
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <div className="App min-h-screen bg-gray-50 overflow-x-hidden">
-      {/* Desktop Header - hidden on mobile/tablet */}
-      <div className="hidden sm:block">
-        <DesktopHeader 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          setIsPostAdOpen={setIsPostAdOpen} 
-          isLoggedIn={isLoggedIn}
-          setIsLoginOpen={setIsLoginOpen}
-        />
-      </div>
+    <div className="App min-h-screen bg-gray-50">
+      <Header 
+        currentPage={currentPage} 
+        setCurrentPage={setCurrentPage}
+        user={user}
+        isLoggedIn={isLoggedIn}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+        compareCount={compareList.length}
+        onCompareClick={() => setShowCompareModal(true)}
+      />
       
-      {/* Mobile Header - visible on mobile/tablet */}
-      <div className="block sm:hidden">
-        <MobileHeader 
-          isLoggedIn={isLoggedIn}
-          setIsLoginOpen={setIsLoginOpen}
-        />
-      </div>
-      
-      {/* Main Content */}
-      <main className="min-h-screen pb-20 sm:pb-0">
-        {renderContent()}
+      <main className="pt-16 pb-20 md:pb-8">
+        {currentPage === 'home' && (
+          <div className="space-y-0">
+            {/* Hero Section with Enhanced Search */}
+            <HeroSection 
+              onCompareClick={() => setShowCompareModal(true)}
+              onPriceAlertsClick={() => setShowPriceAlertsModal(true)}
+            />
+            
+            {/* Compare Section */}
+            <CompareSection 
+              compareList={compareList}
+              onCompareClick={() => setShowCompareModal(true)}
+            />
+            
+            {/* Enhanced Selling Section */}
+            <SellSection 
+              isLoggedIn={isLoggedIn}
+              setCurrentPage={setCurrentPage}
+            />
+            
+            {/* Featured Shops Section */}
+            <FeaturedShopsSection />
+            
+            {/* Our Offerings Section */}
+            <OurOfferingsSection 
+              onCompareClick={() => setShowCompareModal(true)}
+              onPriceAlertsClick={() => setShowPriceAlertsModal(true)}
+            />
+            
+            {/* Featured Phones */}
+            <FeaturedPhones 
+              addToCompare={addToCompare}
+              compareList={compareList}
+            />
+            
+            {/* Accessories Section */}
+            <AccessoriesSection />
+            
+            {/* Content Cards Section */}
+            <ContentCardsSection />
+            
+            {/* Browse Section */}
+            <BrowseSection />
+          </div>
+        )}
+        
+        {/* Other pages would render here based on currentPage */}
       </main>
-      
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && (
+        <MobileBottomNav 
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          isLoggedIn={isLoggedIn}
+          compareCount={compareList.length}
+        />
+      )}
+
       {/* Footer */}
       <Footer />
-      
-      {/* Bottom Navigation - Mobile/Tablet Only */}
-      <div className="block sm:hidden">
-        <BottomNavigation 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          setIsPostAdOpen={setIsPostAdOpen}
-          isLoggedIn={isLoggedIn}
-          setIsLoginOpen={setIsLoginOpen}
+
+      {/* Modals */}
+      {showPriceAlertsModal && (
+        <PriceDropAlertsModal 
+          isOpen={showPriceAlertsModal}
+          onClose={() => setShowPriceAlertsModal(false)}
         />
-      </div>
+      )}
 
-      {/* Post Ad Modal */}
-      <PostAdModal isOpen={isPostAdOpen} setIsOpen={setIsPostAdOpen} />
-
-      {/* Login Modal */}
-      <LoginModal 
-        isOpen={isLoginOpen} 
-        setIsOpen={setIsLoginOpen} 
-        setIsLoggedIn={setIsLoggedIn} 
-      />
+      {showCompareModal && (
+        <CompareModal 
+          isOpen={showCompareModal}
+          onClose={() => setShowCompareModal(false)}
+          compareList={compareList}
+          onRemove={removeFromCompare}
+        />
+      )}
     </div>
   );
 }

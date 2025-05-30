@@ -1,4099 +1,1661 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Home, 
-  FileText, 
-  Plus, 
-  MessageCircle, 
+  Search, 
   Menu, 
   X, 
   User, 
-  Smartphone, 
-  HardDrive, 
-  Star, 
-  Camera,
-  ChevronRight,
-  Bell,
-  Search,
-  MapPin,
-  DollarSign,
-  Eye,
-  Heart,
+  Home, 
+  List, 
+  Plus, 
+  MessageCircle, 
+  MoreHorizontal,
   Phone,
   Mail,
+  MapPin,
+  Star,
   Shield,
   CheckCircle,
+  TrendingDown,
+  Smartphone,
+  Headphones,
+  Battery,
   Filter,
-  Grid,
-  List,
+  ArrowRight,
+  Play,
+  Eye,
+  Heart,
+  BarChart3,
+  Users,
+  Award,
+  Zap,
   Clock,
-  TrendingUp
+  Globe,
+  Facebook,
+  Instagram,
+  Twitter,
+  Youtube,
+  ChevronDown,
+  SlidersHorizontal,
+  Bell,
+  Compare,
+  ShoppingBag
 } from 'react-feather';
 
-// Profile Dashboard Component
-export const ProfileDashboard = () => {
-  const [user, setUser] = useState(null);
-  const [userListings, setUserListings] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
+// Header Component
+export const Header = ({ 
+  currentPage, 
+  setCurrentPage, 
+  user, 
+  isLoggedIn, 
+  onLogin, 
+  onLogout,
+  compareCount,
+  onCompareClick 
+}) => {
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
-  useEffect(() => {
-    fetchUserData();
-    fetchUserListings();
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem('auth_token');
-      if (!token) return;
-
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      const response = await fetch(`${backendUrl}/api/auth/me`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchUserListings = async () => {
-    try {
-      const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
-      if (!userData.email) return;
-
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      const response = await fetch(`${backendUrl}/api/listings?seller_email=${userData.email}`);
-
-      if (response.ok) {
-        const listings = await response.json();
-        setUserListings(listings);
-      }
-    } catch (error) {
-      console.error('Error fetching user listings:', error);
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_data');
-    window.location.reload();
-  };
-
-  if (isLoading) {
-    return (
-      <div className="pt-20 pb-24 md:pb-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/4 mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="h-32 bg-gray-300 rounded"></div>
-              <div className="h-32 bg-gray-300 rounded"></div>
-              <div className="h-32 bg-gray-300 rounded"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="pt-20 pb-24 md:pb-8">
-        <div className="max-w-4xl mx-auto px-4 text-center py-20">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Please Login</h2>
-          <p className="text-gray-600 mb-8">You need to login to access your profile</p>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
-            Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'overview':
-        return (
-          <div className="space-y-6">
-            {/* Profile Overview */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Profile Information</h3>
-                <button
-                  onClick={() => setIsEditingProfile(true)}
-                  className="text-blue-600 hover:text-blue-700 flex items-center"
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  Edit Profile
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                  <p className="text-gray-900">{user.name}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <p className="text-gray-900">{user.email}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                  <p className="text-gray-900">{user.phone}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    user.role === 'shop_owner' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {user.role === 'shop_owner' ? '🏪 Shop Owner' : '👤 Normal User'}
-                  </span>
-                </div>
-                {user.role === 'shop_owner' && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Verification Status</label>
-                    <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${
-                      user.verification_status === 'approved' ? 'bg-green-100 text-green-800' :
-                      user.verification_status === 'under_review' ? 'bg-yellow-100 text-yellow-800' :
-                      user.verification_status === 'rejected' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {user.verification_status === 'approved' && '✅ Verified'}
-                      {user.verification_status === 'under_review' && '⏳ Under Review'}
-                      {user.verification_status === 'rejected' && '❌ Rejected'}
-                      {user.verification_status === 'pending' && '📋 Pending'}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {user.business_details && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4">Business Information</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
-                      <p className="text-gray-900">{user.business_details.business_name}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Business Type</label>
-                      <p className="text-gray-900">{user.business_details.business_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                      <p className="text-gray-900">{user.business_details.city}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Years in Business</label>
-                      <p className="text-gray-900">{user.business_details.years_in_business} years</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center">
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <Smartphone className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Active Listings</p>
-                    <p className="text-2xl font-bold text-gray-900">{userListings.length}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center">
-                  <div className="p-3 bg-green-100 rounded-lg">
-                    <Eye className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Total Views</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {userListings.reduce((sum, listing) => sum + (listing.views || 0), 0)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center">
-                  <div className="p-3 bg-purple-100 rounded-lg">
-                    <Clock className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Member Since</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {new Date(user.created_at).getFullYear()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'listings':
-        return (
-          <div className="bg-white rounded-lg shadow-md">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900">My Listings</h3>
-              <p className="text-gray-600">Manage your posted advertisements</p>
-            </div>
-            
-            {userListings.length > 0 ? (
-              <div className="divide-y divide-gray-200">
-                {userListings.map((listing) => (
-                  <div key={listing.id} className="p-6 hover:bg-gray-50">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h4 className="text-lg font-semibold text-gray-900">
-                          {listing.brand} {listing.model}
-                        </h4>
-                        <p className="text-gray-600">{listing.description}</p>
-                        <div className="flex items-center space-x-4 mt-2">
-                          <span className="text-lg font-bold text-blue-600">
-                            PKR {listing.price.toLocaleString()}
-                          </span>
-                          <span className="text-sm text-gray-500 flex items-center">
-                            <MapPin className="w-3 h-3 mr-1" />
-                            {listing.city}
-                          </span>
-                          <span className="text-sm text-gray-500 flex items-center">
-                            <Eye className="w-3 h-3 mr-1" />
-                            {listing.views || 0} views
-                          </span>
-                        </div>
-                      </div>
-                      <div className="ml-4 flex items-center space-x-2">
-                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                          listing.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {listing.is_active ? 'Active' : 'Inactive'}
-                        </span>
-                        <button className="text-blue-600 hover:text-blue-700 p-1">
-                          <User className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="p-12 text-center">
-                <Smartphone className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">No listings yet</h4>
-                <p className="text-gray-600">Start selling by posting your first phone listing</p>
-                <button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-                  Post Your First Ad
-                </button>
-              </div>
-            )}
-          </div>
-        );
-
-      case 'settings':
-        return (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Account Settings</h3>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-4 border-b border-gray-200">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Email Notifications</h4>
-                    <p className="text-sm text-gray-600">Receive updates about your listings</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-                
-                <div className="flex items-center justify-between py-4 border-b border-gray-200">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">SMS Notifications</h4>
-                    <p className="text-sm text-gray-600">Get text messages for important updates</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-                
-                <div className="pt-4">
-                  <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg mr-4">
-                    Change Password
-                  </button>
-                  <button 
-                    onClick={handleLogout}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
+  const navigation = [
+    { name: 'Used Phones', key: 'used-phones', color: 'text-white hover:text-gray-200' },
+    { name: 'New Phones', key: 'new-phones', color: 'text-white hover:text-gray-200' },
+    { name: 'Accessories', key: 'accessories', color: 'text-white hover:text-gray-200' },
+    { name: 'Phone Store', key: 'phone-store', color: 'text-white hover:text-gray-200' },
+    { name: 'Reviews', key: 'reviews', color: 'text-white hover:text-gray-200' },
+    { name: 'Videos', key: 'videos', color: 'text-white hover:text-gray-200' },
+    { name: 'Forums', key: 'forums', color: 'text-white hover:text-gray-200' },
+    { name: 'Blog', key: 'blog', color: 'text-white hover:text-gray-200' },
+  ];
 
   return (
-    <div className="pt-20 pb-24 md:pb-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Welcome back, {user.name}!
-              </h1>
-              <p className="text-gray-600">Manage your account and listings</p>
-            </div>
-            {user.role === 'shop_owner' && user.verification_status === 'approved' && (
-              <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
-                ✅ Verified Shop Owner
-              </div>
-            )}
+    <header className="fixed top-0 left-0 right-0 z-50 bg-slate-800 text-white shadow-lg">
+      {/* Top Bar */}
+      <div className="bg-slate-900 px-4 py-1 text-sm hidden md:block">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center space-x-4 text-gray-300">
+            <span className="flex items-center">
+              <Phone className="w-3 h-3 mr-1" />
+              Download App via SMS
+            </span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <span className="text-orange-400">اردو</span>
+            <button className="hover:text-white transition-colors">Sign Up</button>
+            <button className="hover:text-white transition-colors">Sign In</button>
           </div>
         </div>
+      </div>
 
-        {/* Navigation Tabs */}
-        <div className="border-b border-gray-200 mb-8">
-          <nav className="-mb-px flex space-x-8">
-            {[
-              { id: 'overview', name: 'Overview', icon: Home },
-              { id: 'listings', name: 'My Listings', icon: Smartphone },
-              { id: 'settings', name: 'Settings', icon: User }
-            ].map((tab) => (
+      {/* Main Header */}
+      <div className="px-4 py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center">
+            <button
+              onClick={() => setCurrentPage('home')}
+              className="flex items-center space-x-2 hover:opacity-90 transition-opacity"
+            >
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <Smartphone className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <div className="text-xl font-bold text-white">PhoneFlip</div>
+                <div className="text-xs text-gray-300 -mt-1">.PK</div>
+              </div>
+            </button>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-6">
+            {navigation.map((item) => (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                key={item.key}
+                onClick={() => setCurrentPage(item.key)}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  currentPage === item.key 
+                    ? 'bg-blue-600 text-white' 
+                    : item.color
                 }`}
               >
-                <tab.icon className="w-4 h-4 mr-2" />
-                {tab.name}
+                {item.name}
               </button>
             ))}
           </nav>
-        </div>
 
-        {/* Tab Content */}
-        {renderTabContent()}
-      </div>
-    </div>
-  );
-};
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-4">
+            {/* Compare Button */}
+            <button
+              onClick={onCompareClick}
+              className="relative hidden md:flex items-center space-x-1 text-white hover:text-blue-300 transition-colors"
+            >
+              <Compare className="w-5 h-5" />
+              <span className="text-sm">Compare</span>
+              {compareCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {compareCount}
+                </span>
+              )}
+            </button>
 
-// Enhanced MyAds Component
-export const MyAdsPage = () => {
-  const [userListings, setUserListings] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState(null);
+            {/* Post Ad Button */}
+            <button
+              onClick={() => setCurrentPage('post-ad')}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Post an Ad</span>
+            </button>
 
-  useEffect(() => {
-    checkAuth();
-    fetchUserListings();
-  }, []);
-
-  const checkAuth = () => {
-    const userData = localStorage.getItem('user_data');
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  };
-
-  const fetchUserListings = async () => {
-    try {
-      const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
-      if (!userData.email) return;
-
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      const response = await fetch(`${backendUrl}/api/listings`);
-
-      if (response.ok) {
-        const allListings = await response.json();
-        // Filter listings by user email
-        const myListings = allListings.filter(listing => 
-          listing.seller_email === userData.email
-        );
-        setUserListings(myListings);
-      }
-    } catch (error) {
-      console.error('Error fetching user listings:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (!user) {
-    return (
-      <div className="pt-20 pb-24 md:pb-8">
-        <div className="max-w-4xl mx-auto px-4 text-center py-20">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Please Login</h2>
-          <p className="text-gray-600 mb-8">You need to login to view your ads</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="pt-20 pb-24 md:pb-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="animate-pulse space-y-4">
-            {[1,2,3].map(i => (
-              <div key={i} className="bg-gray-300 h-32 rounded-lg"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="pt-20 pb-24 md:pb-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Ads</h1>
-          <p className="text-gray-600">Manage your posted advertisements</p>
-        </div>
-
-        {userListings.length > 0 ? (
-          <div className="space-y-4">
-            {userListings.map((listing) => (
-              <div key={listing.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        {listing.brand} {listing.model}
-                      </h3>
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        listing.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
-                        listing.condition === 'Good' ? 'bg-blue-100 text-blue-800' :
-                        listing.condition === 'Fair' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {listing.condition}
-                      </span>
-                    </div>
-                    
-                    <p className="text-gray-600 mb-3">{listing.description}</p>
-                    
-                    <div className="flex items-center space-x-6 text-sm text-gray-500">
-                      <span className="text-2xl font-bold text-blue-600">
-                        PKR {listing.price.toLocaleString()}
-                      </span>
-                      <span className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {listing.city}
-                      </span>
-                      <span className="flex items-center">
-                        <Eye className="w-4 h-4 mr-1" />
-                        {listing.views || 0} views
-                      </span>
-                      <span className="flex items-center">
-                        <Clock className="w-4 h-4 mr-1" />
-                        {new Date(listing.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                    
-                    {listing.storage && listing.ram && (
-                      <div className="mt-2 text-sm text-gray-600">
-                        <span className="bg-gray-100 px-2 py-1 rounded mr-2">{listing.storage}</span>
-                        <span className="bg-gray-100 px-2 py-1 rounded">{listing.ram}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="ml-6 flex flex-col items-end space-y-2">
-                    <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                      listing.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {listing.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                    
-                    <div className="flex space-x-2">
-                      <button className="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded">
-                        <User className="w-4 h-4" />
-                      </button>
-                      <button className="text-gray-600 hover:text-gray-700 p-2 hover:bg-gray-50 rounded">
-                        <Heart className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <Smartphone className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No ads posted yet</h3>
-            <p className="text-gray-600 mb-8">Start selling by posting your first phone listing</p>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
-              Post Your First Ad
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="lg:hidden p-2 rounded-md text-white hover:bg-slate-700 transition-colors"
+            >
+              {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Enhanced Login/Signup Modal Component with Role Selection
-export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
-  const [currentStep, setCurrentStep] = useState('login'); // 'login', 'signup', 'role-select', 'shop-details', 'kyc-upload'
-  const [isLoading, setIsLoading] = useState(false);
-  const [userRole, setUserRole] = useState('');
-  
-  const [loginData, setLoginData] = useState({
-    email: '',
-    password: ''
-  });
-
-  const [signupData, setSignupData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    phone: '',
-    role: 'normal_user'
-  });
-
-  const [businessData, setBusinessData] = useState({
-    business_name: '',
-    business_type: 'mobile_shop',
-    business_address: '',
-    city: '',
-    postal_code: '',
-    business_phone: '',
-    website: '',
-    description: '',
-    years_in_business: 1
-  });
-
-  const [kycData, setKycData] = useState({
-    cnic_front: '',
-    cnic_back: '',
-    business_license: '',
-    trade_license: ''
-  });
-
-  const resetForm = () => {
-    setCurrentStep('login');
-    setUserRole('');
-    setIsLoading(false);
-    setLoginData({ email: '', password: '' });
-    setSignupData({ name: '', email: '', password: '', phone: '', role: 'normal_user' });
-    setBusinessData({
-      business_name: '', business_type: 'mobile_shop', business_address: '', city: '', 
-      postal_code: '', business_phone: '', website: '', description: '', years_in_business: 1
-    });
-    setKycData({ cnic_front: '', cnic_back: '', business_license: '', trade_license: '' });
-  };
-
-  const handleClose = () => {
-    setIsOpen(false);
-    resetForm();
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      const response = await fetch(`${backendUrl}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginData)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        localStorage.setItem('auth_token', result.access_token);
-        localStorage.setItem('user_data', JSON.stringify(result.user));
-        setIsLoggedIn && setIsLoggedIn(true);
-        alert(`Welcome back, ${result.user.name}!`);
-        handleClose();
-      } else {
-        const error = await response.json();
-        alert('Login failed: ' + (error.detail || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      alert('Login failed. Please check your connection.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    // Validate required fields
-    if (!signupData.name || !signupData.email || !signupData.phone || !signupData.password) {
-      alert('Please fill in all required fields');
-      setIsLoading(false);
-      return;
-    }
-    
-    // Ensure role is set
-    if (!signupData.role) {
-      setSignupData({...signupData, role: 'normal_user'});
-    }
-    
-    try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      console.log('Backend URL:', backendUrl);
-      console.log('Signup data:', signupData);
-      
-      if (signupData.role === 'normal_user') {
-        const response = await fetch(`${backendUrl}/api/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(signupData)
-        });
-
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-
-        if (response.ok) {
-          const result = await response.json();
-          localStorage.setItem('auth_token', result.access_token);
-          localStorage.setItem('user_data', JSON.stringify(result.user));
-          setIsLoggedIn && setIsLoggedIn(true);
-          alert('Account created successfully!');
-          handleClose();
-        } else {
-          const errorText = await response.text();
-          console.log('Error response text:', errorText);
-          let errorMessage = 'Unknown error';
-          try {
-            const error = JSON.parse(errorText);
-            errorMessage = error.detail || 'Unknown error';
-          } catch (e) {
-            errorMessage = errorText || 'Failed to register user';
-          }
-          alert('Signup failed: ' + errorMessage);
-        }
-      } else {
-        // Shop owner registration
-        const shopOwnerData = {
-          name: signupData.name,
-          email: signupData.email,
-          password: signupData.password,
-          phone: signupData.phone,
-          business_details: businessData,
-          kyc_documents: kycData
-        };
-
-        console.log('Shop owner data:', shopOwnerData);
-
-        const response = await fetch(`${backendUrl}/api/auth/register-shop-owner`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(shopOwnerData)
-        });
-
-        console.log('Shop owner response status:', response.status);
-
-        if (response.ok) {
-          const result = await response.json();
-          alert('Shop owner registration submitted! Your account is under review and you will be notified once approved.');
-          handleClose();
-        } else {
-          const errorText = await response.text();
-          console.log('Shop owner error response:', errorText);
-          let errorMessage = 'Unknown error';
-          try {
-            const error = JSON.parse(errorText);
-            errorMessage = error.detail || 'Unknown error';
-          } catch (e) {
-            errorMessage = errorText || 'Failed to register shop owner';
-          }
-          alert('Registration failed: ' + errorMessage);
-        }
-      }
-    } catch (error) {
-      console.error('Signup error:', error);
-      alert('Signup failed: ' + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleFileUpload = (field, event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setKycData({...kycData, [field]: e.target.result.split(',')[1]}); // Remove data:image/jpeg;base64, part
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-        onClick={handleClose}
-      >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex items-center justify-between p-6 border-b">
-            <h2 className="text-xl font-bold">
-              {currentStep === 'login' && 'Login'}
-              {currentStep === 'signup' && 'Sign Up'}
-              {currentStep === 'role-select' && 'Select Account Type'}
-              {currentStep === 'shop-details' && 'Business Details'}
-              {currentStep === 'kyc-upload' && 'KYC Documents'}
-            </h2>
-            <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="p-6">
-            {/* Login Form */}
-            {currentStep === 'login' && (
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input
-                    type="email"
-                    id="login-email"
-                    name="email"
-                    value={loginData.email}
-                    onChange={(e) => setLoginData({...loginData, email: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your email"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                  <input
-                    type="password"
-                    id="login-password"
-                    name="password"
-                    value={loginData.password}
-                    onChange={(e) => setLoginData({...loginData, password: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your password"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
-                >
-                  {isLoading ? 'Logging in...' : 'Login'}
-                </button>
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentStep('role-select')}
-                    className="text-blue-600 hover:text-blue-700"
-                  >
-                    Don't have an account? Sign up
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* Role Selection */}
-            {currentStep === 'role-select' && (
-              <div className="space-y-4">
-                <p className="text-gray-600 mb-6">Choose your account type to get started:</p>
-                <div className="space-y-4">
-                  <button
-                    onClick={() => {
-                      setUserRole('normal_user');
-                      setSignupData({...signupData, role: 'normal_user'});
-                      setCurrentStep('signup');
-                    }}
-                    className="w-full p-4 border-2 border-gray-200 hover:border-blue-500 rounded-lg text-left transition-colors"
-                  >
-                    <div className="flex items-center">
-                      <div className="text-2xl mr-4">👤</div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">Normal User</h3>
-                        <p className="text-sm text-gray-600">Buy and sell phones as an individual</p>
-                      </div>
-                    </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      setUserRole('shop_owner');
-                      setSignupData({...signupData, role: 'shop_owner'});
-                      setCurrentStep('signup');
-                    }}
-                    className="w-full p-4 border-2 border-gray-200 hover:border-green-500 rounded-lg text-left transition-colors"
-                  >
-                    <div className="flex items-center">
-                      <div className="text-2xl mr-4">🏪</div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">Shop Owner</h3>
-                        <p className="text-sm text-gray-600">Manage your business with advanced dashboard</p>
-                      </div>
-                    </div>
-                  </button>
-                </div>
-                
-                <div className="text-center mt-6">
-                  <button
-                    onClick={() => setCurrentStep('login')}
-                    className="text-blue-600 hover:text-blue-700"
-                  >
-                    Already have an account? Login
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Basic Signup Form */}
-            {currentStep === 'signup' && (
-              <form onSubmit={userRole === 'shop_owner' ? (e) => { e.preventDefault(); setCurrentStep('shop-details'); } : handleSignup} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                  <input
-                    type="text"
-                    id="signup-name"
-                    name="name"
-                    value={signupData.name}
-                    onChange={(e) => setSignupData({...signupData, name: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your full name"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input
-                    type="email"
-                    id="signup-email"
-                    name="email"
-                    value={signupData.email}
-                    onChange={(e) => setSignupData({...signupData, email: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your email address"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                  <input
-                    type="tel"
-                    id="signup-phone"
-                    name="phone"
-                    value={signupData.phone}
-                    onChange={(e) => setSignupData({...signupData, phone: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="03xx-xxxxxxx"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                  <input
-                    type="password"
-                    id="signup-password"
-                    name="password"
-                    value={signupData.password}
-                    onChange={(e) => setSignupData({...signupData, password: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Create a strong password"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
-                >
-                  {isLoading ? 'Creating Account...' : userRole === 'shop_owner' ? 'Continue' : 'Create Account'}
-                </button>
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentStep('role-select')}
-                    className="text-gray-600 hover:text-gray-700"
-                  >
-                    ← Back to account types
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* Business Details Form */}
-            {currentStep === 'shop-details' && (
-              <form onSubmit={(e) => { e.preventDefault(); setCurrentStep('kyc-upload'); }} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
-                  <input
-                    type="text"
-                    value={businessData.business_name}
-                    onChange={(e) => setBusinessData({...businessData, business_name: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
-                  <select
-                    value={businessData.business_type}
-                    onChange={(e) => setBusinessData({...businessData, business_type: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                  >
-                    <option value="mobile_shop">Mobile Shop</option>
-                    <option value="electronics_store">Electronics Store</option>
-                    <option value="repair_service">Repair Service</option>
-                    <option value="distributor">Distributor</option>
-                    <option value="online_retailer">Online Retailer</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Business Address</label>
-                  <textarea
-                    value={businessData.business_address}
-                    onChange={(e) => setBusinessData({...businessData, business_address: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg h-20"
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-                    <select
-                      value={businessData.city}
-                      onChange={(e) => setBusinessData({...businessData, city: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
-                      required
-                    >
-                      <option value="">Select City</option>
-                      <option value="Karachi">Karachi</option>
-                      <option value="Lahore">Lahore</option>
-                      <option value="Islamabad">Islamabad</option>
-                      <option value="Rawalpindi">Rawalpindi</option>
-                      <option value="Faisalabad">Faisalabad</option>
-                      <option value="Multan">Multan</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
-                    <input
-                      type="text"
-                      value={businessData.postal_code}
-                      onChange={(e) => setBusinessData({...businessData, postal_code: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Business Phone</label>
-                  <input
-                    type="tel"
-                    value={businessData.business_phone}
-                    onChange={(e) => setBusinessData({...businessData, business_phone: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Website (Optional)</label>
-                  <input
-                    type="url"
-                    value={businessData.website}
-                    onChange={(e) => setBusinessData({...businessData, website: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Years in Business</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={businessData.years_in_business}
-                    onChange={(e) => setBusinessData({...businessData, years_in_business: parseInt(e.target.value)})}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Business Description</label>
-                  <textarea
-                    value={businessData.description}
-                    onChange={(e) => setBusinessData({...businessData, description: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg h-20"
-                    placeholder="Describe your business..."
-                    required
-                  />
-                </div>
-                <div className="flex space-x-4">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentStep('signup')}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-medium"
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium"
-                  >
-                    Continue
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* KYC Documents Upload */}
-            {currentStep === 'kyc-upload' && (
-              <form onSubmit={handleSignup} className="space-y-4">
-                <p className="text-sm text-gray-600 mb-4">Please upload clear images of your documents for verification:</p>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">CNIC Front *</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileUpload('cnic_front', e)}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">CNIC Back *</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileUpload('cnic_back', e)}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Business License (Optional)</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileUpload('business_license', e)}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Trade License (Optional)</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileUpload('trade_license', e)}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                  />
-                </div>
-                
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-sm text-yellow-800">
-                    ⚠️ Your account will be under review after submission. You'll be notified once approved.
-                  </p>
-                </div>
-                
-                <div className="flex space-x-4">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentStep('shop-details')}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-medium"
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isLoading || !kycData.cnic_front || !kycData.cnic_back}
-                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
-                  >
-                    {isLoading ? 'Submitting...' : 'Submit Application'}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
-  );
-};
-
-// Enhanced Single-Page Post Ad Modal with Confirmation Screen
-export const PostAdModal = ({ isOpen, setIsOpen }) => {
-  const [currentView, setCurrentView] = useState('form'); // 'form' or 'confirmation'
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submittedAdId, setSubmittedAdId] = useState(null);
-  const [formData, setFormData] = useState({
-    // Phone Details
-    brand: '',
-    model: '',
-    condition: 'Excellent',
-    price: '',
-    storage: '',
-    ram: '',
-    color: '',
-    warranty: '',
-    
-    // Location & Description
-    city: 'Karachi',
-    area: '',
-    description: '',
-    
-    // Seller Information
-    seller_name: '',
-    seller_phone: '',
-    seller_email: '',
-    
-    // Additional Features
-    features: [],
-    
-    // Preferences
-    negotiable: true,
-    exchange: false,
-    urgent_sale: false
-  });
-
-  const phoneFeatures = [
-    'Face Unlock', 'Fingerprint Scanner', 'Fast Charging', 'Wireless Charging',
-    'Dual SIM', 'Water Resistant', 'Original Box', 'Original Charger',
-    'Screen Protector Applied', 'Cover Included', 'Headphones Included',
-    'Original Receipt', 'Under Warranty', 'Never Repaired'
-  ];
-
-  const phoneBrands = [
-    'iPhone', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'OnePlus', 
-    'Huawei', 'Realme', 'Google Pixel', 'Nothing', 'Infinix', 'Tecno'
-  ];
-
-  const cities = [
-    'Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 
-    'Multan', 'Peshawar', 'Quetta', 'Sialkot', 'Gujranwala'
-  ];
-
-  const storageOptions = ['64GB', '128GB', '256GB', '512GB', '1TB'];
-  const ramOptions = ['3GB', '4GB', '6GB', '8GB', '12GB', '16GB'];
-  const conditionOptions = ['Excellent', 'Good', 'Fair', 'Poor'];
-
-  const resetForm = () => {
-    setCurrentView('form');
-    setFormData({
-      brand: '', model: '', condition: 'Excellent', price: '', storage: '', ram: '', color: '', warranty: '',
-      city: 'Karachi', area: '', description: '', seller_name: '', seller_phone: '', seller_email: '',
-      features: [], negotiable: true, exchange: false, urgent_sale: false
-    });
-    setIsSubmitting(false);
-    setSubmittedAdId(null);
-  };
-
-  const handleClose = () => {
-    setIsOpen(false);
-    setTimeout(resetForm, 300);
-  };
-
-  const handleFeatureToggle = (feature) => {
-    setFormData(prev => ({
-      ...prev,
-      features: prev.features.includes(feature)
-        ? prev.features.filter(f => f !== feature)
-        : [...prev.features, feature]
-    }));
-  };
-
-  const validateForm = () => {
-    const requiredFields = ['brand', 'model', 'condition', 'price', 'city', 'seller_name', 'seller_phone'];
-    const missingFields = requiredFields.filter(field => !formData[field]);
-    
-    if (missingFields.length > 0) {
-      alert(`Please fill in the following required fields: ${missingFields.join(', ')}`);
-      return false;
-    }
-    
-    if (formData.price <= 0) {
-      alert('Please enter a valid price');
-      return false;
-    }
-    
-    return true;
-  };
-
-  const submitListing = async () => {
-    if (!validateForm()) return;
-    
-    setIsSubmitting(true);
-    try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      
-      const submissionData = {
-        ...formData,
-        price: parseInt(formData.price),
-        is_featured: false,
-        is_active: true,
-        views: 0,
-        created_at: new Date().toISOString()
-      };
-
-      const response = await fetch(`${backendUrl}/api/listings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submissionData)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setSubmittedAdId(result.id);
-        setCurrentView('confirmation');
-      } else {
-        const error = await response.json();
-        alert('Failed to post ad: ' + (error.detail || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Submit error:', error);
-      alert('Failed to post ad. Please check your connection.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleEdit = () => {
-    setCurrentView('form');
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        
-        {/* Form View */}
-        {currentView === 'form' && (
-          <>
-            {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-lg">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Post Your Phone Ad</h2>
-                <button 
-                  onClick={handleClose}
-                  className="text-gray-400 hover:text-gray-600 p-2"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              <p className="text-gray-600 mt-1">Fill in all details to create your listing</p>
-            </div>
-
-            {/* Form Content */}
-            <div className="px-6 py-6">
-              <form className="space-y-8">
-                
-                {/* Phone Information Section */}
-                <div className="bg-blue-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <Smartphone className="w-5 h-5 mr-2 text-blue-600" />
-                    Phone Information
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Brand */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Brand *
-                      </label>
-                      <select
-                        value={formData.brand}
-                        onChange={(e) => setFormData({...formData, brand: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        required
-                      >
-                        <option value="">Select Brand</option>
-                        {phoneBrands.map(brand => (
-                          <option key={brand} value={brand}>{brand}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Model */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Model *
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.model}
-                        onChange={(e) => setFormData({...formData, model: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., iPhone 15 Pro Max"
-                        required
-                      />
-                    </div>
-
-                    {/* Condition */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Condition *
-                      </label>
-                      <select
-                        value={formData.condition}
-                        onChange={(e) => setFormData({...formData, condition: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        required
-                      >
-                        {conditionOptions.map(condition => (
-                          <option key={condition} value={condition}>{condition}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Price */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Price (PKR) *
-                      </label>
-                      <input
-                        type="number"
-                        value={formData.price}
-                        onChange={(e) => setFormData({...formData, price: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="150000"
-                        required
-                      />
-                    </div>
-
-                    {/* Storage */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Storage
-                      </label>
-                      <select
-                        value={formData.storage}
-                        onChange={(e) => setFormData({...formData, storage: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="">Select Storage</option>
-                        {storageOptions.map(storage => (
-                          <option key={storage} value={storage}>{storage}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* RAM */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        RAM
-                      </label>
-                      <select
-                        value={formData.ram}
-                        onChange={(e) => setFormData({...formData, ram: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="">Select RAM</option>
-                        {ramOptions.map(ram => (
-                          <option key={ram} value={ram}>{ram}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Color */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Color
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.color}
-                        onChange={(e) => setFormData({...formData, color: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., Space Black"
-                      />
-                    </div>
-
-                    {/* Warranty */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Warranty Status
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.warranty}
-                        onChange={(e) => setFormData({...formData, warranty: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., 6 months remaining"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Location & Description Section */}
-                <div className="bg-green-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <MapPin className="w-5 h-5 mr-2 text-green-600" />
-                    Location & Description
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    {/* City */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        City *
-                      </label>
-                      <select
-                        value={formData.city}
-                        onChange={(e) => setFormData({...formData, city: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        required
-                      >
-                        {cities.map(city => (
-                          <option key={city} value={city}>{city}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Area */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Area/Locality
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.area}
-                        onChange={(e) => setFormData({...formData, area: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., Gulshan-e-Iqbal"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Description
-                    </label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      rows="4"
-                      placeholder="Describe your phone's condition, usage, any issues, etc."
-                    />
-                  </div>
-                </div>
-
-                {/* Features Section */}
-                <div className="bg-purple-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <Star className="w-5 h-5 mr-2 text-purple-600" />
-                    Features & Accessories
-                  </h3>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {phoneFeatures.map((feature) => (
-                      <label key={feature} className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.features.includes(feature)}
-                          onChange={() => handleFeatureToggle(feature)}
-                          className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        />
-                        <span className="text-sm text-gray-700">{feature}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Contact Information Section */}
-                <div className="bg-orange-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <User className="w-5 h-5 mr-2 text-orange-600" />
-                    Contact Information
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Seller Name */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Name *
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.seller_name}
-                        onChange={(e) => setFormData({...formData, seller_name: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="Full Name"
-                        required
-                      />
-                    </div>
-
-                    {/* Phone */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number *
-                      </label>
-                      <input
-                        type="tel"
-                        value={formData.seller_phone}
-                        onChange={(e) => setFormData({...formData, seller_phone: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="03xx-xxxxxxx"
-                        required
-                      />
-                    </div>
-
-                    {/* Email */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        value={formData.seller_email}
-                        onChange={(e) => setFormData({...formData, seller_email: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="your@email.com"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Preferences Section */}
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <Settings className="w-5 h-5 mr-2 text-gray-600" />
-                    Sale Preferences
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.negotiable}
-                        onChange={(e) => setFormData({...formData, negotiable: e.target.checked})}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Price is negotiable</span>
-                    </label>
-
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.exchange}
-                        onChange={(e) => setFormData({...formData, exchange: e.target.checked})}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Open to exchange</span>
-                    </label>
-
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.urgent_sale}
-                        onChange={(e) => setFormData({...formData, urgent_sale: e.target.checked})}
-                        className="rounded border-gray-300 text-red-600 focus:ring-red-500"
-                      />
-                      <span className="text-sm text-gray-700">Urgent sale</span>
-                    </label>
-                  </div>
-                </div>
-              </form>
-            </div>
-
-            {/* Footer */}
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-lg">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-600">
-                  Fields marked with * are required
-                </p>
-                <div className="flex space-x-3">
-                  <button
-                    type="button"
-                    onClick={handleClose}
-                    className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={submitListing}
-                    disabled={isSubmitting}
-                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full"></div>
-                        Posting...
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Post My Ad
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Confirmation View */}
-        {currentView === 'confirmation' && (
-          <>
-            {/* Success Header */}
-            <div className="bg-green-500 text-white px-6 py-6 rounded-t-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
-                    <Check className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold">Ad Posted Successfully!</h2>
-                    <p className="text-green-100">Your phone listing is now live on PhoneFlip.PK</p>
-                  </div>
-                </div>
-                <button 
-                  onClick={handleClose}
-                  className="text-white hover:text-green-100 p-2"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            {/* Ad Preview */}
-            <div className="px-6 py-6">
-              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                {/* Ad Header */}
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-2xl font-bold text-gray-900">
-                        {formData.brand} {formData.model}
-                      </h3>
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        formData.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
-                        formData.condition === 'Good' ? 'bg-blue-100 text-blue-800' :
-                        formData.condition === 'Fair' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {formData.condition}
-                      </span>
-                      {formData.urgent_sale && (
-                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                          Urgent Sale
-                        </span>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
-                      <span className="flex items-center">
-                        <MapPin className="w-3 h-3 mr-1" />
-                        {formData.city}{formData.area && `, ${formData.area}`}
-                      </span>
-                      <span className="flex items-center">
-                        <Clock className="w-3 h-3 mr-1" />
-                        Just now
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="text-3xl font-bold text-blue-600 mb-1">
-                      PKR {parseInt(formData.price).toLocaleString()}
-                    </div>
-                    {formData.negotiable && (
-                      <span className="text-sm text-gray-600">Negotiable</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Specifications */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  {formData.storage && (
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-600">Storage</div>
-                      <div className="font-semibold text-gray-900">{formData.storage}</div>
-                    </div>
-                  )}
-                  {formData.ram && (
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-600">RAM</div>
-                      <div className="font-semibold text-gray-900">{formData.ram}</div>
-                    </div>
-                  )}
-                  {formData.color && (
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-600">Color</div>
-                      <div className="font-semibold text-gray-900">{formData.color}</div>
-                    </div>
-                  )}
-                  {formData.warranty && (
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-600">Warranty</div>
-                      <div className="font-semibold text-gray-900">{formData.warranty}</div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Description */}
-                {formData.description && (
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
-                    <p className="text-gray-700 leading-relaxed">{formData.description}</p>
-                  </div>
-                )}
-
-                {/* Features */}
-                {formData.features.length > 0 && (
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-gray-900 mb-3">Features & Accessories</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {formData.features.map((feature) => (
-                        <div key={feature} className="flex items-center text-sm text-gray-700">
-                          <Check className="w-3 h-3 text-green-500 mr-2" />
-                          {feature}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Seller Information */}
-                <div className="border-t border-gray-200 pt-6">
-                  <h4 className="font-semibold text-gray-900 mb-3">Contact Information</h4>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <div className="flex items-center text-gray-700">
-                      <User className="w-4 h-4 mr-2" />
-                      {formData.seller_name}
-                    </div>
-                    <div className="flex items-center text-gray-700">
-                      <Phone className="w-4 h-4 mr-2" />
-                      {formData.seller_phone}
-                    </div>
-                    {formData.seller_email && (
-                      <div className="flex items-center text-gray-700">
-                        <Mail className="w-4 h-4 mr-2" />
-                        {formData.seller_email}
-                      </div>
-                    )}
-                  </div>
-                  
-                  {(formData.exchange || formData.negotiable) && (
-                    <div className="flex items-center gap-4 mt-3">
-                      {formData.negotiable && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          Negotiable
-                        </span>
-                      )}
-                      {formData.exchange && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                          Exchange OK
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="bg-gray-50 px-6 py-4 rounded-b-lg">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600">
-                  Ad ID: {submittedAdId || 'Generated'} • Posted on {new Date().toLocaleDateString()}
-                </div>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={handleEdit}
-                    className="px-6 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors flex items-center"
-                  >
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    Edit Ad
-                  </button>
-                  <button
-                    onClick={handleClose}
-                    className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center"
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Live Ad
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  );
-};
-    model: '',
-    condition: 'Excellent',
-    price: '',
-    storage: '',
-    ram: '',
-    color: '',
-    warranty: '',
-    
-    // Location & Description
-    city: 'Karachi',
-    area: '',
-    description: '',
-    
-    // Seller Information
-    seller_name: '',
-    seller_phone: '',
-    seller_email: '',
-    
-    // Additional Features
-    features: [],
-    
-    // Preferences
-    negotiable: true,
-    exchange: false,
-    urgent_sale: false
-  });
-
-  const phoneFeatures = [
-    'Face Unlock', 'Fingerprint Scanner', 'Fast Charging', 'Wireless Charging',
-    'Dual SIM', 'Water Resistant', 'Original Box', 'Original Charger',
-    'Screen Protector Applied', 'Cover Included', 'Headphones Included',
-    'Original Receipt', 'Under Warranty', 'Never Repaired'
-  ];
-
-  const phoneBrands = [
-    'iPhone', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'OnePlus', 
-    'Huawei', 'Realme', 'Google Pixel', 'Nothing', 'Infinix', 'Tecno'
-  ];
-
-  const cities = [
-    'Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 
-    'Multan', 'Peshawar', 'Quetta', 'Sialkot', 'Gujranwala'
-  ];
-
-  const storageOptions = ['64GB', '128GB', '256GB', '512GB', '1TB'];
-  const ramOptions = ['3GB', '4GB', '6GB', '8GB', '12GB', '16GB'];
-  const conditionOptions = ['Excellent', 'Good', 'Fair', 'Poor'];
-
-  const resetForm = () => {
-    setCurrentView('form');
-    setFormData({
-      brand: '', model: '', condition: 'Excellent', price: '', storage: '', ram: '', color: '', warranty: '',
-      city: 'Karachi', area: '', description: '', seller_name: '', seller_phone: '', seller_email: '',
-      features: [], negotiable: true, exchange: false, urgent_sale: false
-    });
-    setIsSubmitting(false);
-    setSubmittedAdId(null);
-  };
-
-  const handleClose = () => {
-    setIsOpen(false);
-    setTimeout(resetForm, 300);
-  };
-
-  const handleFeatureToggle = (feature) => {
-    setFormData(prev => ({
-      ...prev,
-      features: prev.features.includes(feature)
-        ? prev.features.filter(f => f !== feature)
-        : [...prev.features, feature]
-    }));
-  };
-
-  const validateForm = () => {
-    const requiredFields = ['brand', 'model', 'condition', 'price', 'city', 'seller_name', 'seller_phone'];
-    const missingFields = requiredFields.filter(field => !formData[field]);
-    
-    if (missingFields.length > 0) {
-      alert(`Please fill in the following required fields: ${missingFields.join(', ')}`);
-      return false;
-    }
-    
-    if (formData.price <= 0) {
-      alert('Please enter a valid price');
-      return false;
-    }
-    
-    return true;
-  };
-
-  const submitListing = async () => {
-    if (!validateForm()) return;
-    
-    setIsSubmitting(true);
-    try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      
-      const submissionData = {
-        ...formData,
-        price: parseInt(formData.price),
-        is_featured: false,
-        is_active: true,
-        views: 0,
-        created_at: new Date().toISOString()
-      };
-
-      const response = await fetch(`${backendUrl}/api/listings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submissionData)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setSubmittedAdId(result.id);
-        setCurrentView('confirmation');
-      } else {
-        const error = await response.json();
-        alert('Failed to post ad: ' + (error.detail || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Submit error:', error);
-      alert('Failed to post ad. Please check your connection.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleEdit = () => {
-    setCurrentView('form');
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        
-        {/* Form View */}
-        {currentView === 'form' && (
-          <>
-            {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-lg">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Post Your Phone Ad</h2>
-                <button 
-                  onClick={handleClose}
-                  className="text-gray-400 hover:text-gray-600 p-2"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              <p className="text-gray-600 mt-1">Fill in all details to create your listing</p>
-            </div>
-
-            {/* Form Content */}
-            <div className="px-6 py-6">
-              <form className="space-y-8">
-                
-                {/* Phone Information Section */}
-                <div className="bg-blue-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <Smartphone className="w-5 h-5 mr-2 text-blue-600" />
-                    Phone Information
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Brand */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Brand *
-                      </label>
-                      <select
-                        value={formData.brand}
-                        onChange={(e) => setFormData({...formData, brand: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        required
-                      >
-                        <option value="">Select Brand</option>
-                        {phoneBrands.map(brand => (
-                          <option key={brand} value={brand}>{brand}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Model */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Model *
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.model}
-                        onChange={(e) => setFormData({...formData, model: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., iPhone 15 Pro Max"
-                        required
-                      />
-                    </div>
-
-                    {/* Condition */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Condition *
-                      </label>
-                      <select
-                        value={formData.condition}
-                        onChange={(e) => setFormData({...formData, condition: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        required
-                      >
-                        {conditionOptions.map(condition => (
-                          <option key={condition} value={condition}>{condition}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Price */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Price (PKR) *
-                      </label>
-                      <input
-                        type="number"
-                        value={formData.price}
-                        onChange={(e) => setFormData({...formData, price: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="150000"
-                        required
-                      />
-                    </div>
-
-                    {/* Storage */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Storage
-                      </label>
-                      <select
-                        value={formData.storage}
-                        onChange={(e) => setFormData({...formData, storage: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="">Select Storage</option>
-                        {storageOptions.map(storage => (
-                          <option key={storage} value={storage}>{storage}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* RAM */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        RAM
-                      </label>
-                      <select
-                        value={formData.ram}
-                        onChange={(e) => setFormData({...formData, ram: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="">Select RAM</option>
-                        {ramOptions.map(ram => (
-                          <option key={ram} value={ram}>{ram}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Color */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Color
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.color}
-                        onChange={(e) => setFormData({...formData, color: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., Space Black"
-                      />
-                    </div>
-
-                    {/* Warranty */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Warranty Status
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.warranty}
-                        onChange={(e) => setFormData({...formData, warranty: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., 6 months remaining"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Location & Description Section */}
-                <div className="bg-green-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <MapPin className="w-5 h-5 mr-2 text-green-600" />
-                    Location & Description
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    {/* City */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        City *
-                      </label>
-                      <select
-                        value={formData.city}
-                        onChange={(e) => setFormData({...formData, city: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        required
-                      >
-                        {cities.map(city => (
-                          <option key={city} value={city}>{city}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Area */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Area/Locality
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.area}
-                        onChange={(e) => setFormData({...formData, area: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., Gulshan-e-Iqbal"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Description
-                    </label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      rows="4"
-                      placeholder="Describe your phone's condition, usage, any issues, etc."
-                    />
-                  </div>
-                </div>
-
-                {/* Features Section */}
-                <div className="bg-purple-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <Star className="w-5 h-5 mr-2 text-purple-600" />
-                    Features & Accessories
-                  </h3>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {phoneFeatures.map((feature) => (
-                      <label key={feature} className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.features.includes(feature)}
-                          onChange={() => handleFeatureToggle(feature)}
-                          className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        />
-                        <span className="text-sm text-gray-700">{feature}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Contact Information Section */}
-                <div className="bg-orange-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <User className="w-5 h-5 mr-2 text-orange-600" />
-                    Contact Information
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Seller Name */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Name *
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.seller_name}
-                        onChange={(e) => setFormData({...formData, seller_name: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="Full Name"
-                        required
-                      />
-                    </div>
-
-                    {/* Phone */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number *
-                      </label>
-                      <input
-                        type="tel"
-                        value={formData.seller_phone}
-                        onChange={(e) => setFormData({...formData, seller_phone: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="03xx-xxxxxxx"
-                        required
-                      />
-                    </div>
-
-                    {/* Email */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        value={formData.seller_email}
-                        onChange={(e) => setFormData({...formData, seller_email: e.target.value})}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        placeholder="your@email.com"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Preferences Section */}
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <Settings className="w-5 h-5 mr-2 text-gray-600" />
-                    Sale Preferences
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.negotiable}
-                        onChange={(e) => setFormData({...formData, negotiable: e.target.checked})}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Price is negotiable</span>
-                    </label>
-
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.exchange}
-                        onChange={(e) => setFormData({...formData, exchange: e.target.checked})}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">Open to exchange</span>
-                    </label>
-
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.urgent_sale}
-                        onChange={(e) => setFormData({...formData, urgent_sale: e.target.checked})}
-                        className="rounded border-gray-300 text-red-600 focus:ring-red-500"
-                      />
-                      <span className="text-sm text-gray-700">Urgent sale</span>
-                    </label>
-                  </div>
-                </div>
-              </form>
-            </div>
-
-            {/* Footer */}
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-lg">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-600">
-                  Fields marked with * are required
-                </p>
-                <div className="flex space-x-3">
-                  <button
-                    type="button"
-                    onClick={handleClose}
-                    className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={submitListing}
-                    disabled={isSubmitting}
-                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full"></div>
-                        Posting...
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Post My Ad
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Confirmation View */}
-        {currentView === 'confirmation' && (
-          <>
-            {/* Success Header */}
-            <div className="bg-green-500 text-white px-6 py-6 rounded-t-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
-                    <Check className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold">Ad Posted Successfully!</h2>
-                    <p className="text-green-100">Your phone listing is now live on PhoneFlip.PK</p>
-                  </div>
-                </div>
-                <button 
-                  onClick={handleClose}
-                  className="text-white hover:text-green-100 p-2"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            {/* Ad Preview */}
-            <div className="px-6 py-6">
-              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                {/* Ad Header */}
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-2xl font-bold text-gray-900">
-                        {formData.brand} {formData.model}
-                      </h3>
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        formData.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
-                        formData.condition === 'Good' ? 'bg-blue-100 text-blue-800' :
-                        formData.condition === 'Fair' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {formData.condition}
-                      </span>
-                      {formData.urgent_sale && (
-                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                          Urgent Sale
-                        </span>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
-                      <span className="flex items-center">
-                        <MapPin className="w-3 h-3 mr-1" />
-                        {formData.city}{formData.area && `, ${formData.area}`}
-                      </span>
-                      <span className="flex items-center">
-                        <Clock className="w-3 h-3 mr-1" />
-                        Just now
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="text-3xl font-bold text-blue-600 mb-1">
-                      PKR {parseInt(formData.price).toLocaleString()}
-                    </div>
-                    {formData.negotiable && (
-                      <span className="text-sm text-gray-600">Negotiable</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Specifications */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  {formData.storage && (
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-600">Storage</div>
-                      <div className="font-semibold text-gray-900">{formData.storage}</div>
-                    </div>
-                  )}
-                  {formData.ram && (
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-600">RAM</div>
-                      <div className="font-semibold text-gray-900">{formData.ram}</div>
-                    </div>
-                  )}
-                  {formData.color && (
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-600">Color</div>
-                      <div className="font-semibold text-gray-900">{formData.color}</div>
-                    </div>
-                  )}
-                  {formData.warranty && (
-                    <div className="bg-gray-50 rounded-lg p-3 text-center">
-                      <div className="text-sm text-gray-600">Warranty</div>
-                      <div className="font-semibold text-gray-900">{formData.warranty}</div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Description */}
-                {formData.description && (
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
-                    <p className="text-gray-700 leading-relaxed">{formData.description}</p>
-                  </div>
-                )}
-
-                {/* Features */}
-                {formData.features.length > 0 && (
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-gray-900 mb-3">Features & Accessories</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {formData.features.map((feature) => (
-                        <div key={feature} className="flex items-center text-sm text-gray-700">
-                          <Check className="w-3 h-3 text-green-500 mr-2" />
-                          {feature}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Seller Information */}
-                <div className="border-t border-gray-200 pt-6">
-                  <h4 className="font-semibold text-gray-900 mb-3">Contact Information</h4>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <div className="flex items-center text-gray-700">
-                      <User className="w-4 h-4 mr-2" />
-                      {formData.seller_name}
-                    </div>
-                    <div className="flex items-center text-gray-700">
-                      <Phone className="w-4 h-4 mr-2" />
-                      {formData.seller_phone}
-                    </div>
-                    {formData.seller_email && (
-                      <div className="flex items-center text-gray-700">
-                        <Mail className="w-4 h-4 mr-2" />
-                        {formData.seller_email}
-                      </div>
-                    )}
-                  </div>
-                  
-                  {(formData.exchange || formData.negotiable) && (
-                    <div className="flex items-center gap-4 mt-3">
-                      {formData.negotiable && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          Negotiable
-                        </span>
-                      )}
-                      {formData.exchange && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                          Exchange OK
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="bg-gray-50 px-6 py-4 rounded-b-lg">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600">
-                  Ad ID: {submittedAdId || 'Generated'} • Posted on {new Date().toLocaleDateString()}
-                </div>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={handleEdit}
-                    className="px-6 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors flex items-center"
-                  >
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    Edit Ad
-                  </button>
-                  <button
-                    onClick={handleClose}
-                    className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center"
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Live Ad
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  );
-};
-      const response = await fetch(`${backendUrl}/api/listings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          price: parseInt(formData.price)
-        })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        alert('🎉 Your listing has been posted successfully! It will appear on the website instantly.');
-        handleClose();
-        // Trigger a page refresh to show the new listing
-        window.location.reload();
-      } else {
-        const error = await response.json();
-        alert('Failed to post listing: ' + (error.detail || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Error submitting listing:', error);
-      alert('Failed to post listing. Please check your internet connection and try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-        onClick={handleClose}
-      >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white rounded-lg w-full max-w-lg max-h-96 overflow-y-auto"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex items-center justify-between p-6 border-b">
-            <h2 className="text-xl font-bold">Post Your Phone Ad</h2>
-            <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="p-6">
-            {step === 1 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Basic Information</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
-                    <select
-                      value={formData.brand}
-                      onChange={(e) => setFormData({...formData, brand: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
-                      required
-                    >
-                      <option value="">Select Brand</option>
-                      <option value="iPhone">iPhone</option>
-                      <option value="Samsung">Samsung</option>
-                      <option value="Xiaomi">Xiaomi</option>
-                      <option value="Oppo">Oppo</option>
-                      <option value="Vivo">Vivo</option>
-                      <option value="OnePlus">OnePlus</option>
-                      <option value="Huawei">Huawei</option>
-                      <option value="Google">Google</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Model</label>
-                    <input
-                      type="text"
-                      value={formData.model}
-                      onChange={(e) => setFormData({...formData, model: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
-                      placeholder="e.g., iPhone 15 Pro"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Condition</label>
-                    <select
-                      value={formData.condition}
-                      onChange={(e) => setFormData({...formData, condition: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
-                      required
-                    >
-                      <option value="">Select Condition</option>
-                      <option value="Excellent">Excellent</option>
-                      <option value="Good">Good</option>
-                      <option value="Fair">Fair</option>
-                      <option value="Poor">Poor</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Price (PKR)</label>
-                    <input
-                      type="number"
-                      value={formData.price}
-                      onChange={(e) => setFormData({...formData, price: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
-                      placeholder="150000"
-                      required
-                    />
-                  </div>
-                </div>
-                <button
-                  onClick={() => setStep(2)}
-                  disabled={!formData.brand || !formData.model || !formData.condition || !formData.price}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
-                >
-                  Next Step
-                </button>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Specifications & Details</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Storage</label>
-                    <select
-                      value={formData.storage}
-                      onChange={(e) => setFormData({...formData, storage: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
-                    >
-                      <option value="">Select Storage</option>
-                      <option value="64GB">64GB</option>
-                      <option value="128GB">128GB</option>
-                      <option value="256GB">256GB</option>
-                      <option value="512GB">512GB</option>
-                      <option value="1TB">1TB</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">RAM</label>
-                    <select
-                      value={formData.ram}
-                      onChange={(e) => setFormData({...formData, ram: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
-                    >
-                      <option value="">Select RAM</option>
-                      <option value="4GB">4GB</option>
-                      <option value="6GB">6GB</option>
-                      <option value="8GB">8GB</option>
-                      <option value="12GB">12GB</option>
-                      <option value="16GB">16GB</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-                  <select
-                    value={formData.city}
-                    onChange={(e) => setFormData({...formData, city: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                    required
-                  >
-                    <option value="">Select City</option>
-                    <option value="Karachi">Karachi</option>
-                    <option value="Lahore">Lahore</option>
-                    <option value="Islamabad">Islamabad</option>
-                    <option value="Rawalpindi">Rawalpindi</option>
-                    <option value="Faisalabad">Faisalabad</option>
-                    <option value="Multan">Multan</option>
-                    <option value="Peshawar">Peshawar</option>
-                    <option value="Quetta">Quetta</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg h-24"
-                    placeholder="Describe your phone's condition, accessories included, etc."
-                    required
-                  />
-                </div>
-                <button
-                  onClick={() => setStep(3)}
-                  disabled={!formData.city || !formData.description}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
-                >
-                  Next Step
-                </button>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Contact Information</h3>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
-                  <input
-                    type="text"
-                    value={formData.seller_name}
-                    onChange={(e) => setFormData({...formData, seller_name: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                    placeholder="Enter your full name"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                  <input
-                    type="tel"
-                    value={formData.seller_phone}
-                    onChange={(e) => setFormData({...formData, seller_phone: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                    placeholder="03xx-xxxxxxx"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                  <input
-                    type="email"
-                    value={formData.seller_email}
-                    onChange={(e) => setFormData({...formData, seller_email: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                    placeholder="your.email@example.com"
-                    required
-                  />
-                </div>
-                <div className="flex space-x-4">
-                  <button
-                    onClick={() => setStep(2)}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-medium"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={submitListing}
-                    disabled={isSubmitting || !formData.seller_name || !formData.seller_phone || !formData.seller_email}
-                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
-                  >
-                    {isSubmitting ? 'Posting...' : 'Post Ad'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
-  );
-};
-
-// Mobile Header Component - Simplified to only show logo
-export const MobileHeader = ({ isLoggedIn, setIsLoginOpen }) => {
-  const handleLoginClick = () => {
-    if (!isLoggedIn) {
-      setIsLoginOpen(true);
-    }
-  };
-  return (
-    <header className="block sm:hidden bg-blue-900 text-white sticky top-0 z-50 safe-area-top">
-      <div className="px-4 py-4">
-        <div className="flex items-center justify-center">
-          <div className="text-xl font-bold">
-            PhoneFlip<span className="text-green-400">.PK</span>
-          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="lg:hidden mt-4 pb-4 border-t border-slate-700">
+            <div className="space-y-2 mt-4">
+              {navigation.map((item) => (
+                <button
+                  key={item.key}
+                  onClick={() => {
+                    setCurrentPage(item.key);
+                    setShowMobileMenu(false);
+                  }}
+                  className={`block w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    currentPage === item.key 
+                      ? 'bg-blue-600 text-white' 
+                      : 'text-white hover:bg-slate-700'
+                  }`}
+                >
+                  {item.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
 };
 
-// Desktop Header Component
-export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen, isLoggedIn, setIsLoginOpen }) => {
-  const handlePostAd = () => {
-    if (!isLoggedIn) {
-      setIsLoginOpen(true);
-    } else {
-      setIsPostAdOpen(true);
-    }
-  };
-
-  const navItems = [
-    { id: 'used-phones', label: 'Used Phones' },
-    { id: 'new-phones', label: 'New Phones' },
-    { id: 'accessories', label: 'Accessories' },
-    { id: 'reviews', label: 'Reviews' },
-    { id: 'videos', label: 'Videos' },
-    { id: 'forums', label: 'Forums' },
-    { id: 'blog', label: 'Blog' }
-  ];
-
-  return (
-    <>
-      <header className="hidden sm:block bg-blue-900 text-white sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between py-4">
-            <div 
-              className="text-2xl font-bold cursor-pointer"
-              onClick={() => setActiveTab('home')}
-            >
-              PhoneFlip<span className="text-green-400">.PK</span>
-            </div>
-            
-            <nav className="flex items-center space-x-8">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`hover:text-green-400 transition-colors ${
-                    activeTab === item.id ? 'text-green-400' : ''
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-            
-            <div className="flex items-center space-x-4">
-              {isLoggedIn ? (
-                <div className="flex items-center space-x-4">
-                  <button className="hover:text-green-400 transition-colors">
-                    <Bell className="w-5 h-5" />
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('profile')}
-                    className="hover:text-green-400 transition-colors"
-                  >
-                    <User className="w-5 h-5" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setIsLoginOpen(true)}
-                  className="text-white hover:text-green-400 transition-colors"
-                >
-                  Login
-                </button>
-              )}
-              <button
-                onClick={handlePostAd}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-              >
-                Post an Ad
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-      {/* Login Modal - Now handled in App.js */}
-    </>
-  );
-};
-
-// Bottom Navigation Component - Enhanced with More menu
-export const BottomNavigation = ({ activeTab, setActiveTab, setIsPostAdOpen, isLoggedIn, setIsLoginOpen }) => {
-  const [isMoreOpen, setIsMoreOpen] = useState(false);
-
-  const handleSell = () => {
-    if (!isLoggedIn) {
-      setIsLoginOpen(true);
-    } else {
-      setIsPostAdOpen && setIsPostAdOpen(true);
-    }
-  };
-
-  const handleMyAds = () => {
-    if (!isLoggedIn) {
-      setIsLoginOpen(true);
-    } else {
-      setActiveTab('my-ads');
-    }
-  };
-
-  const handleChat = () => {
-    if (!isLoggedIn) {
-      setIsLoginOpen(true);
-    } else {
-      setActiveTab('chat');
-    }
-  };
-
-  const moreMenuItems = [
-    { 
-      section: 'Account',
-      items: [
-        { 
-          id: 'login', 
-          label: isLoggedIn ? 'Profile' : 'Login/Signup', 
-          icon: User, 
-          action: () => {
-            if (isLoggedIn) {
-              setActiveTab('profile');
-            } else {
-              setIsLoginOpen(true);
-            }
-            setIsMoreOpen(false);
-          }
-        }
-      ]
-    },
-    {
-      section: 'Browse Phones',
-      items: [
-        { id: 'used-phones', label: 'Used Phones', icon: Smartphone, action: () => { setActiveTab('used-phones'); setIsMoreOpen(false); }},
-        { id: 'new-phones', label: 'New Phones', icon: Smartphone, action: () => { setActiveTab('new-phones'); setIsMoreOpen(false); }},
-        { id: 'accessories', label: 'Accessories', icon: HardDrive, action: () => { setActiveTab('accessories'); setIsMoreOpen(false); }}
-      ]
-    },
-    {
-      section: 'Community',
-      items: [
-        { id: 'reviews', label: 'Reviews', icon: Star, action: () => { setActiveTab('reviews'); setIsMoreOpen(false); }},
-        { id: 'videos', label: 'Videos', icon: Camera, action: () => { setActiveTab('videos'); setIsMoreOpen(false); }},
-        { id: 'forums', label: 'Forums', icon: MessageCircle, action: () => { setActiveTab('forums'); setIsMoreOpen(false); }},
-        { id: 'blog', label: 'Blog', icon: FileText, action: () => { setActiveTab('blog'); setIsMoreOpen(false); }}
-      ]
-    }
-  ];
-
-  const navItems = [
-    { 
-      id: 'home', 
-      icon: Home, 
-      label: 'Home', 
-      action: () => setActiveTab('home') 
-    },
-    { 
-      id: 'my-ads', 
-      icon: FileText, 
-      label: 'My Ads', 
-      action: handleMyAds 
-    },
-    { 
-      id: 'sell', 
-      icon: Plus, 
-      label: 'Sell', 
-      action: handleSell,
-      highlighted: true 
-    },
-    { 
-      id: 'chat', 
-      icon: MessageCircle, 
-      label: 'Chat', 
-      action: handleChat 
-    },
-    { 
-      id: 'more', 
-      icon: Menu, 
-      label: 'More', 
-      action: () => setIsMoreOpen(!isMoreOpen) 
-    }
-  ];
-
-  return (
-    <>
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-bottom">
-        <div className="flex justify-around py-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            const isHighlighted = item.highlighted;
-
-            return (
-              <button
-                key={item.id}
-                onClick={item.action}
-                className={`flex flex-col items-center justify-center px-2 py-2 min-w-0 flex-1 ${
-                  isHighlighted 
-                    ? 'bg-red-600 text-white rounded-full mx-2 shadow-lg transform scale-110' 
-                    : isActive 
-                      ? 'text-blue-600' 
-                      : 'text-gray-600 hover:text-blue-600'
-                } transition-all duration-200`}
-              >
-                <Icon className={`${isHighlighted ? 'w-6 h-6' : 'w-5 h-5'} mb-1`} />
-                <span className={`text-xs ${isHighlighted ? 'font-semibold' : 'font-medium'} leading-none`}>
-                  {item.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </nav>
-
-      {/* More Menu Overlay */}
-      <AnimatePresence>
-        {isMoreOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40 sm:hidden"
-              onClick={() => setIsMoreOpen(false)}
-            />
-            <motion.div
-              initial={{ y: 300 }}
-              animate={{ y: 0 }}
-              exit={{ y: 300 }}
-              className="fixed bottom-16 left-4 right-4 bg-white rounded-t-2xl z-50 sm:hidden max-h-96 overflow-y-auto"
-            >
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">More Options</h3>
-                  <button
-                    onClick={() => setIsMoreOpen(false)}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <div className="space-y-6">
-                  {moreMenuItems.map((section, sectionIndex) => (
-                    <div key={sectionIndex}>
-                      <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                        {section.section}
-                      </h4>
-                      <div className="space-y-2">
-                        {section.items.map((item) => {
-                          const Icon = item.icon;
-                          return (
-                            <button
-                              key={item.id}
-                              onClick={item.action}
-                              className="flex items-center w-full px-3 py-3 text-left hover:bg-gray-50 rounded-lg transition-colors"
-                            >
-                              <Icon className="w-5 h-5 text-gray-400 mr-3" />
-                              <span className="text-gray-900">{item.label}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Login Modal - Now handled in App.js */}
-    </>
-  );
-};
-
-// Hero Section Component
-export const HeroSection = () => {
-  const [searchData, setSearchData] = useState({
+// Enhanced Hero Section with Advanced Search
+export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
+  const [searchFilters, setSearchFilters] = useState({
+    query: '',
     brand: '',
     city: '',
-    budget: ''
+    priceRange: '',
+    condition: '',
+    storage: '',
+    ram: ''
   });
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+  const brands = ['iPhone', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'OnePlus', 'Huawei', 'Realme'];
+  const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
+  const priceRanges = ['Under 20K', '20K - 50K', '50K - 100K', '100K - 150K', '150K+'];
+  const conditions = ['New', 'Like New', 'Good', 'Fair'];
+  const storageOptions = ['64GB', '128GB', '256GB', '512GB', '1TB'];
+  const ramOptions = ['4GB', '6GB', '8GB', '12GB', '16GB'];
 
   return (
-    <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-white">
-      <div className="max-w-7xl mx-auto px-4 py-16 sm:py-24">
-        <div className="text-center mb-12">
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl sm:text-6xl font-bold mb-6"
-          >
+    <section className="bg-gradient-to-br from-slate-800 via-blue-900 to-slate-800 text-white py-12 md:py-20">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-5xl font-bold mb-4">
             Find Used Mobile Phones in Pakistan
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl sm:text-2xl text-blue-100"
-          >
-            Buy & Sell Phones with Confidence
-          </motion.p>
-        </div>
+          </h1>
+          <p className="text-lg md:text-xl text-blue-100 mb-8">
+            With thousands of phones, we have just the right one for you
+          </p>
 
-        {/* Desktop Search */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="hidden sm:block bg-white rounded-lg p-6 shadow-2xl"
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Phone Brand/Model</label>
-              <input
-                type="text"
-                value={searchData.brand}
-                onChange={(e) => setSearchData({...searchData, brand: e.target.value})}
-                placeholder="e.g., iPhone 15, Samsung Galaxy"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-              <select
-                value={searchData.city}
-                onChange={(e) => setSearchData({...searchData, city: e.target.value})}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-              >
-                <option value="">All Cities</option>
-                <option value="Karachi">Karachi</option>
-                <option value="Lahore">Lahore</option>
-                <option value="Islamabad">Islamabad</option>
-                <option value="Rawalpindi">Rawalpindi</option>
-                <option value="Faisalabad">Faisalabad</option>
-                <option value="Multan">Multan</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Budget Range</label>
-              <select
-                value={searchData.budget}
-                onChange={(e) => setSearchData({...searchData, budget: e.target.value})}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-              >
-                <option value="">Any Price</option>
-                <option value="0-25000">Under 25,000</option>
-                <option value="25000-50000">25,000 - 50,000</option>
-                <option value="50000-100000">50,000 - 100,000</option>
-                <option value="100000-200000">100,000 - 200,000</option>
-                <option value="200000+">Above 200,000</option>
-              </select>
-            </div>
-            <div className="flex items-end">
-              <button className="w-full bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg font-medium transition-colors">
-                <Search className="w-5 h-5 inline mr-2" />
-                Search Phones
-              </button>
-            </div>
-          </div>
-          <div className="mt-4 text-center">
-            <button className="text-blue-600 hover:text-blue-700 font-medium">
-              Advanced Search
+          {/* Quick Action Buttons */}
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <button
+              onClick={onCompareClick}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+            >
+              <Compare className="w-5 h-5" />
+              <span>Compare Phones</span>
+            </button>
+            <button
+              onClick={onPriceAlertsClick}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+            >
+              <Bell className="w-5 h-5" />
+              <span>Price Alerts</span>
             </button>
           </div>
-        </motion.div>
 
-        {/* Mobile Search */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="block sm:hidden mx-4"
-        >
-          <div className="bg-white rounded-lg p-4 shadow-xl">
-            <div className="space-y-4">
-              <input
-                type="text"
-                value={searchData.brand}
-                onChange={(e) => setSearchData({...searchData, brand: e.target.value})}
-                placeholder="Search phones..."
-                className="w-full p-3 border border-gray-300 rounded-lg text-gray-900"
-              />
-              <div className="grid grid-cols-2 gap-4">
+          {/* Enhanced Search Bar */}
+          <div className="bg-white rounded-xl shadow-2xl p-4 md:p-6 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+              {/* Phone Search */}
+              <div className="md:col-span-1">
+                <input
+                  type="text"
+                  placeholder="Phone Make or Model"
+                  value={searchFilters.query}
+                  onChange={(e) => setSearchFilters({...searchFilters, query: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* City Dropdown */}
+              <div className="relative">
                 <select
-                  value={searchData.city}
-                  onChange={(e) => setSearchData({...searchData, city: e.target.value})}
-                  className="w-full p-3 border border-gray-300 rounded-lg text-gray-900"
+                  value={searchFilters.city}
+                  onChange={(e) => setSearchFilters({...searchFilters, city: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
                 >
                   <option value="">All Cities</option>
-                  <option value="Karachi">Karachi</option>
-                  <option value="Lahore">Lahore</option>
-                  <option value="Islamabad">Islamabad</option>
+                  {cities.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
                 </select>
-                <select
-                  value={searchData.budget}
-                  onChange={(e) => setSearchData({...searchData, budget: e.target.value})}
-                  className="w-full p-3 border border-gray-300 rounded-lg text-gray-900"
-                >
-                  <option value="">Any Price</option>
-                  <option value="0-25000">Under 25K</option>
-                  <option value="25000-50000">25K - 50K</option>
-                  <option value="50000-100000">50K - 100K</option>
-                  <option value="100000+">Above 100K</option>
-                </select>
+                <ChevronDown className="absolute right-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
               </div>
-              <button className="w-full bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg font-medium">
-                Search Phones
+
+              {/* Price Range */}
+              <div className="relative">
+                <select
+                  value={searchFilters.priceRange}
+                  onChange={(e) => setSearchFilters({...searchFilters, priceRange: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                >
+                  <option value="">Price Range</option>
+                  {priceRanges.map(range => (
+                    <option key={range} value={range}>{range}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
+              </div>
+
+              {/* Search Button */}
+              <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                <Search className="w-5 h-5" />
+                <span>Search</span>
               </button>
             </div>
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
-};
 
-// Quick Categories Component
-export const QuickCategories = () => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      const response = await fetch(`${backendUrl}/api/stats`);
-      if (response.ok) {
-        const stats = await response.json();
-        // Transform backend data to category format
-        const transformedCategories = stats.brands.map(brand => ({
-          name: brand.name,
-          icon: '📱',
-          count: `${brand.count}+`
-        }));
-        
-        // Ensure we have at least 6 categories
-        while (transformedCategories.length < 6) {
-          const staticCategories = getStaticCategories();
-          const existingNames = transformedCategories.map(c => c.name);
-          const remaining = staticCategories.filter(c => !existingNames.includes(c.name));
-          if (remaining.length > 0) {
-            transformedCategories.push(remaining[0]);
-          } else {
-            break;
-          }
-        }
-        
-        setCategories(transformedCategories.slice(0, 6));
-      } else {
-        console.error('Failed to fetch stats');
-        setCategories(getStaticCategories());
-      }
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      setCategories(getStaticCategories());
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getStaticCategories = () => [
-    { name: 'iPhone', icon: '📱', count: '1,200+' },
-    { name: 'Samsung', icon: '📱', count: '800+' },
-    { name: 'Xiaomi', icon: '📱', count: '600+' },
-    { name: 'Oppo', icon: '📱', count: '400+' },
-    { name: 'Vivo', icon: '📱', count: '350+' },
-    { name: 'OnePlus', icon: '📱', count: '200+' }
-  ];
-
-  if (loading) {
-    return (
-      <div className="py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Browse by Brand</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {[1,2,3,4,5,6].map((i) => (
-              <div key={i} className="bg-gray-50 p-6 rounded-lg text-center animate-pulse">
-                <div className="text-3xl mb-2">📱</div>
-                <div className="h-4 bg-gray-300 rounded mb-2 mx-auto w-16"></div>
-                <div className="h-3 bg-gray-300 rounded mx-auto w-12"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Browse by Brand</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((category, index) => (
-            <motion.div
-              key={category.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-gray-50 hover:bg-gray-100 p-6 rounded-lg text-center cursor-pointer transition-colors"
+            {/* Advanced Filters Toggle */}
+            <button
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="text-blue-600 hover:text-blue-700 font-medium flex items-center space-x-1 mx-auto"
             >
-              <div className="text-3xl mb-2">{category.icon}</div>
-              <h3 className="font-semibold text-gray-900">{category.name}</h3>
-              <p className="text-sm text-gray-600">{category.count}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+              <SlidersHorizontal className="w-4 h-4" />
+              <span>{showAdvancedFilters ? 'Hide' : 'Show'} Advanced Filters</span>
+            </button>
 
-// Featured Phones Component
-export const FeaturedPhones = () => {
-  const [featuredPhones, setFeaturedPhones] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchFeaturedPhones();
-  }, []);
-
-  const fetchFeaturedPhones = async () => {
-    try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-      const response = await fetch(`${backendUrl}/api/listings/featured?limit=4`);
-      if (response.ok) {
-        const listings = await response.json();
-        // Transform backend data to component format
-        const transformedPhones = listings.map(listing => ({
-          id: listing.id,
-          title: `${listing.brand} ${listing.model}`,
-          price: `PKR ${listing.price.toLocaleString()}`,
-          condition: listing.condition,
-          location: listing.city,
-          image: getPhoneImage(listing.brand),
-          specs: `${listing.storage || 'N/A'}, ${listing.ram || 'N/A'}`,
-          timeAgo: getTimeAgo(listing.created_at)
-        }));
-        setFeaturedPhones(transformedPhones);
-      } else {
-        console.error('Failed to fetch featured phones');
-        // Fallback to static data if API fails
-        setFeaturedPhones(getStaticPhones());
-      }
-    } catch (error) {
-      console.error('Error fetching featured phones:', error);
-      // Fallback to static data if API fails
-      setFeaturedPhones(getStaticPhones());
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getPhoneImage = (brand) => {
-    const imageMap = {
-      'iPhone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300',
-      'Samsung': 'https://images.unsplash.com/photo-1584651432430-7e1ac8303a0a?w=300',
-      'Xiaomi': 'https://images.unsplash.com/photo-1575719362347-a70b129740e0?w=300',
-      'OnePlus': 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300',
-      'Oppo': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300',
-      'Vivo': 'https://images.unsplash.com/photo-1584651432430-7e1ac8303a0a?w=300',
-      'Huawei': 'https://images.unsplash.com/photo-1575719362347-a70b129740e0?w=300',
-      'Google': 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300'
-    };
-    return imageMap[brand] || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300';
-  };
-
-  const getTimeAgo = (dateString) => {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diffInMs = now - date;
-    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-    const diffInDays = Math.floor(diffInHours / 24);
-
-    if (diffInHours < 1) return 'Just now';
-    if (diffInHours < 24) return `${diffInHours} hours ago`;
-    if (diffInDays === 1) return '1 day ago';
-    return `${diffInDays} days ago`;
-  };
-
-  const getStaticPhones = () => [
-    {
-      id: 1,
-      title: 'iPhone 15 Pro Max',
-      price: 'PKR 185,000',
-      condition: 'Excellent',
-      location: 'Karachi',
-      image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300',
-      specs: '256GB, Natural Titanium',
-      timeAgo: '2 hours ago'
-    },
-    {
-      id: 2,
-      title: 'Samsung Galaxy S24 Ultra',
-      price: 'PKR 150,000',
-      condition: 'Good',
-      location: 'Lahore',
-      image: 'https://images.unsplash.com/photo-1584651432430-7e1ac8303a0a?w=300',
-      specs: '512GB, Titanium Gray',
-      timeAgo: '5 hours ago'
-    },
-    {
-      id: 3,
-      title: 'OnePlus 12',
-      price: 'PKR 75,000',
-      condition: 'Excellent',
-      location: 'Islamabad',
-      image: 'https://images.unsplash.com/photo-1575719362347-a70b129740e0?w=300',
-      specs: '256GB, Flowy Emerald',
-      timeAgo: '1 day ago'
-    },
-    {
-      id: 4,
-      title: 'Xiaomi 14 Ultra',
-      price: 'PKR 95,000',
-      condition: 'Good',
-      location: 'Rawalpindi',
-      image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300',
-      specs: '512GB, White',
-      timeAgo: '2 days ago'
-    }
-  ];
-
-  if (loading) {
-    return (
-      <div className="py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Featured Phones</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1,2,3,4].map((i) => (
-              <div key={i} className="bg-white rounded-lg shadow-md animate-pulse">
-                <div className="h-48 bg-gray-300 rounded-t-lg"></div>
-                <div className="p-4 space-y-2">
-                  <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-                  <div className="h-4 bg-gray-300 rounded w-2/3"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="py-12 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Featured Phones</h2>
-          <button className="text-blue-600 hover:text-blue-700 font-medium">View All</button>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredPhones.map((phone, index) => (
-            <motion.div
-              key={phone.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-            >
-              <div className="relative">
-                <img 
-                  src={phone.image} 
-                  alt={phone.title}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
-                <button className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-gray-50">
-                  <Heart className="w-4 h-4 text-gray-600" />
-                </button>
-                <div className="absolute bottom-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-medium">
-                  {phone.condition}
-                </div>
-              </div>
-              
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">{phone.title}</h3>
-                <p className="text-sm text-gray-600 mb-2">{phone.specs}</p>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-lg font-bold text-blue-600">{phone.price}</span>
-                  <div className="flex items-center text-gray-500 text-sm">
-                    <MapPin className="w-3 h-3 mr-1" />
-                    {phone.location}
+            {/* Advanced Filters Panel */}
+            {showAdvancedFilters && (
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  {/* Brand Filter */}
+                  <div className="relative">
+                    <select
+                      value={searchFilters.brand}
+                      onChange={(e) => setSearchFilters({...searchFilters, brand: e.target.value})}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                    >
+                      <option value="">All Brands</option>
+                      {brands.map(brand => (
+                        <option key={brand} value={brand}>{brand}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
                   </div>
-                </div>
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>{phone.timeAgo}</span>
-                  <div className="flex items-center">
-                    <Eye className="w-3 h-3 mr-1" />
-                    <span>125</span>
+
+                  {/* Condition Filter */}
+                  <div className="relative">
+                    <select
+                      value={searchFilters.condition}
+                      onChange={(e) => setSearchFilters({...searchFilters, condition: e.target.value})}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                    >
+                      <option value="">All Conditions</option>
+                      {conditions.map(condition => (
+                        <option key={condition} value={condition}>{condition}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
+                  </div>
+
+                  {/* Storage Filter */}
+                  <div className="relative">
+                    <select
+                      value={searchFilters.storage}
+                      onChange={(e) => setSearchFilters({...searchFilters, storage: e.target.value})}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                    >
+                      <option value="">All Storage</option>
+                      {storageOptions.map(storage => (
+                        <option key={storage} value={storage}>{storage}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
+                  </div>
+
+                  {/* RAM Filter */}
+                  <div className="relative">
+                    <select
+                      value={searchFilters.ram}
+                      onChange={(e) => setSearchFilters({...searchFilters, ram: e.target.value})}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                    >
+                      <option value="">All RAM</option>
+                      {ramOptions.map(ram => (
+                        <option key={ram} value={ram}>{ram}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
                   </div>
                 </div>
               </div>
-            </motion.div>
-          ))}
-        </div>
-        
-        {featuredPhones.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No featured phones available at the moment.</p>
-            <p className="text-gray-400 text-sm mt-2">Be the first to post a listing!</p>
+            )}
           </div>
-        )}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Compare Section
+export const CompareSection = ({ compareList, onCompareClick }) => {
+  if (compareList.length === 0) return null;
+
+  return (
+    <div className="bg-blue-50 border-b">
+      <div className="max-w-7xl mx-auto px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Compare className="w-5 h-5 text-blue-600" />
+            <span className="text-blue-900 font-medium">
+              {compareList.length} phone{compareList.length > 1 ? 's' : ''} selected for comparison
+            </span>
+          </div>
+          <button
+            onClick={onCompareClick}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            Compare Now
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-// Selling Section Component
-export const SellingSection = () => {
+// Enhanced Sell Section
+export const SellSection = ({ isLoggedIn, setCurrentPage }) => {
   return (
-    <div className="py-16 bg-white">
+    <section className="bg-white py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
             Sell Your Phone on PhoneFlip and Get the Best Price
           </h2>
         </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Post Your Ad */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-blue-50 p-8 rounded-lg"
-          >
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Post your Ad</h3>
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                <span>Post your Ad for Free in 3 Easy Steps</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                <span>Get Genuine offers from Verified Buyers</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                <span>Sell your phone Fast and Safe</span>
-              </li>
-            </ul>
-            <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-medium w-full">
+          <div className="bg-gray-50 rounded-xl p-6 md:p-8">
+            <h3 className="text-xl font-bold text-gray-900 mb-6">Post your Ad on PhoneFlip</h3>
+            <div className="space-y-4 mb-8">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">Post your Ad for Free in 3 Easy Steps</span>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">Get Genuine offers from Verified Buyers</span>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">Sell your Phone Fast at the Best Price</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setCurrentPage('post-ad')}
+              className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-medium transition-colors w-full md:w-auto"
+            >
               Post Your Ad
             </button>
-          </motion.div>
+          </div>
 
-          {/* Try PhoneFlip Sell It For Me */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-green-50 p-8 rounded-lg"
-          >
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Try PhoneFlip Sell It For Me</h3>
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                <span>Dedicated Sales Expert to Sell your Phone</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                <span>We Bargain for you and share the Best Offer</span>
-              </li>
-              <li className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                <span>We ensure Safe & Secure Transaction</span>
-              </li>
-            </ul>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium w-full">
-              Book Phone Inspection
+          {/* Sell to PhoneFlip (Updated) */}
+          <div className="bg-gray-50 rounded-xl p-6 md:p-8 relative">
+            <div className="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+              Quick Sale
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-6">Sell to PhoneFlip</h3>
+            <div className="space-y-4 mb-8">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">Get Instant Price Quote for your Phone</span>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">Free Home Pickup & Instant Payment</span>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">No Hassle, No Waiting, No Commission</span>
+              </div>
+            </div>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors w-full md:w-auto">
+              Get Quote Now
             </button>
-          </motion.div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
-// Footer Component
-export const Footer = () => {
+// Featured Shops Section
+export const FeaturedShopsSection = () => {
+  const [userCity, setUserCity] = useState('Karachi'); // Default or detected city
+
+  const featuredShops = [
+    {
+      id: 1,
+      name: 'Mobile World Karachi',
+      rating: 4.8,
+      reviews: 245,
+      image: 'https://images.pexels.com/photos/5475811/pexels-photo-5475811.jpeg',
+      verified: true,
+      location: 'Saddar, Karachi',
+      specialties: ['iPhone', 'Samsung', 'Accessories'],
+      yearsInBusiness: 8,
+      phoneCount: 150
+    },
+    {
+      id: 2,
+      name: 'Tech Hub Lahore',
+      rating: 4.9,
+      reviews: 189,
+      image: 'https://images.pexels.com/photos/9169180/pexels-photo-9169180.jpeg',
+      verified: true,
+      location: 'Liberty Market, Lahore',
+      specialties: ['Xiaomi', 'OnePlus', 'Gaming Phones'],
+      yearsInBusiness: 5,
+      phoneCount: 200
+    },
+    {
+      id: 3,
+      name: 'Smart Phones Islamabad',
+      rating: 4.7,
+      reviews: 312,
+      image: 'https://images.pexels.com/photos/8728559/pexels-photo-8728559.jpeg',
+      verified: true,
+      location: 'Blue Area, Islamabad',
+      specialties: ['Premium Phones', 'Repairs', 'Trade-in'],
+      yearsInBusiness: 12,
+      phoneCount: 180
+    },
+    {
+      id: 4,
+      name: 'Digital Mart Faisalabad',
+      rating: 4.6,
+      reviews: 156,
+      image: 'https://images.unsplash.com/photo-1596207498818-edb80522f50b',
+      verified: true,
+      location: 'Clock Tower, Faisalabad',
+      specialties: ['Budget Phones', 'Accessories', 'Warranty'],
+      yearsInBusiness: 6,
+      phoneCount: 120
+    }
+  ];
+
   return (
-    <footer className="bg-gray-900 text-white py-12">
+    <section className="bg-gradient-to-br from-green-50 to-blue-50 py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-8">
-          <div>
-            <div className="text-2xl font-bold mb-4">
-              PhoneFlip<span className="text-green-400">.PK</span>
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Top Shops in {userCity}
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Verified sellers with excellent ratings and genuine products
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {featuredShops.map((shop) => (
+            <div key={shop.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              {/* Shop Image */}
+              <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 relative overflow-hidden">
+                <img 
+                  src={shop.image} 
+                  alt={shop.name}
+                  className="w-full h-full object-cover opacity-80"
+                />
+                <div className="absolute top-4 left-4">
+                  {shop.verified && (
+                    <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
+                      <Shield className="w-3 h-3" />
+                      <span>Verified</span>
+                    </div>
+                  )}
+                </div>
+                <div className="absolute top-4 right-4 bg-white bg-opacity-90 px-2 py-1 rounded-full text-xs font-medium text-gray-800">
+                  {shop.phoneCount}+ Phones
+                </div>
+              </div>
+
+              {/* Shop Info */}
+              <div className="p-6">
+                <h3 className="font-bold text-lg text-gray-900 mb-2">{shop.name}</h3>
+                
+                {/* Rating */}
+                <div className="flex items-center space-x-2 mb-3">
+                  <div className="flex items-center">
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className={`w-4 h-4 ${i < Math.floor(shop.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">{shop.rating}</span>
+                  <span className="text-sm text-gray-500">({shop.reviews} reviews)</span>
+                </div>
+
+                {/* Location */}
+                <div className="flex items-center space-x-1 mb-3 text-gray-600">
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm">{shop.location}</span>
+                </div>
+
+                {/* Specialties */}
+                <div className="mb-4">
+                  <div className="flex flex-wrap gap-1">
+                    {shop.specialties.slice(0, 2).map((specialty, index) => (
+                      <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                        {specialty}
+                      </span>
+                    ))}
+                    {shop.specialties.length > 2 && (
+                      <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
+                        +{shop.specialties.length - 2} more
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Experience Badge */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-1 text-gray-600">
+                    <Award className="w-4 h-4" />
+                    <span className="text-sm">{shop.yearsInBusiness} years</span>
+                  </div>
+                  <button className="text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors">
+                    View Shop
+                  </button>
+                </div>
+              </div>
             </div>
-            <p className="text-gray-400 mb-4">
-              Pakistan's largest mobile phone marketplace. Buy and sell phones with confidence.
-            </p>
-            <div className="flex space-x-4">
-              <button className="bg-blue-600 hover:bg-blue-700 p-2 rounded">
-                <Phone className="w-4 h-4" />
-              </button>
-              <button className="bg-blue-600 hover:bg-blue-700 p-2 rounded">
-                <Mail className="w-4 h-4" />
-              </button>
+          ))}
+        </div>
+
+        {/* View All Button */}
+        <div className="text-center mt-8">
+          <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors inline-flex items-center space-x-2">
+            <span>View All Verified Shops</span>
+            <ArrowRight className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Our Offerings Section
+export const OurOfferingsSection = ({ onCompareClick, onPriceAlertsClick }) => {
+  const offerings = [
+    {
+      id: 1,
+      icon: <Compare className="w-8 h-8" />,
+      title: 'Phone Comparison Tool',
+      description: 'Compare specs, prices, and features side-by-side to make the best choice',
+      color: 'from-blue-500 to-blue-600',
+      action: onCompareClick,
+      buttonText: 'Compare Phones'
+    },
+    {
+      id: 2,
+      icon: <Shield className="w-8 h-8" />,
+      title: 'Phone Condition Check',
+      description: 'Complete guide to verify phone authenticity and condition before buying',
+      color: 'from-green-500 to-green-600',
+      action: () => {},
+      buttonText: 'Check Guide'
+    },
+    {
+      id: 3,
+      icon: <TrendingDown className="w-8 h-8" />,
+      title: 'Price Drop Alerts',
+      description: 'Get notified when prices drop on your favorite phone models',
+      color: 'from-orange-500 to-red-500',
+      action: onPriceAlertsClick,
+      buttonText: 'Set Alert'
+    },
+    {
+      id: 4,
+      icon: <Star className="w-8 h-8" />,
+      title: 'Shop Reviews & Ratings',
+      description: 'Read genuine reviews and ratings from verified buyers and sellers',
+      color: 'from-purple-500 to-pink-500',
+      action: () => {},
+      buttonText: 'Read Reviews'
+    }
+  ];
+
+  return (
+    <section className="bg-gradient-to-br from-purple-50 to-pink-50 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Our Offerings
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Comprehensive tools and services to help you buy and sell phones with confidence
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {offerings.map((offering) => (
+            <div key={offering.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              {/* Icon Header */}
+              <div className={`bg-gradient-to-r ${offering.color} p-6 text-white`}>
+                <div className="w-16 h-16 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  {offering.icon}
+                </div>
+                <h3 className="text-lg font-bold text-center">{offering.title}</h3>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                  {offering.description}
+                </p>
+                <button
+                  onClick={offering.action}
+                  className={`w-full bg-gradient-to-r ${offering.color} text-white py-3 rounded-lg font-medium hover:opacity-90 transition-opacity`}
+                >
+                  {offering.buttonText}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Accessories Section
+export const AccessoriesSection = () => {
+  const accessories = [
+    {
+      id: 1,
+      name: 'Phone Cases',
+      image: 'https://images.unsplash.com/photo-1596207891316-23851be3cc20',
+      priceRange: 'PKR 500 - 5,000',
+      itemCount: 1250,
+      category: 'Protection'
+    },
+    {
+      id: 2,
+      name: 'Chargers & Cables',
+      image: 'https://images.pexels.com/photos/7616608/pexels-photo-7616608.jpeg',
+      priceRange: 'PKR 300 - 3,000',
+      itemCount: 890,
+      category: 'Power'
+    },
+    {
+      id: 3,
+      name: 'Screen Protectors',
+      image: 'https://images.unsplash.com/photo-1590459963567-1bf6b8595be1',
+      priceRange: 'PKR 200 - 2,000',
+      itemCount: 650,
+      category: 'Protection'
+    },
+    {
+      id: 4,
+      name: 'Headphones & Earbuds',
+      image: 'https://images.unsplash.com/photo-1577174881658-0f30ed549adc',
+      priceRange: 'PKR 800 - 15,000',
+      itemCount: 920,
+      category: 'Audio'
+    },
+    {
+      id: 5,
+      name: 'Power Banks',
+      image: 'https://images.pexels.com/photos/8728560/pexels-photo-8728560.jpeg',
+      priceRange: 'PKR 1,000 - 8,000',
+      itemCount: 380,
+      category: 'Power'
+    },
+    {
+      id: 6,
+      name: 'Phone Stands',
+      image: 'https://images.pexels.com/photos/16053029/pexels-photo-16053029.jpeg',
+      priceRange: 'PKR 300 - 2,500',
+      itemCount: 240,
+      category: 'Utility'
+    }
+  ];
+
+  const categories = ['All', 'Protection', 'Power', 'Audio', 'Utility'];
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const filteredAccessories = selectedCategory === 'All' 
+    ? accessories 
+    : accessories.filter(item => item.category === selectedCategory);
+
+  return (
+    <section className="bg-gradient-to-br from-orange-50 to-yellow-50 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Phone Accessories
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Complete your phone experience with genuine accessories
+          </p>
+        </div>
+
+        {/* Category Filter */}
+        <div className="flex flex-wrap justify-center gap-3 mb-8">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-6 py-2 rounded-full font-medium transition-colors ${
+                selectedCategory === category
+                  ? 'bg-orange-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-orange-100'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        {/* Accessories Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          {filteredAccessories.map((accessory) => (
+            <div key={accessory.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              {/* Image */}
+              <div className="h-40 bg-gradient-to-br from-orange-400 to-yellow-500 relative overflow-hidden">
+                <img 
+                  src={accessory.image} 
+                  alt={accessory.name}
+                  className="w-full h-full object-cover opacity-90"
+                />
+                <div className="absolute top-2 right-2 bg-white bg-opacity-90 px-2 py-1 rounded-full text-xs font-medium text-gray-800">
+                  {accessory.itemCount}+ items
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-4">
+                <h3 className="font-bold text-sm text-gray-900 mb-2">{accessory.name}</h3>
+                <p className="text-xs text-gray-600 mb-3">{accessory.priceRange}</p>
+                <button className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+                  Browse
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* View All Button */}
+        <div className="text-center mt-8">
+          <button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-medium transition-colors inline-flex items-center space-x-2">
+            <ShoppingBag className="w-5 h-5" />
+            <span>Browse All Accessories</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Content Cards Section
+export const ContentCardsSection = () => {
+  const blogPosts = [
+    {
+      id: 1,
+      title: 'Best Phones Under 30K in Pakistan 2024',
+      excerpt: 'Discover the top budget-friendly smartphones that offer excellent value for money',
+      image: 'https://images.unsplash.com/photo-1596207498818-edb80522f50b',
+      category: 'Buying Guide',
+      readTime: '5 min read',
+      publishDate: '2 days ago',
+      views: 1250
+    },
+    {
+      id: 2,
+      title: 'How to Check Phone Condition Before Buying',
+      excerpt: 'Complete checklist to verify phone authenticity and avoid scams',
+      image: 'https://images.pexels.com/photos/5475811/pexels-photo-5475811.jpeg',
+      category: 'Tips & Tricks',
+      readTime: '8 min read',
+      publishDate: '1 week ago',
+      views: 2100
+    },
+    {
+      id: 3,
+      title: 'iPhone vs Samsung: Which is Better?',
+      excerpt: 'Detailed comparison of features, performance, and value',
+      image: 'https://images.unsplash.com/photo-1596207891316-23851be3cc20',
+      category: 'Comparison',
+      readTime: '12 min read',
+      publishDate: '3 days ago',
+      views: 3400
+    }
+  ];
+
+  const videos = [
+    {
+      id: 1,
+      title: 'iPhone 15 Pro Max Review - Pakistan',
+      thumbnail: 'https://images.pexels.com/photos/9169180/pexels-photo-9169180.jpeg',
+      duration: '15:30',
+      views: 45000,
+      channel: 'PhoneFlip Reviews',
+      uploadDate: '1 week ago'
+    },
+    {
+      id: 2,
+      title: 'Best Gaming Phones Under 100K',
+      thumbnail: 'https://images.pexels.com/photos/8728559/pexels-photo-8728559.jpeg',
+      duration: '22:15',
+      views: 28000,
+      channel: 'Tech Pakistan',
+      uploadDate: '4 days ago'
+    }
+  ];
+
+  const news = [
+    {
+      id: 1,
+      title: 'Samsung Galaxy S24 Ultra Price Drop in Pakistan',
+      excerpt: 'Latest flagship now available at reduced prices across major retailers',
+      publishDate: '6 hours ago',
+      category: 'Price Update'
+    },
+    {
+      id: 2,
+      title: 'New Trade-in Program Launched',
+      excerpt: 'Exchange your old phone for instant discount on new purchases',
+      publishDate: '2 days ago',
+      category: 'Announcement'
+    }
+  ];
+
+  return (
+    <section className="bg-white py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Latest Content
+          </h2>
+          <p className="text-gray-600">
+            Stay updated with reviews, guides, and market news
+          </p>
+        </div>
+
+        {/* Blog Posts */}
+        <div className="mb-12">
+          <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+            <div className="w-1 h-6 bg-blue-600 mr-3"></div>
+            Featured Articles
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {blogPosts.map((post) => (
+              <article key={post.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 relative overflow-hidden">
+                  <img 
+                    src={post.image} 
+                    alt={post.title}
+                    className="w-full h-full object-cover opacity-80"
+                  />
+                  <div className="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    {post.category}
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h4 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2">{post.title}</h4>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{post.excerpt}</p>
+                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                    <div className="flex items-center space-x-4">
+                      <span>{post.readTime}</span>
+                      <span>{post.publishDate}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Eye className="w-4 h-4" />
+                      <span>{post.views}</span>
+                    </div>
+                  </div>
+                  <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                    Read More →
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        {/* Videos and News */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Videos */}
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+              <div className="w-1 h-6 bg-red-600 mr-3"></div>
+              Latest Videos
+            </h3>
+            <div className="space-y-4">
+              {videos.map((video) => (
+                <div key={video.id} className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors">
+                  <div className="flex space-x-4">
+                    <div className="relative flex-shrink-0">
+                      <img 
+                        src={video.thumbnail} 
+                        alt={video.title}
+                        className="w-24 h-16 rounded-lg object-cover"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Play className="w-6 h-6 text-white bg-red-600 rounded-full p-1" />
+                      </div>
+                      <div className="absolute bottom-1 right-1 bg-black bg-opacity-75 text-white text-xs px-1 rounded">
+                        {video.duration}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900 mb-1 line-clamp-2">{video.title}</h4>
+                      <p className="text-sm text-gray-600 mb-2">{video.channel}</p>
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>{video.views.toLocaleString()} views</span>
+                        <span>{video.uploadDate}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-          
+
+          {/* News */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li><button className="hover:text-white transition-colors">Used Phones</button></li>
-              <li><button className="hover:text-white transition-colors">New Phones</button></li>
-              <li><button className="hover:text-white transition-colors">Accessories</button></li>
-              <li><button className="hover:text-white transition-colors">Sell Your Phone</button></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Support</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li><button className="hover:text-white transition-colors">Help Center</button></li>
-              <li><button className="hover:text-white transition-colors">Safety Tips</button></li>
-              <li><button className="hover:text-white transition-colors">Contact Us</button></li>
-              <li><button className="hover:text-white transition-colors">Report Issue</button></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Download App</h3>
-            <p className="text-gray-400 mb-4">Get the best experience on mobile</p>
-            <div className="space-y-2">
-              <button className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded w-full text-left">
-                📱 Download for iOS
-              </button>
-              <button className="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded w-full text-left">
-                🤖 Download for Android
-              </button>
+            <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+              <div className="w-1 h-6 bg-green-600 mr-3"></div>
+              Market News
+            </h3>
+            <div className="space-y-4">
+              {news.map((item) => (
+                <div key={item.id} className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+                  <div className="flex items-start justify-between mb-2">
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                      {item.category}
+                    </span>
+                    <span className="text-xs text-gray-500">{item.publishDate}</span>
+                  </div>
+                  <h4 className="font-medium text-gray-900 mb-2">{item.title}</h4>
+                  <p className="text-sm text-gray-600 mb-3">{item.excerpt}</p>
+                  <button className="text-green-600 hover:text-green-700 font-medium text-sm">
+                    Read More →
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-        
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 PhoneFlip.PK. All rights reserved.</p>
+      </div>
+    </section>
+  );
+};
+
+// Enhanced Footer
+export const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer className="bg-slate-800 text-white pt-12 pb-6">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          {/* Company Info */}
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <Smartphone className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <div className="text-xl font-bold">PhoneFlip</div>
+                <div className="text-xs text-gray-300 -mt-1">.PK</div>
+              </div>
+            </div>
+            <p className="text-gray-300 text-sm mb-4">
+              Pakistan's leading marketplace for buying and selling used mobile phones with verified sellers and genuine products.
+            </p>
+            <div className="flex space-x-4">
+              <Facebook className="w-5 h-5 text-gray-400 hover:text-blue-400 cursor-pointer transition-colors" />
+              <Instagram className="w-5 h-5 text-gray-400 hover:text-pink-400 cursor-pointer transition-colors" />
+              <Twitter className="w-5 h-5 text-gray-400 hover:text-blue-400 cursor-pointer transition-colors" />
+              <Youtube className="w-5 h-5 text-gray-400 hover:text-red-400 cursor-pointer transition-colors" />
+            </div>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Company</h3>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">About Us</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Contact</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Careers</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Press</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Blog</a></li>
+            </ul>
+          </div>
+
+          {/* Support */}
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Support</h3>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Help Center</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Cookie Policy</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Safety Guidelines</a></li>
+            </ul>
+          </div>
+
+          {/* Mobile Apps */}
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Download App</h3>
+            <div className="space-y-3">
+              <button className="bg-black hover:bg-gray-900 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors w-full">
+                <div className="text-left">
+                  <div className="text-xs text-gray-300">Download on the</div>
+                  <div className="text-sm font-semibold">App Store</div>
+                </div>
+              </button>
+              <button className="bg-black hover:bg-gray-900 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors w-full">
+                <div className="text-left">
+                  <div className="text-xs text-gray-300">Get it on</div>
+                  <div className="text-sm font-semibold">Google Play</div>
+                </div>
+              </button>
+            </div>
+            
+            {/* Contact Info */}
+            <div className="mt-6 text-sm text-gray-300">
+              <div className="flex items-center space-x-2 mb-2">
+                <Phone className="w-4 h-4" />
+                <span>+92 300 1234567</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Mail className="w-4 h-4" />
+                <span>hello@phoneflip.pk</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-gray-700 pt-6">
+          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+            <div className="mb-4 md:mb-0">
+              <p>&copy; {currentYear} PhoneFlip.PK. All rights reserved.</p>
+            </div>
+            <div className="flex items-center space-x-1">
+              <Globe className="w-4 h-4" />
+              <span>Made with ❤️ in Pakistan</span>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
   );
 };
 
-// Mobile Menu Component (keeping original for compatibility)
-export const MobileMenu = ({ isOpen, setIsOpen, setActiveTab, setIsPostAdOpen }) => {
-  return null; // Not needed anymore with new bottom navigation
-};
+// Price Drop Alerts Modal
+export const PriceDropAlertsModal = ({ isOpen, onClose }) => {
+  const [alertData, setAlertData] = useState({
+    phone: '',
+    brand: '',
+    maxPrice: '',
+    email: '',
+    city: ''
+  });
 
-// Reviews Page Component
-export const ReviewsPage = () => {
-  const phoneReviews = [
-    {
-      id: 1,
-      title: 'iPhone 15 Pro Max Review',
-      author: 'Tech Expert',
-      rating: 4.5,
-      publishDate: '2 days ago',
-      excerpt: 'The iPhone 15 Pro Max delivers exceptional performance with its A17 Pro chip and impressive camera system.',
-      image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9',
-      readTime: '5 min read'
-    },
-    {
-      id: 2,
-      title: 'Samsung Galaxy S24 Ultra Review',
-      author: 'Mobile Reviewer',
-      rating: 4.7,
-      publishDate: '1 week ago',
-      excerpt: 'Samsung continues to push boundaries with the S24 Ultra, featuring enhanced AI capabilities and superior S Pen functionality.',
-      image: 'https://images.unsplash.com/photo-1584651432430-7e1ac8303a0a',
-      readTime: '7 min read'
-    },
-    {
-      id: 3,
-      title: 'OnePlus 12 Review',
-      author: 'PhoneFlip Team',
-      rating: 4.3,
-      publishDate: '2 weeks ago',
-      excerpt: 'OnePlus returns to its flagship roots with improved build quality and camera performance.',
-      image: 'https://images.unsplash.com/photo-1575719362347-a70b129740e0',
-      readTime: '6 min read'
-    }
-  ];
+  if (!isOpen) return null;
 
   return (
-    <div className="pt-20 pb-24 sm:pb-8">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Phone Reviews</h1>
-          <p className="text-lg text-gray-600">Expert reviews and detailed analysis of the latest mobile phones</p>
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl max-w-md w-full p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold text-gray-900">Set Price Alert</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {phoneReviews.map((review, index) => (
-            <motion.div
-              key={review.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+        <form className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone Model</label>
+            <input
+              type="text"
+              placeholder="e.g., iPhone 15 Pro Max"
+              value={alertData.phone}
+              onChange={(e) => setAlertData({...alertData, phone: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+            <select
+              value={alertData.brand}
+              onChange={(e) => setAlertData({...alertData, brand: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <img 
-                src={review.image} 
-                alt={review.title}
-                className="w-full h-48 object-cover rounded-t-lg"
-              />
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        className={`w-4 h-4 ${i < Math.floor(review.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} 
-                      />
-                    ))}
-                    <span className="ml-2 text-sm text-gray-600">{review.rating}</span>
-                  </div>
-                  <span className="text-sm text-gray-500">{review.readTime}</span>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{review.title}</h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{review.excerpt}</p>
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>By {review.author}</span>
-                  <span>{review.publishDate}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              <option value="">Select Brand</option>
+              <option value="iPhone">iPhone</option>
+              <option value="Samsung">Samsung</option>
+              <option value="Xiaomi">Xiaomi</option>
+              <option value="Oppo">Oppo</option>
+              <option value="Vivo">Vivo</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Alert When Price Drops Below</label>
+            <input
+              type="text"
+              placeholder="PKR 100,000"
+              value={alertData.maxPrice}
+              onChange={(e) => setAlertData({...alertData, maxPrice: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              placeholder="your@email.com"
+              value={alertData.email}
+              onChange={(e) => setAlertData({...alertData, email: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">City (Optional)</label>
+            <select
+              value={alertData.city}
+              onChange={(e) => setAlertData({...alertData, city: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Cities</option>
+              <option value="Karachi">Karachi</option>
+              <option value="Lahore">Lahore</option>
+              <option value="Islamabad">Islamabad</option>
+              <option value="Rawalpindi">Rawalpindi</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-medium transition-colors"
+          >
+            Set Price Alert
+          </button>
+        </form>
       </div>
     </div>
   );
 };
 
-// Videos Page Component
-export const VideosPage = () => {
-  const phoneVideos = [
-    {
-      id: 1,
-      title: 'iPhone 15 Pro Max Unboxing & First Impressions',
-      channel: 'PhoneFlip TV',
-      views: '125K views',
-      publishDate: '3 days ago',
-      duration: '12:45',
-      thumbnail: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9',
-      youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    },
-    {
-      id: 2,
-      title: 'Samsung Galaxy S24 Ultra Camera Test',
-      channel: 'Tech Reviews PK',
-      views: '89K views',
-      publishDate: '1 week ago',
-      duration: '15:30',
-      thumbnail: 'https://images.unsplash.com/photo-1584651432430-7e1ac8303a0a',
-      youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    },
-    {
-      id: 3,
-      title: 'Best Budget Phones in Pakistan 2024',
-      channel: 'PhoneFlip Guide',
-      views: '200K views',
-      publishDate: '2 weeks ago',
-      duration: '18:22',
-      thumbnail: 'https://images.unsplash.com/photo-1575719362347-a70b129740e0',
-      youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    }
-  ];
-
-  const [selectedVideo, setSelectedVideo] = useState(null);
+// Compare Modal
+export const CompareModal = ({ isOpen, onClose, compareList, onRemove }) => {
+  if (!isOpen) return null;
 
   return (
-    <div className="pt-20 pb-24 sm:pb-8">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Phone Videos</h1>
-          <p className="text-lg text-gray-600">Watch reviews, unboxings, and tutorials</p>
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold text-gray-900">Compare Phones</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {phoneVideos.map((video, index) => (
-            <motion.div
-              key={video.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-              onClick={() => setSelectedVideo(video)}
-            >
-              <div className="relative">
-                <img 
-                  src={video.thumbnail} 
-                  alt={video.title}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
-                <div className="absolute inset-0 bg-black/20 rounded-t-lg flex items-center justify-center">
-                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center">
-                    <div className="w-0 h-0 border-l-[16px] border-l-white border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent ml-1" />
-                  </div>
-                </div>
-                <div className="absolute bottom-2 right-2 bg-black/80 text-white px-2 py-1 rounded text-xs">
-                  {video.duration}
-                </div>
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{video.title}</h3>
-                <p className="text-sm text-gray-600 mb-1">{video.channel}</p>
-                <div className="flex items-center text-xs text-gray-500">
-                  <span>{video.views}</span>
-                  <span className="mx-2">•</span>
-                  <span>{video.publishDate}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Video Player Modal */}
-        <AnimatePresence>
-          {selectedVideo && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
-                onClick={() => setSelectedVideo(null)}
-              >
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
-                  className="bg-white rounded-lg w-full max-w-4xl"
-                  onClick={(e) => e.stopPropagation()}
+        {compareList.length === 0 ? (
+          <div className="text-center py-12">
+            <Compare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h4 className="text-lg font-medium text-gray-900 mb-2">No phones to compare</h4>
+            <p className="text-gray-600">Add phones to your comparison list to see them here</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {compareList.map((phone) => (
+              <div key={phone.id} className="border rounded-lg p-4 relative">
+                <button
+                  onClick={() => onRemove(phone.id)}
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-700"
                 >
-                  <div className="flex items-center justify-between p-4 border-b">
-                    <h3 className="text-lg font-semibold">{selectedVideo.title}</h3>
-                    <button
-                      onClick={() => setSelectedVideo(null)}
-                      className="text-gray-400 hover:text-gray-600"
-                    >
-                      <X className="w-6 h-6" />
-                    </button>
-                  </div>
-                  <div className="aspect-video">
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      src={`https://www.youtube.com/embed/dQw4w9WgXcQ`}
-                      title={selectedVideo.title}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="rounded-b-lg"
-                    ></iframe>
-                  </div>
-                </motion.div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
+                  <X className="w-5 h-5" />
+                </button>
+                <img 
+                  src={phone.image} 
+                  alt={phone.title}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+                <h4 className="font-bold text-lg mb-2">{phone.title}</h4>
+                <p className="text-blue-600 font-bold text-xl mb-4">{phone.price}</p>
+                {/* Add more comparison specs here */}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-// Forums Page Component
-export const ForumsPage = () => {
-  const forumTopics = [
+// Keep existing components (MobileBottomNav, BrowseSection, FeaturedPhones) unchanged
+export const MobileBottomNav = ({ currentPage, setCurrentPage, isLoggedIn, compareCount }) => {
+  const tabs = [
+    { key: 'home', icon: Home, label: 'Home' },
+    { key: 'my-ads', icon: List, label: 'My Ads', requiresAuth: true },
+    { key: 'sell', icon: Plus, label: 'Sell', isSpecial: true, requiresAuth: true },
+    { key: 'chat', icon: MessageCircle, label: 'Chat', requiresAuth: true },
+    { key: 'more', icon: MoreHorizontal, label: 'More' }
+  ];
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 md:hidden">
+      <div className="flex justify-around items-center py-2">
+        {tabs.map((tab) => {
+          const IconComponent = tab.icon;
+          const isActive = currentPage === tab.key;
+          const isSpecial = tab.isSpecial;
+          
+          return (
+            <button
+              key={tab.key}
+              onClick={() => {
+                if (tab.requiresAuth && !isLoggedIn) {
+                  alert('Please login to access this feature');
+                  return;
+                }
+                setCurrentPage(tab.key);
+              }}
+              className={`flex flex-col items-center justify-center py-2 px-3 min-w-0 relative ${
+                isSpecial 
+                  ? 'transform -translate-y-2' 
+                  : ''
+              }`}
+            >
+              <div className={`flex items-center justify-center relative ${
+                isSpecial 
+                  ? 'w-14 h-14 bg-red-600 rounded-full shadow-lg' 
+                  : 'w-6 h-6'
+              }`}>
+                <IconComponent 
+                  className={`${
+                    isSpecial 
+                      ? 'w-7 h-7 text-white' 
+                      : isActive 
+                        ? 'w-6 h-6 text-blue-600' 
+                        : 'w-6 h-6 text-gray-400'
+                  }`} 
+                />
+                {tab.key === 'chat' && compareCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {compareCount}
+                  </span>
+                )}
+              </div>
+              <span className={`text-xs mt-1 truncate ${
+                isSpecial 
+                  ? 'text-red-600 font-medium' 
+                  : isActive 
+                    ? 'text-blue-600 font-medium' 
+                    : 'text-gray-500'
+              }`}>
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+};
+
+export const BrowseSection = () => {
+  const [activeTab, setActiveTab] = useState('Category');
+  
+  const tabs = ['Category', 'City', 'Brand', 'Model', 'Budget', 'Storage'];
+  
+  const categoryData = {
+    'Category': [
+      { name: 'iPhone', count: 1234, color: 'bg-blue-500' },
+      { name: 'Samsung', count: 2156, color: 'bg-purple-500' },
+      { name: 'Xiaomi', count: 1876, color: 'bg-orange-500' },
+      { name: 'Oppo', count: 945, color: 'bg-green-500' },
+      { name: 'Vivo', count: 823, color: 'bg-pink-500' },
+      { name: 'OnePlus', count: 567, color: 'bg-red-500' }
+    ],
+    'City': [
+      { name: 'Karachi', count: 3456, color: 'bg-blue-600' },
+      { name: 'Lahore', count: 2890, color: 'bg-green-600' },
+      { name: 'Islamabad', count: 1567, color: 'bg-purple-600' },
+      { name: 'Rawalpindi', count: 1234, color: 'bg-orange-600' },
+      { name: 'Faisalabad', count: 891, color: 'bg-red-600' },
+      { name: 'Multan', count: 654, color: 'bg-indigo-600' }
+    ],
+    'Brand': [
+      { name: 'Apple iPhone', count: 1234, color: 'bg-gray-600' },
+      { name: 'Samsung Galaxy', count: 2156, color: 'bg-blue-600' },
+      { name: 'Xiaomi Mi/Redmi', count: 1876, color: 'bg-orange-600' },
+      { name: 'Oppo', count: 945, color: 'bg-green-600' },
+      { name: 'Vivo', count: 823, color: 'bg-purple-600' },
+      { name: 'OnePlus', count: 567, color: 'bg-red-600' }
+    ],
+    'Model': [
+      { name: 'iPhone 15 Pro Max', count: 234, color: 'bg-blue-500' },
+      { name: 'Galaxy S24 Ultra', count: 445, color: 'bg-purple-500' },
+      { name: 'Xiaomi 14 Ultra', count: 167, color: 'bg-orange-500' },
+      { name: 'iPhone 14 Pro', count: 298, color: 'bg-blue-600' },
+      { name: 'Galaxy S23', count: 356, color: 'bg-purple-600' },
+      { name: 'OnePlus 12', count: 123, color: 'bg-red-500' }
+    ],
+    'Budget': [
+      { name: 'Under 25K', count: 1456, color: 'bg-green-500' },
+      { name: '25K - 50K', count: 2234, color: 'bg-blue-500' },
+      { name: '50K - 100K', count: 1789, color: 'bg-purple-500' },
+      { name: '100K - 150K', count: 967, color: 'bg-orange-500' },
+      { name: '150K - 200K', count: 445, color: 'bg-red-500' },
+      { name: 'Above 200K', count: 234, color: 'bg-gray-600' }
+    ],
+    'Storage': [
+      { name: '64GB', count: 1234, color: 'bg-blue-400' },
+      { name: '128GB', count: 2456, color: 'bg-green-500' },
+      { name: '256GB', count: 1789, color: 'bg-purple-500' },
+      { name: '512GB', count: 678, color: 'bg-orange-500' },
+      { name: '1TB', count: 234, color: 'bg-red-500' },
+      { name: '2TB', count: 45, color: 'bg-gray-600' }
+    ]
+  };
+
+  return (
+    <section className="bg-white py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Browse Used Phones
+          </h2>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex flex-wrap justify-center mb-8 border-b border-gray-200">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-6 py-3 font-medium text-sm transition-colors relative ${
+                activeTab === tab
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* Content Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {categoryData[activeTab].map((item, index) => (
+            <button
+              key={index}
+              className="group bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-all duration-200 hover:border-blue-300"
+            >
+              <div className={`w-12 h-12 ${item.color} rounded-lg mb-3 mx-auto group-hover:scale-110 transition-transform flex items-center justify-center`}>
+                <span className="text-white font-bold text-lg">
+                  {item.name.charAt(0)}
+                </span>
+              </div>
+              <h3 className="font-medium text-gray-900 text-sm mb-1 group-hover:text-blue-600">
+                {item.name}
+              </h3>
+              <p className="text-xs text-gray-500">
+                {item.count.toLocaleString()} phones
+              </p>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const FeaturedPhones = ({ addToCompare, compareList }) => {
+  const featuredPhones = [
     {
       id: 1,
-      title: 'iPhone vs Samsung: Which is better in 2024?',
-      author: 'TechLover123',
-      replies: 45,
-      lastActivity: '2 hours ago',
-      category: 'General Discussion',
-      isHot: true
+      title: 'iPhone 15 Pro Max',
+      price: 'PKR 180,000',
+      originalPrice: 'PKR 195,000',
+      image: 'https://images.unsplash.com/photo-1596207498818-edb80522f50b',
+      condition: 'Like New',
+      storage: '256GB',
+      ram: '8GB',
+      city: 'Karachi',
+      views: 1250,
+      featured: true,
+      seller: 'Mobile World',
+      verified: true,
+      postedDate: '2 days ago'
     },
     {
       id: 2,
-      title: 'Best budget phones under 50,000 PKR',
-      author: 'BudgetHunter',
-      replies: 23,
-      lastActivity: '5 hours ago',
-      category: 'Buying Guide'
+      title: 'Samsung Galaxy S24 Ultra',
+      price: 'PKR 150,000',
+      originalPrice: 'PKR 165,000',
+      image: 'https://images.pexels.com/photos/5475811/pexels-photo-5475811.jpeg',
+      condition: 'Excellent',
+      storage: '512GB',
+      ram: '12GB',
+      city: 'Lahore',
+      views: 890,
+      featured: true,
+      seller: 'Tech Hub',
+      verified: true,
+      postedDate: '1 day ago'
     },
     {
       id: 3,
-      title: 'How to check if a used phone is original?',
-      author: 'SafeBuyer',
-      replies: 67,
-      lastActivity: '1 day ago',
-      category: 'Safety Tips',
-      isPinned: true
+      title: 'Xiaomi 14 Ultra',
+      price: 'PKR 95,000',
+      originalPrice: 'PKR 105,000',
+      image: 'https://images.unsplash.com/photo-1596207891316-23851be3cc20',
+      condition: 'Good',
+      storage: '256GB',
+      ram: '12GB',
+      city: 'Islamabad',
+      views: 567,
+      featured: true,
+      seller: 'Smart Phones',
+      verified: false,
+      postedDate: '3 hours ago'
     },
     {
       id: 4,
-      title: 'Gaming performance comparison: Snapdragon vs MediaTek',
-      author: 'MobileGamer',
-      replies: 34,
-      lastActivity: '2 days ago',
-      category: 'Performance'
+      title: 'OnePlus 12',
+      price: 'PKR 85,000',
+      originalPrice: 'PKR 95,000',
+      image: 'https://images.pexels.com/photos/8728559/pexels-photo-8728559.jpeg',
+      condition: 'Like New',
+      storage: '256GB',
+      ram: '16GB',
+      city: 'Rawalpindi',
+      views: 423,
+      featured: false,
+      seller: 'Digital Mart',
+      verified: true,
+      postedDate: '5 hours ago'
     }
   ];
 
   return (
-    <div className="pt-20 pb-24 sm:pb-8">
+    <section className="bg-gray-50 py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Community Forums</h1>
-          <p className="text-lg text-gray-600">Join discussions with fellow phone enthusiasts</p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              Featured Phones
+            </h2>
+            <p className="text-gray-600">
+              Handpicked deals from verified sellers
+            </p>
+          </div>
+          <button className="hidden md:block text-blue-600 hover:text-blue-700 font-medium">
+            View All Featured →
+          </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="border-b border-gray-200 p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 sm:mb-0">Recent Discussions</h2>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium">
-                Start New Topic
-              </button>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {featuredPhones.map((phone) => {
+            const isInCompare = compareList.some(p => p.id === phone.id);
+            
+            return (
+              <div key={phone.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                {/* Image Container */}
+                <div className="relative h-64 bg-gradient-to-br from-blue-500 to-purple-600 overflow-hidden">
+                  <img 
+                    src={phone.image} 
+                    alt={phone.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  
+                  {/* Badges */}
+                  <div className="absolute top-3 left-3">
+                    {phone.featured && (
+                      <span className="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium mb-2 block w-fit">
+                        Featured
+                      </span>
+                    )}
+                    <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                      {phone.condition}
+                    </span>
+                  </div>
 
-          <div className="divide-y divide-gray-200">
-            {forumTopics.map((topic, index) => (
-              <motion.div
-                key={topic.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="p-6 hover:bg-gray-50 cursor-pointer transition-colors"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      {topic.isPinned && (
-                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Pinned</span>
+                  {/* Action Buttons */}
+                  <div className="absolute top-3 right-3 flex flex-col space-y-2">
+                    <button className="bg-white bg-opacity-90 p-2 rounded-full hover:bg-opacity-100 transition-all group">
+                      <Heart className="w-4 h-4 text-gray-600 group-hover:text-red-500" />
+                    </button>
+                    <button
+                      onClick={() => addToCompare(phone)}
+                      disabled={isInCompare}
+                      className={`p-2 rounded-full transition-all ${
+                        isInCompare 
+                          ? 'bg-blue-500 text-white' 
+                          : 'bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-600 hover:text-blue-500'
+                      }`}
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* View Count */}
+                  <div className="absolute bottom-3 left-3 bg-black bg-opacity-50 text-white px-2 py-1 rounded-full text-xs flex items-center space-x-1">
+                    <Eye className="w-3 h-3" />
+                    <span>{phone.views}</span>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-5">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
+                      {phone.title}
+                    </h3>
+                    {phone.verified && (
+                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 ml-2" />
+                    )}
+                  </div>
+
+                  {/* Price */}
+                  <div className="mb-3">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-2xl font-bold text-blue-600">{phone.price}</span>
+                      {phone.originalPrice && (
+                        <span className="text-sm text-gray-500 line-through">{phone.originalPrice}</span>
                       )}
-                      {topic.isHot && (
-                        <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Hot</span>
-                      )}
-                      <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">{topic.category}</span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{topic.title}</h3>
-                    <div className="flex items-center text-sm text-gray-500 space-x-4">
-                      <span>By {topic.author}</span>
-                      <span>•</span>
-                      <span>{topic.replies} replies</span>
-                      <span>•</span>
-                      <span>Last activity {topic.lastActivity}</span>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
-// Blog Page Component
-export const BlogPage = () => {
-  const blogPosts = [
-    {
-      id: 1,
-      title: 'How to Sell Your Phone Quickly: 10 Expert Tips',
-      excerpt: 'Learn the secrets to selling your phone fast and getting the best price in the Pakistani market.',
-      author: 'PhoneFlip Editorial',
-      publishDate: 'March 15, 2024',
-      readTime: '8 min read',
-      image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9',
-      category: 'Selling Guide'
-    },
-    {
-      id: 2,
-      title: 'Phone Market Trends in Pakistan 2024',
-      excerpt: 'Discover the latest trends shaping the Pakistani mobile phone market and what to expect.',
-      author: 'Market Analyst',
-      publishDate: 'March 12, 2024',
-      readTime: '12 min read',
-      image: 'https://images.unsplash.com/photo-1584651432430-7e1ac8303a0a',
-      category: 'Market News'
-    },
-    {
-      id: 3,
-      title: 'Avoiding Scams When Buying Used Phones',
-      excerpt: 'Essential safety tips to protect yourself from fraud when purchasing second-hand mobile phones.',
-      author: 'Security Expert',
-      publishDate: 'March 10, 2024',
-      readTime: '6 min read',
-      image: 'https://images.unsplash.com/photo-1575719362347-a70b129740e0',
-      category: 'Safety Tips'
-    }
-  ];
+                  {/* Specs */}
+                  <div className="grid grid-cols-2 gap-2 mb-4 text-sm">
+                    <div className="flex items-center space-x-1 text-gray-600">
+                      <span className="font-medium">Storage:</span>
+                      <span>{phone.storage}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-gray-600">
+                      <span className="font-medium">RAM:</span>
+                      <span>{phone.ram}</span>
+                    </div>
+                  </div>
 
-  return (
-    <div className="pt-20 pb-24 sm:pb-8">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">PhoneFlip Blog</h1>
-          <p className="text-lg text-gray-600">Insights, tips, and news about the mobile phone market</p>
-        </div>
+                  {/* Location & Seller */}
+                  <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
+                    <div className="flex items-center space-x-1">
+                      <MapPin className="w-4 h-4" />
+                      <span>{phone.city}</span>
+                    </div>
+                    <span>{phone.postedDate}</span>
+                  </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogPosts.map((post, index) => (
-            <motion.article
-              key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer overflow-hidden"
-            >
-              <img 
-                src={post.image} 
-                alt={post.title}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{post.category}</span>
-                  <span className="text-sm text-gray-500">{post.readTime}</span>
-                </div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2">{post.title}</h2>
-                <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>By {post.author}</span>
-                  <span>{post.publishDate}</span>
+                  {/* Seller Info */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                        <User className="w-4 h-4 text-gray-600" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">{phone.seller}</span>
+                    </div>
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                      Contact
+                    </button>
+                  </div>
                 </div>
               </div>
-            </motion.article>
-          ))}
+            );
+          })}
         </div>
 
-        <div className="text-center mt-12">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium">
-            Load More Posts
+        {/* Mobile View All Button */}
+        <div className="text-center mt-8 md:hidden">
+          <button className="text-blue-600 hover:text-blue-700 font-medium">
+            View All Featured Phones →
           </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
