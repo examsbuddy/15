@@ -819,6 +819,7 @@ async def get_stats():
     """Get platform statistics"""
     try:
         total_listings = await db.phone_listings.count_documents({"is_active": True})
+        total_accessories = await db.accessories.count_documents({"is_active": True})
         
         # Get brand counts
         pipeline = [
@@ -840,12 +841,82 @@ async def get_stats():
         
         return {
             "total_listings": total_listings,
+            "total_accessories": total_accessories,
             "brands": [{"name": stat["_id"], "count": stat["count"]} for stat in brand_stats],
             "cities": [{"name": stat["_id"], "count": stat["count"]} for stat in city_stats]
         }
     except Exception as e:
         logger.error(f"Error fetching stats: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch stats")
+
+# Accessories Routes
+@api_router.get("/accessories")
+async def get_accessories(skip: int = 0, limit: int = 50, type: Optional[str] = None, brand: Optional[str] = None, city: Optional[str] = None, min_price: Optional[int] = None, max_price: Optional[int] = None):
+    """Get accessories with optional filters"""
+    try:
+        # Build query filter
+        query = {"is_active": True, "category": "accessories"}
+        
+        if type:
+            query["type"] = {"$regex": type, "$options": "i"}
+        if city:
+            query["city"] = {"$regex": city, "$options": "i"}
+        if brand:
+            query["brand"] = {"$regex": brand, "$options": "i"}
+        if min_price is not None or max_price is not None:
+            price_filter = {}
+            if min_price is not None:
+                price_filter["$gte"] = min_price
+            if max_price is not None:
+                price_filter["$lte"] = max_price
+            query["price"] = price_filter
+        
+        # Get accessories sorted by creation date (newest first)
+        cursor = db.accessories.find(query).sort("created_at", -1).skip(skip).limit(limit)
+        accessories = await cursor.to_list(length=limit)
+        
+        # Serialize ObjectIds
+        for accessory in accessories:
+            accessory = serialize_doc(accessory)
+        
+        return accessories
+    except Exception as e:
+        logger.error(f"Error fetching accessories: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch accessories")
+
+@api_router.get("/accessories/featured")
+async def get_featured_accessories(limit: int = 4):
+    """Get featured accessories"""
+    try:
+        # Get featured accessories first, then recent ones if not enough featured
+        featured_cursor = db.accessories.find({
+            "is_active": True, 
+            "is_featured": True,
+            "category": "accessories"
+        }).sort("created_at", -1).limit(limit)
+        
+        featured_accessories = await featured_cursor.to_list(length=limit)
+        
+        # If not enough featured, get recent ones
+        if len(featured_accessories) < limit:
+            remaining = limit - len(featured_accessories)
+            recent_cursor = db.accessories.find({
+                "is_active": True,
+                "category": "accessories",
+                "is_featured": {"$ne": True}
+            }).sort("created_at", -1).limit(remaining)
+            
+            recent_accessories = await recent_cursor.to_list(length=remaining)
+            featured_accessories.extend(recent_accessories)
+        
+        # Serialize ObjectIds
+        for accessory in featured_accessories:
+            accessory = serialize_doc(accessory)
+        
+        return featured_accessories
+    except Exception as e:
+        logger.error(f"Error fetching featured accessories: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch featured accessories")
 
 # Include the router in the main app
 app.include_router(api_router)
