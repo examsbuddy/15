@@ -20,7 +20,8 @@ import {
   PostAdPage,
   SearchResultsPage,
   ShopOwnerDashboard,
-  DetailedListingPage
+  DetailedListingPage,
+  DedicatedSearchPage
 } from './Components';
 
 function App() {
