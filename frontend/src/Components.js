@@ -1499,10 +1499,8 @@ export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
 };
 
 // Bottom Navigation Component - Enhanced with More menu
-export const BottomNavigation = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
+export const BottomNavigation = ({ activeTab, setActiveTab, setIsPostAdOpen, isLoggedIn, setIsLoginOpen }) => {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleSell = () => {
     if (!isLoggedIn) {
