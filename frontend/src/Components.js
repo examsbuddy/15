@@ -1605,7 +1605,10 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
               </div>
 
               {/* Search Button */}
-              <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+              <button 
+                onClick={handleSearch}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
                 <Search className="w-6 h-6" />
                 <span>Search</span>
               </button>
