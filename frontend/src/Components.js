@@ -1687,8 +1687,7 @@ export const BottomNavigation = ({ activeTab, setActiveTab, setIsPostAdOpen, isL
         )}
       </AnimatePresence>
 
-      {/* Login Modal */}
-      <LoginModal isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} setIsLoggedIn={setIsLoggedIn} />
+      {/* Login Modal - Now handled in App.js */}
     </>
   );
 };
