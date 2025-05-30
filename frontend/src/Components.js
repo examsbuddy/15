@@ -949,7 +949,7 @@ export const MobileHeader = ({ isMenuOpen, setIsMenuOpen, setIsPostAdOpen, setAc
         {/* Mobile Post Ad Button - Floating */}
         <button
           onClick={handlePostAd}
-          className="fixed bottom-20 right-4 bg-red-600 hover:bg-red-700 text-white p-4 rounded-full shadow-lg z-40 lg:hidden"
+          className="fixed bottom-20 right-4 bg-red-600 hover:bg-red-700 text-white p-4 rounded-full shadow-lg z-40 sm:hidden"
         >
           <Plus className="w-6 h-6" />
         </button>
