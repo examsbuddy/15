@@ -56,40 +56,99 @@ class PhoneFlipAPITester:
             print(f"❌ Failed - Error: {str(e)}")
             return False, {}
 
-    def test_api_root(self):
-        """Test API root endpoint"""
-        return self.run_test(
-            "API Root",
-            "GET",
-            "api",
-            200
+    def test_register_normal_user(self):
+        """Test registering a normal user"""
+        test_data = {
+            "name": "Test User",
+            "email": self.test_user_email,
+            "password": self.test_user_password,
+            "phone": "03001234567",
+            "role": "normal_user"
+        }
+        
+        success, response = self.run_test(
+            "Register Normal User",
+            "POST",
+            "api/auth/register",
+            200,
+            data=test_data
         )
-
-    def test_get_listings(self):
-        """Test getting all listings"""
-        return self.run_test(
-            "Get All Listings",
-            "GET",
-            "api/listings",
-            200
+        
+        if success and "access_token" in response:
+            self.auth_token = response["access_token"]
+            self.user_data = response["user"]
+            print(f"Registered user with email: {self.test_user_email}")
+        
+        return success, response
+    
+    def test_login(self):
+        """Test user login"""
+        test_data = {
+            "email": self.test_user_email,
+            "password": self.test_user_password
+        }
+        
+        success, response = self.run_test(
+            "User Login",
+            "POST",
+            "api/auth/login",
+            200,
+            data=test_data
         )
-
-    def test_get_featured_listings(self):
-        """Test getting featured listings"""
+        
+        if success and "access_token" in response:
+            self.auth_token = response["access_token"]
+            self.user_data = response["user"]
+            print(f"Logged in user with email: {self.test_user_email}")
+        
+        return success, response
+    
+    def test_get_current_user(self):
+        """Test getting current user info"""
+        if not self.auth_token:
+            print("❌ No auth token available, skipping test")
+            return False, {}
+        
         return self.run_test(
-            "Get Featured Listings",
+            "Get Current User Info",
             "GET",
-            "api/listings/featured",
-            200
+            "api/auth/me",
+            200,
+            auth=True
         )
-
-    def test_get_stats(self):
-        """Test getting platform statistics"""
+    
+    def test_register_shop_owner(self):
+        """Test registering a shop owner"""
+        test_data = {
+            "name": "Test Shop Owner",
+            "email": self.test_shop_owner_email,
+            "password": self.test_user_password,
+            "phone": "03009876543",
+            "business_details": {
+                "business_name": "Test Mobile Shop",
+                "business_type": "mobile_shop",
+                "business_address": "123 Test Street",
+                "city": "Karachi",
+                "postal_code": "75000",
+                "business_phone": "03009876543",
+                "website": "https://testshop.com",
+                "description": "This is a test shop for automated testing.",
+                "years_in_business": 5
+            },
+            "kyc_documents": {
+                "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
+                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",    # test base64 data
+                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
+                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="      # test base64 data
+            }
+        }
+        
         return self.run_test(
-            "Get Platform Stats",
-            "GET",
-            "api/stats",
-            200
+            "Register Shop Owner",
+            "POST",
+            "api/auth/register-shop-owner",
+            200,
+            data=test_data
         )
 
     def test_create_listing(self):
