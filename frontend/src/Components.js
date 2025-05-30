@@ -239,6 +239,323 @@ export const LoginModal = ({ isOpen, setIsOpen }) => {
   );
 };
 
+// Post Ad Modal Component
+export const PostAdModal = ({ isOpen, setIsOpen }) => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [adData, setAdData] = useState({
+    title: '',
+    brand: '',
+    model: '',
+    price: '',
+    condition: '',
+    storage: '',
+    ram: '',
+    city: '',
+    description: '',
+    phone: '',
+    images: []
+  });
+
+  const brands = ['iPhone', 'Samsung', 'Xiaomi', 'OnePlus', 'Oppo', 'Vivo', 'Huawei', 'Nokia', 'Realme'];
+  const conditions = ['Excellent', 'Good', 'Fair', 'Poor'];
+  const storageOptions = ['32GB', '64GB', '128GB', '256GB', '512GB', '1TB'];
+  const ramOptions = ['2GB', '3GB', '4GB', '6GB', '8GB', '12GB', '16GB'];
+
+  const handleNext = () => {
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Ad submitted:', adData);
+    setIsOpen(false);
+    setCurrentStep(1);
+    // Reset form
+    setAdData({
+      title: '', brand: '', model: '', price: '', condition: '',
+      storage: '', ram: '', city: '', description: '', phone: '', images: []
+    });
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setIsOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Post Your Phone Ad
+                </h2>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Progress Steps */}
+              <div className="flex items-center justify-center mb-8">
+                {[1, 2, 3].map((step) => (
+                  <div key={step} className="flex items-center">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                      currentStep >= step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+                    }`}>
+                      {step}
+                    </div>
+                    {step < 3 && (
+                      <div className={`w-16 h-1 mx-2 ${
+                        currentStep > step ? 'bg-blue-600' : 'bg-gray-200'
+                      }`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <form onSubmit={handleSubmit}>
+                {/* Step 1: Basic Information */}
+                {currentStep === 1 && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Brand *
+                        </label>
+                        <select
+                          value={adData.brand}
+                          onChange={(e) => setAdData({...adData, brand: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          required
+                        >
+                          <option value="">Select Brand</option>
+                          {brands.map(brand => (
+                            <option key={brand} value={brand}>{brand}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Model *
+                        </label>
+                        <input
+                          type="text"
+                          value={adData.model}
+                          onChange={(e) => setAdData({...adData, model: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          placeholder="e.g., iPhone 14 Pro Max"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Condition *
+                        </label>
+                        <select
+                          value={adData.condition}
+                          onChange={(e) => setAdData({...adData, condition: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          required
+                        >
+                          <option value="">Select Condition</option>
+                          {conditions.map(condition => (
+                            <option key={condition} value={condition}>{condition}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Price (PKR) *
+                        </label>
+                        <input
+                          type="number"
+                          value={adData.price}
+                          onChange={(e) => setAdData({...adData, price: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          placeholder="e.g., 150000"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Storage
+                        </label>
+                        <select
+                          value={adData.storage}
+                          onChange={(e) => setAdData({...adData, storage: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="">Select Storage</option>
+                          {storageOptions.map(storage => (
+                            <option key={storage} value={storage}>{storage}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          RAM
+                        </label>
+                        <select
+                          value={adData.ram}
+                          onChange={(e) => setAdData({...adData, ram: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="">Select RAM</option>
+                          {ramOptions.map(ram => (
+                            <option key={ram} value={ram}>{ram}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 2: Location & Description */}
+                {currentStep === 2 && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold mb-4">Location & Description</h3>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        City *
+                      </label>
+                      <select
+                        value={adData.city}
+                        onChange={(e) => setAdData({...adData, city: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        required
+                      >
+                        <option value="">Select City</option>
+                        {cities.map(city => (
+                          <option key={city} value={city}>{city}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        value={adData.phone}
+                        onChange={(e) => setAdData({...adData, phone: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="03XX XXXXXXX"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                      </label>
+                      <textarea
+                        value={adData.description}
+                        onChange={(e) => setAdData({...adData, description: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        rows="4"
+                        placeholder="Describe your phone's condition, any accessories included, etc."
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: Review & Submit */}
+                {currentStep === 3 && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold mb-4">Review Your Ad</h3>
+                    
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-gray-900 mb-2">
+                        {adData.brand} {adData.model}
+                      </h4>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <span><strong>Price:</strong> Rs {adData.price?.toLocaleString()}</span>
+                        <span><strong>Condition:</strong> {adData.condition}</span>
+                        <span><strong>Storage:</strong> {adData.storage}</span>
+                        <span><strong>RAM:</strong> {adData.ram}</span>
+                        <span><strong>City:</strong> {adData.city}</span>
+                        <span><strong>Phone:</strong> {adData.phone}</span>
+                      </div>
+                      {adData.description && (
+                        <div className="mt-2">
+                          <strong>Description:</strong>
+                          <p className="text-gray-600 mt-1">{adData.description}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Navigation Buttons */}
+                <div className="flex justify-between mt-8">
+                  <button
+                    type="button"
+                    onClick={handlePrev}
+                    className={`px-6 py-2 rounded-lg font-medium ${
+                      currentStep === 1 
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                        : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+                    }`}
+                    disabled={currentStep === 1}
+                  >
+                    Previous
+                  </button>
+
+                  {currentStep < 3 ? (
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
+                    >
+                      Next
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium"
+                    >
+                      Post Ad
+                    </button>
+                  )}
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
 // Notification Panel Component
 export const NotificationPanel = ({ isOpen, setIsOpen }) => {
   const [unreadCount, setUnreadCount] = useState(notifications.filter(n => n.unread).length);
