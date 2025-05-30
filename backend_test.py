@@ -6,6 +6,17 @@ import uuid
 from datetime import datetime
 
 class PhoneFlipAPITester:
+    def __init__(self, base_url):
+        self.base_url = base_url
+        self.tests_run = 0
+        self.tests_passed = 0
+        self.test_listing_id = None
+        self.auth_token = None
+        self.user_data = None
+        self.test_user_email = f"test_user_{uuid.uuid4().hex[:8]}@example.com"
+        self.test_user_password = "Test@123456"
+        self.test_shop_owner_email = f"shop_owner_{uuid.uuid4().hex[:8]}@example.com"
+
     def run_test(self, name, method, endpoint, expected_status, data=None, params=None, auth=False):
         """Run a single API test"""
         url = f"{self.base_url}/{endpoint}"
@@ -69,7 +80,7 @@ class PhoneFlipAPITester:
             print(f"Registered user with email: {self.test_user_email}")
         
         return success, response
-
+    
     def test_login(self):
         """Test user login"""
         test_data = {
@@ -123,7 +134,7 @@ class PhoneFlipAPITester:
             "api/listings",
             200
         )
-
+    
     def test_get_featured_listings(self):
         """Test getting featured listings"""
         return self.run_test(
@@ -132,7 +143,7 @@ class PhoneFlipAPITester:
             "api/listings/featured",
             200
         )
-
+    
     def test_get_stats(self):
         """Test getting platform statistics"""
         return self.run_test(
@@ -141,7 +152,7 @@ class PhoneFlipAPITester:
             "api/stats",
             200
         )
-
+    
     def test_register_shop_owner(self):
         """Test registering a shop owner"""
         test_data = {
@@ -175,42 +186,41 @@ class PhoneFlipAPITester:
             200,
             data=test_data
         )
-
+    
     def test_create_listing(self):
         """Test creating a new listing"""
         test_data = {
-            "brand": "Samsung",
-            "model": "Galaxy S23",
+            "title": "iPhone 13 Pro Max",
+            "description": "Excellent condition, barely used",
+            "brand": "Apple",
+            "model": "iPhone 13 Pro Max",
+            "storage": "256GB",
+            "color": "Graphite",
             "condition": "Good",
             "price": 120000,
-            "storage": "256GB",
-            "ram": "8GB",
             "city": "Karachi",
-            "description": "This is a test listing created by automated testing.",
-            "seller_name": "Test User",
-            "seller_phone": "03001234567",
-            "seller_email": "test@example.com",
-            "features": ["5G", "AMOLED Display", "Fast Charging"]
+            "images": ["base64encodedimage1", "base64encodedimage2"]
         }
         
         success, response = self.run_test(
-            "Create New Listing",
+            "Create Listing",
             "POST",
             "api/listings",
-            200,
-            data=test_data
+            201,
+            data=test_data,
+            auth=True
         )
         
-        if success and response.get("success") and "listing_id" in response:
-            self.test_listing_id = response["listing_id"]
-            print(f"Created test listing with ID: {self.test_listing_id}")
+        if success and "id" in response:
+            self.test_listing_id = response["id"]
+            print(f"Created listing with ID: {self.test_listing_id}")
         
         return success, response
-
+    
     def test_get_listing_by_id(self):
-        """Test getting a specific listing by ID"""
+        """Test getting a listing by ID"""
         if not self.test_listing_id:
-            print("❌ No test listing ID available, skipping test")
+            print("❌ No listing ID available, skipping test")
             return False, {}
         
         return self.run_test(
@@ -219,22 +229,15 @@ class PhoneFlipAPITester:
             f"api/listings/{self.test_listing_id}",
             200
         )
-
+    
     def test_filtered_listings(self):
-        """Test getting listings with filters"""
-        params = {
-            "brand": "Samsung",
-            "city": "Karachi",
-            "min_price": 100000,
-            "max_price": 150000
-        }
-        
+        """Test getting filtered listings"""
         return self.run_test(
             "Get Filtered Listings",
             "GET",
             "api/listings",
             200,
-            params=params
+            params={"brand": "Apple", "min_price": 50000, "max_price": 150000}
         )
 
 def main():
