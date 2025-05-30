@@ -984,7 +984,7 @@ export const BottomNavigation = ({ activeTab, setActiveTab, setIsPostAdOpen }) =
 
   return (
     <>
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-bottom">
         <div className="flex justify-around py-2">
           {navItems.map((item) => {
             const Icon = item.icon;
