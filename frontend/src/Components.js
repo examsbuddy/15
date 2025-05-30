@@ -621,7 +621,7 @@ export const OurOfferingsSection = ({ onCompareClick, onPriceAlertsClick }) => {
   const offerings = [
     {
       id: 1,
-      icon: <Compare className="w-8 h-8" />,
+      icon: <GitCompare className="w-8 h-8" />,
       title: 'Phone Comparison Tool',
       description: 'Compare specs, prices, and features side-by-side to make the best choice',
       color: 'from-blue-500 to-blue-600',
