@@ -1407,7 +1407,12 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
 };
 
 // Mobile Header Component - Simplified to only show logo
-export const MobileHeader = () => {
+export const MobileHeader = ({ isLoggedIn, setIsLoginOpen }) => {
+  const handleLoginClick = () => {
+    if (!isLoggedIn) {
+      setIsLoginOpen(true);
+    }
+  };
   return (
     <header className="block sm:hidden bg-blue-900 text-white sticky top-0 z-50 safe-area-top">
       <div className="px-4 py-4">
