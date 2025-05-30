@@ -1976,17 +1976,22 @@ export const PostAdPage = ({ onSubmitSuccess, user }) => {
   const [showPreview, setShowPreview] = useState(false);
   const [submittedListing, setSubmittedListing] = useState(null);
   const [error, setError] = useState('');
+  const [photoError, setPhotoError] = useState('');
 
   const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'];
   const conditions = ['Excellent', 'Very Good', 'Good', 'Fair', 'Poor'];
   const storageOptions = ['32GB', '64GB', '128GB', '256GB', '512GB', '1TB'];
   const ramOptions = ['3GB', '4GB', '6GB', '8GB', '12GB', '16GB', '18GB'];
   const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
+  const batteryOptions = ['3000mAh', '3500mAh', '4000mAh', '4500mAh', '5000mAh', '5500mAh', '6000mAh'];
+  const screenSizeOptions = ['5.4 inch', '6.1 inch', '6.4 inch', '6.7 inch', '6.8 inch', '7.0 inch'];
+  const networkOptions = ['4G', '5G'];
   const commonFeatures = [
     'Face ID', 'Fingerprint Scanner', 'Wireless Charging', 'Fast Charging', 
     'Dual SIM', 'NFC', 'Water Resistant', 'Headphone Jack', 
     'Expandable Storage', 'Dual Camera', 'Triple Camera', 'Quad Camera'
   ];
+  const commonAccessories = ['Charger', 'Cable', 'Earphones', 'Case', 'Screen Protector', 'Documentation'];
 
   const handleInputChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
