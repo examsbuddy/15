@@ -3576,23 +3576,30 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
   const [filteredListings, setFilteredListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState({
-    brand: '',
+    brand: [],
     model: '',
-    city: '',
-    condition: '',
+    city: [],
+    condition: [],
+    color: [],
     priceRange: '',
-    storage: '',
-    ram: '',
-    battery: '',
-    network: '',
+    storage: [],
+    ram: [],
+    battery: [],
+    battery_health: [],
+    network: [],
+    seller_type: [],
     search: ''
   });
   const [sortBy, setSortBy] = useState('newest');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+  const itemsPerPage = 20;
 
   const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'];
   const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
-  const conditions = ['Excellent', 'Very Good', 'Good', 'Fair', 'Poor'];
+  const conditions = ['New', 'Like New', 'Excellent', 'Very Good', 'Good', 'Fair', 'Used', 'Refurbished'];
+  const colors = ['Black', 'White', 'Blue', 'Red', 'Green', 'Yellow', 'Purple', 'Pink', 'Gold', 'Silver'];
   const priceRanges = [
     'Under ₨50,000',
     '₨50,000 - ₨100,000',
@@ -3604,7 +3611,16 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
   const storageOptions = ['32GB', '64GB', '128GB', '256GB', '512GB', '1TB'];
   const ramOptions = ['3GB', '4GB', '6GB', '8GB', '12GB', '16GB', '18GB'];
   const batteryOptions = ['3000mAh', '3500mAh', '4000mAh', '4500mAh', '5000mAh', '5500mAh', '6000mAh'];
+  const batteryHealthOptions = ['Excellent', 'Good', 'Fair', 'Poor'];
   const networkOptions = ['4G', '5G'];
+  const sellerTypeOptions = ['Individual', 'Shop Owner', 'Verified Seller'];
+  const sortOptions = [
+    { value: 'newest', label: 'Newest Listings' },
+    { value: 'oldest', label: 'Oldest Listings' },
+    { value: 'price_low', label: 'Price: Low to High' },
+    { value: 'price_high', label: 'Price: High to Low' },
+    { value: 'most_viewed', label: 'Most Viewed' }
+  ];
 
   useEffect(() => {
     fetchListings();
