@@ -3931,6 +3931,20 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
               </div>
 
               <div className="space-y-6">
+                {/* Sort By */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    {sortOptions.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Search */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
@@ -3943,34 +3957,55 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
                   />
                 </div>
 
+                {/* City Filter (Top Priority) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    City/Location
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="max-h-40 overflow-y-auto space-y-2">
+                    {cities.map(city => (
+                      <label key={city} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                        <input
+                          type="checkbox"
+                          checked={activeFilters.city.includes(city)}
+                          onChange={() => toggleMultiSelectFilter('city', city)}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700">{city}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Brand Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
-                  <select
-                    value={activeFilters.brand}
-                    onChange={(e) => setActiveFilters({ ...activeFilters, brand: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                  >
-                    <option value="">All Brands</option>
+                  <div className="max-h-40 overflow-y-auto space-y-2">
                     {brands.map(brand => (
-                      <option key={brand} value={brand}>{brand}</option>
+                      <label key={brand} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                        <input
+                          type="checkbox"
+                          checked={activeFilters.brand.includes(brand)}
+                          onChange={() => toggleMultiSelectFilter('brand', brand)}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700">{brand}</span>
+                      </label>
                     ))}
-                  </select>
+                  </div>
                 </div>
 
-                {/* City Filter */}
+                {/* Model Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-                  <select
-                    value={activeFilters.city}
-                    onChange={(e) => setActiveFilters({ ...activeFilters, city: e.target.value })}
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Model</label>
+                  <input
+                    type="text"
+                    value={activeFilters.model}
+                    onChange={(e) => setActiveFilters({ ...activeFilters, model: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                  >
-                    <option value="">All Cities</option>
-                    {cities.map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
+                    placeholder="e.g. iPhone 15 Pro"
+                  />
                 </div>
 
                 {/* Price Range Filter */}
@@ -3988,11 +4023,29 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
                   </select>
                 </div>
 
+                {/* Condition Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Condition</label>
+                  <div className="max-h-40 overflow-y-auto space-y-2">
+                    {conditions.map(condition => (
+                      <label key={condition} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                        <input
+                          type="checkbox"
+                          checked={activeFilters.condition.includes(condition)}
+                          onChange={() => toggleMultiSelectFilter('condition', condition)}
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700">{condition}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Advanced Filters Toggle */}
                 <div>
                   <button
                     onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                    className="flex items-center justify-between w-full text-left text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                    className="flex items-center justify-between w-full text-left text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors py-2"
                   >
                     <span>Advanced Filters</span>
                     <ChevronDown className={`w-4 h-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} />
@@ -4002,91 +4055,94 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
                 {/* Advanced Filters Section */}
                 {showAdvancedFilters && (
                   <>
-                    {/* Model Filter */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Model</label>
-                      <input
-                        type="text"
-                        value={activeFilters.model}
-                        onChange={(e) => setActiveFilters({ ...activeFilters, model: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                        placeholder="e.g. iPhone 15 Pro"
-                      />
-                    </div>
-
-                    {/* Condition Filter */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Condition</label>
-                      <select
-                        value={activeFilters.condition}
-                        onChange={(e) => setActiveFilters({ ...activeFilters, condition: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                      >
-                        <option value="">All Conditions</option>
-                        {conditions.map(condition => (
-                          <option key={condition} value={condition}>{condition}</option>
-                        ))}
-                      </select>
-                    </div>
-
                     {/* Storage Filter */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Storage</label>
-                      <select
-                        value={activeFilters.storage}
-                        onChange={(e) => setActiveFilters({ ...activeFilters, storage: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                      >
-                        <option value="">All Storage</option>
+                      <div className="grid grid-cols-2 gap-2">
                         {storageOptions.map(storage => (
-                          <option key={storage} value={storage}>{storage}</option>
+                          <label key={storage} className="flex items-center space-x-1 cursor-pointer hover:bg-gray-50 p-1 rounded text-xs">
+                            <input
+                              type="checkbox"
+                              checked={activeFilters.storage.includes(storage)}
+                              onChange={() => toggleMultiSelectFilter('storage', storage)}
+                              className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-gray-700">{storage}</span>
+                          </label>
                         ))}
-                      </select>
+                      </div>
                     </div>
 
                     {/* RAM Filter */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">RAM</label>
-                      <select
-                        value={activeFilters.ram}
-                        onChange={(e) => setActiveFilters({ ...activeFilters, ram: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                      >
-                        <option value="">All RAM</option>
+                      <div className="grid grid-cols-2 gap-2">
                         {ramOptions.map(ram => (
-                          <option key={ram} value={ram}>{ram}</option>
+                          <label key={ram} className="flex items-center space-x-1 cursor-pointer hover:bg-gray-50 p-1 rounded text-xs">
+                            <input
+                              type="checkbox"
+                              checked={activeFilters.ram.includes(ram)}
+                              onChange={() => toggleMultiSelectFilter('ram', ram)}
+                              className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-gray-700">{ram}</span>
+                          </label>
                         ))}
-                      </select>
+                      </div>
                     </div>
 
-                    {/* Battery Filter */}
+                    {/* Battery Health Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Battery</label>
-                      <select
-                        value={activeFilters.battery}
-                        onChange={(e) => setActiveFilters({ ...activeFilters, battery: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                      >
-                        <option value="">All Battery</option>
-                        {batteryOptions.map(battery => (
-                          <option key={battery} value={battery}>{battery}</option>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Battery Health</label>
+                      <div className="space-y-2">
+                        {batteryHealthOptions.map(health => (
+                          <label key={health} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                            <input
+                              type="checkbox"
+                              checked={activeFilters.battery_health.includes(health)}
+                              onChange={() => toggleMultiSelectFilter('battery_health', health)}
+                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">{health}</span>
+                          </label>
                         ))}
-                      </select>
+                      </div>
+                    </div>
+
+                    {/* Seller Type Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Seller Type</label>
+                      <div className="space-y-2">
+                        {sellerTypeOptions.map(type => (
+                          <label key={type} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                            <input
+                              type="checkbox"
+                              checked={activeFilters.seller_type.includes(type)}
+                              onChange={() => toggleMultiSelectFilter('seller_type', type)}
+                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">{type}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Network Filter */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Network</label>
-                      <select
-                        value={activeFilters.network}
-                        onChange={(e) => setActiveFilters({ ...activeFilters, network: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                      >
-                        <option value="">All Networks</option>
+                      <div className="flex space-x-4">
                         {networkOptions.map(network => (
-                          <option key={network} value={network}>{network}</option>
+                          <label key={network} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                            <input
+                              type="checkbox"
+                              checked={activeFilters.network.includes(network)}
+                              onChange={() => toggleMultiSelectFilter('network', network)}
+                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">{network}</span>
+                          </label>
                         ))}
-                      </select>
+                      </div>
                     </div>
                   </>
                 )}
