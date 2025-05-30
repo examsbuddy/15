@@ -291,15 +291,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Deep Blue Header Design"
-    - "Navigation Items & Dropdowns"
     - "Responsive Header Design"
-    - "Sign In Modal"
-    - "Sign Up Modal with User Types"
-    - "Shop Owner Registration Process"
-    - "Hero Section with Blue Theme"
-  stuck_tasks: []
-  test_all: true
+    - "Post an Ad Functionality"
+    - "Search System with Sample Data"
+  stuck_tasks: 
+    - "Responsive Header Design"
+    - "Post an Ad Functionality"
+    - "Search System with Sample Data"
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
