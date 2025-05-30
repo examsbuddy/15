@@ -40,7 +40,8 @@ import {
   Bell,
   ShoppingBag,
   Video,
-  FileText
+  FileText,
+  Share2
 } from 'react-feather';
 
 // Enhanced Sign In Modal
