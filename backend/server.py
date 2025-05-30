@@ -1169,6 +1169,7 @@ async def get_listings(
     brand: Optional[str] = None, 
     model: Optional[str] = None,
     condition: Optional[str] = None,
+    color: Optional[str] = None,
     # Price filters
     min_price: Optional[int] = None, 
     max_price: Optional[int] = None,
@@ -1176,11 +1177,15 @@ async def get_listings(
     storage: Optional[str] = None,
     ram: Optional[str] = None,
     battery: Optional[str] = None,
+    battery_health: Optional[str] = None,
     network: Optional[str] = None,
+    seller_type: Optional[str] = None,
     # Search query
-    search: Optional[str] = None
+    search: Optional[str] = None,
+    # Sorting
+    sort_by: Optional[str] = "newest"  # newest, oldest, price_low, price_high, most_viewed
 ):
-    """Get phone listings with advanced filters"""
+    """Get phone listings with advanced filters and sorting"""
     try:
         # Build query filter
         query = {"is_active": True}
@@ -1194,6 +1199,8 @@ async def get_listings(
             query["model"] = {"$regex": model, "$options": "i"}
         if condition:
             query["condition"] = {"$regex": condition, "$options": "i"}
+        if color:
+            query["color"] = {"$regex": color, "$options": "i"}
             
         # Specification filters
         if storage:
@@ -1202,8 +1209,12 @@ async def get_listings(
             query["ram"] = {"$regex": ram, "$options": "i"}
         if battery:
             query["battery"] = {"$regex": battery, "$options": "i"}
+        if battery_health:
+            query["battery_health"] = {"$regex": battery_health, "$options": "i"}
         if network:
             query["network"] = {"$regex": network, "$options": "i"}
+        if seller_type:
+            query["seller_type"] = {"$regex": seller_type, "$options": "i"}
             
         # Price range filter
         if min_price is not None or max_price is not None:
@@ -1214,18 +1225,53 @@ async def get_listings(
                 price_filter["$lte"] = max_price
             query["price"] = price_filter
             
-        # Search across multiple fields
+        # Search across multiple fields (with fuzzy matching)
         if search:
-            search_regex = {"$regex": search, "$options": "i"}
-            query["$or"] = [
-                {"brand": search_regex},
-                {"model": search_regex},
-                {"description": search_regex},
-                {"features": {"$in": [search_regex]}}
-            ]
+            search_terms = search.lower().split()
+            search_conditions = []
+            
+            for term in search_terms:
+                # Fuzzy matching for common misspellings
+                fuzzy_term = term
+                if "iphone" in term or "iphne" in term or "ifone" in term:
+                    fuzzy_term = "iphone"
+                elif "samsung" in term or "samung" in term:
+                    fuzzy_term = "samsung"
+                elif "xiaomi" in term or "xiomi" in term:
+                    fuzzy_term = "xiaomi"
+                
+                search_regex = {"$regex": fuzzy_term, "$options": "i"}
+                search_conditions.append({
+                    "$or": [
+                        {"brand": search_regex},
+                        {"model": search_regex},
+                        {"description": search_regex},
+                        {"features": {"$in": [search_regex]}},
+                        {"processor": search_regex},
+                        {"operating_system": search_regex}
+                    ]
+                })
+            
+            if search_conditions:
+                query["$and"] = search_conditions
         
-        # Get listings sorted by creation date (newest first)
-        cursor = db.phone_listings.find(query).sort("created_at", -1).skip(skip).limit(limit)
+        # Determine sorting
+        sort_criteria = []
+        if sort_by == "newest":
+            sort_criteria = [("created_at", -1)]
+        elif sort_by == "oldest":
+            sort_criteria = [("created_at", 1)]
+        elif sort_by == "price_low":
+            sort_criteria = [("price", 1)]
+        elif sort_by == "price_high":
+            sort_criteria = [("price", -1)]
+        elif sort_by == "most_viewed":
+            sort_criteria = [("views", -1)]
+        else:
+            sort_criteria = [("created_at", -1)]  # default to newest
+        
+        # Get listings with sorting
+        cursor = db.phone_listings.find(query).sort(sort_criteria).skip(skip).limit(limit)
         listings = await cursor.to_list(length=limit)
         
         # Serialize ObjectIds
