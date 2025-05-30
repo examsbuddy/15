@@ -25,6 +25,7 @@ import {
   Eye,
   Heart,
   BarChart2,
+  BarChart3,
   Users,
   Award,
   Zap,
