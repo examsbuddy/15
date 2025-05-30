@@ -4152,10 +4152,41 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
 
           {/* Results */}
           <div className="lg:w-3/4">
+            {/* Active Filter Tags */}
+            {getActiveFilterTags().length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-medium text-gray-700">Active Filters:</h4>
+                  <button
+                    onClick={clearFilters}
+                    className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    Clear All
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {getActiveFilterTags().map((tag, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
+                    >
+                      {tag.label}
+                      <button
+                        onClick={() => removeFilterTag(tag.type, tag.value)}
+                        className="ml-2 hover:text-blue-600"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Sort Options */}
             <div className="flex items-center justify-between mb-6">
               <h4 className="text-lg font-medium text-gray-900">
-                {filteredListings.length} Results
+                {totalResults > 0 ? `${totalResults} Results` : 'Search Results'}
               </h4>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">Sort by:</span>
@@ -4164,29 +4195,57 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                  <option value="price_low">Price: Low to High</option>
-                  <option value="price_high">Price: High to Low</option>
+                  {sortOptions.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
                 </select>
               </div>
             </div>
 
-            {/* Listings Grid */}
-            {filteredListings.length === 0 ? (
-              <div className="text-center py-12">
-                <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No phones found</h3>
-                <p className="text-gray-600 mb-4">Try adjusting your filters or search criteria</p>
-                <button
-                  onClick={clearFilters}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-                >
-                  Clear All Filters
-                </button>
+            {/* Loading State */}
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <span className="ml-3 text-lg text-gray-600">Loading listings...</span>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <>
+                {/* Listings Grid */}
+                {filteredListings.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No phones found</h3>
+                    <p className="text-gray-600 mb-6">Try adjusting your filters or search criteria</p>
+                    
+                    {/* Suggestions */}
+                    <div className="bg-gray-50 rounded-lg p-6 max-w-md mx-auto">
+                      <h4 className="font-medium text-gray-900 mb-3">Suggestions:</h4>
+                      <ul className="text-sm text-gray-600 space-y-2 text-left">
+                        <li>• Try removing some filters</li>
+                        <li>• Check your spelling</li>
+                        <li>• Use more general terms</li>
+                        <li>• Browse by popular brands like Apple, Samsung</li>
+                        <li>• Consider nearby cities</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="mt-6 space-x-4">
+                      <button
+                        onClick={clearFilters}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                      >
+                        Clear All Filters
+                      </button>
+                      <button
+                        onClick={onBack}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium transition-colors"
+                      >
+                        Back to Home
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredListings.map((listing, index) => (
                   <div 
                     key={listing.id || index} 
