@@ -877,7 +877,7 @@ export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
 };
 
 // Mobile Header Component
-export const MobileHeader = ({ isMenuOpen, setIsMenuOpen, setIsPostAdOpen }) => {
+export const MobileHeader = ({ isMenuOpen, setIsMenuOpen, setIsPostAdOpen, setActiveTab }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -886,7 +886,7 @@ export const MobileHeader = ({ isMenuOpen, setIsMenuOpen, setIsPostAdOpen }) => 
     if (!isLoggedIn) {
       setIsLoginOpen(true);
     } else {
-      setIsPostAdOpen(true);
+      setIsPostAdOpen && setIsPostAdOpen(true);
     }
   };
 
