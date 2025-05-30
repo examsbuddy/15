@@ -348,10 +348,12 @@ frontend:
     priority: "high"
     needs_retesting: false
     status_history:
-        agent: "testing"
-        comment: "Navigation items are displayed correctly in the header. The dropdown functionality works when hovering over 'Used Phones', showing brand options like iPhone, Samsung, Xiaomi, etc."
+      - working: "NA"
+        agent: "main"
+        comment: "Navigation items (Used Phones, New Phones, Accessories, Reviews, Videos, Blog) implemented with dropdown functionality."
       - working: true
         agent: "testing"
+        comment: "Navigation items are displayed correctly in the header. The dropdown functionality works when hovering over 'Used Phones', showing brand options like iPhone, Samsung, Xiaomi, etc."
         comment: "Navigation links work correctly. Used Phones, Accessories, Reviews, Blog, and Videos pages are accessible."
       - working: true
         agent: "testing"
