@@ -17,44 +17,30 @@ class PhoneFlipAPITester:
         self.test_user_password = "Test@123456"
         self.test_shop_owner_email = f"shop_owner_{uuid.uuid4().hex[:8]}@example.com"
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, params=None, auth=False):
-        """Run a single API test"""
-        url = f"{self.base_url}/{endpoint}"
-        headers = {'Content-Type': 'application/json'}
+    def test_register_normal_user(self):
+        """Test registering a normal user"""
+        test_data = {
+            "name": "Test User",
+            "email": self.test_user_email,
+            "password": self.test_user_password,
+            "phone": "03001234567",
+            "role": "normal_user"
+        }
         
-        if auth and self.auth_token:
-            headers['Authorization'] = f"Bearer {self.auth_token}"
+        success, response = self.run_test(
+            "Register Normal User",
+            "POST",
+            "api/auth/register",
+            200,
+            data=test_data
+        )
         
-        self.tests_run += 1
-        print(f"\n🔍 Testing {name}...")
+        if success and "access_token" in response:
+            self.auth_token = response["access_token"]
+            self.user_data = response["user"]
+            print(f"Registered user with email: {self.test_user_email}")
         
-        try:
-            if method == 'GET':
-                response = requests.get(url, headers=headers, params=params)
-            elif method == 'POST':
-                response = requests.post(url, json=data, headers=headers)
-            elif method == 'PUT':
-                response = requests.put(url, json=data, headers=headers)
-            
-            # Print response status and data for debugging
-            print(f"Response Status: {response.status_code}")
-            print(f"Response Data: {response.text[:200]}..." if len(response.text) > 200 else f"Response Data: {response.text}")
-            
-            success = response.status_code == expected_status
-            if success:
-                self.tests_passed += 1
-                print(f"✅ Passed - Status: {response.status_code}")
-                try:
-                    return success, response.json()
-                except json.JSONDecodeError:
-                    return success, {}
-            else:
-                print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
-                return False, {}
-
-        except Exception as e:
-            print(f"❌ Failed - Error: {str(e)}")
-            return False, {}
+        return success, response
 
     def test_login(self):
         """Test user login"""
