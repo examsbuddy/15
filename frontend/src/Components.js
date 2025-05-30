@@ -4588,6 +4588,39 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
                     ))}
                   </div>
                 )}
+                
+                {/* Pagination */}
+                {filteredListings.length >= itemsPerPage && (
+                  <div className="mt-8 flex items-center justify-center space-x-4">
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                        currentPage === 1 
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      Previous
+                    </button>
+                    
+                    <span className="text-gray-600">
+                      Page {currentPage} of {Math.ceil(totalResults / itemsPerPage)}
+                    </span>
+                    
+                    <button
+                      onClick={() => setCurrentPage(prev => prev + 1)}
+                      disabled={filteredListings.length < itemsPerPage}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                        filteredListings.length < itemsPerPage
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </div>
