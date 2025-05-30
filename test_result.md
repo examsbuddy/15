@@ -325,7 +325,7 @@ frontend:
         agent: "testing"
         comment: "Confirmed that the deep blue header design is implemented correctly. The header displays the logo, navigation items, and the red Post an Ad button as expected."
 
-  - task: "Navigation Items & Dropdowns"
+  - task: "Advanced Filtering System"
     implemented: true
     working: true
     file: "/app/frontend/src/Components.js"
@@ -333,6 +333,12 @@ frontend:
     priority: "high"
     needs_retesting: false
     status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Advanced filtering system implemented with toggle for additional filters."
+      - working: true
+        agent: "testing"
+        comment: "Advanced Filters section is present on the search results page. The section appears to be functional with a toggle to expand additional filters."
       - working: "NA"
         agent: "main"
         comment: "Navigation items (Used Phones, New Phones, Accessories, Reviews, Videos, Blog) implemented with dropdown functionality."
