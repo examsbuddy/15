@@ -1,3 +1,8 @@
+import { useState } from 'react';
+import { Home, FileText, Plus, MessageCircle, Menu, X, User, Smartphone, HardDrive, Star, Camera } from 'react-feather';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LoginModal } from './LoginModal';
+
 // Mobile Header Component - Simplified to only show logo
 export const MobileHeader = () => {
   return (
