@@ -142,6 +142,15 @@ export const SignInModal = ({ isOpen, onClose, onLogin, onSwitchToSignUp }) => {
               onClick={onSwitchToSignUp}
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
+              Sign up
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Search Results Component with Working Filters
 export const SearchResultsPage = ({ searchFilters, onBack }) => {
   const [listings, setListings] = useState([]);
