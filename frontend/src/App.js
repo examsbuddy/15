@@ -100,6 +100,10 @@ function App() {
         onLogout={handleLogout}
         compareCount={compareList.length}
         onCompareClick={() => setShowCompareModal(true)}
+        showSignInModal={showSignInModal}
+        setShowSignInModal={setShowSignInModal}
+        showSignUpModal={showSignUpModal}
+        setShowSignUpModal={setShowSignUpModal}
       />
       
       <main className="pt-16 pb-20 md:pb-8">
