@@ -119,12 +119,21 @@ function App() {
     <div className="App min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Desktop Header - hidden on mobile/tablet */}
       <div className="hidden sm:block">
-        <DesktopHeader activeTab={activeTab} setActiveTab={setActiveTab} setIsPostAdOpen={setIsPostAdOpen} />
+        <DesktopHeader 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          setIsPostAdOpen={setIsPostAdOpen} 
+          isLoggedIn={isLoggedIn}
+          setIsLoginOpen={setIsLoginOpen}
+        />
       </div>
       
       {/* Mobile Header - visible on mobile/tablet */}
       <div className="block sm:hidden">
-        <MobileHeader />
+        <MobileHeader 
+          isLoggedIn={isLoggedIn}
+          setIsLoginOpen={setIsLoginOpen}
+        />
       </div>
       
       {/* Main Content */}
@@ -141,11 +150,20 @@ function App() {
           activeTab={activeTab} 
           setActiveTab={setActiveTab} 
           setIsPostAdOpen={setIsPostAdOpen}
+          isLoggedIn={isLoggedIn}
+          setIsLoginOpen={setIsLoginOpen}
         />
       </div>
 
       {/* Post Ad Modal */}
       <PostAdModal isOpen={isPostAdOpen} setIsOpen={setIsPostAdOpen} />
+
+      {/* Login Modal */}
+      <LoginModal 
+        isOpen={isLoginOpen} 
+        setIsOpen={setIsLoginOpen} 
+        setIsLoggedIn={setIsLoggedIn} 
+      />
     </div>
   );
 }
