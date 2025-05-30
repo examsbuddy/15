@@ -274,6 +274,29 @@ function App() {
           onRemove={removeFromCompare}
         />
       )}
+
+      {showSignInModal && (
+        <SignInModal 
+          isOpen={showSignInModal}
+          onClose={() => setShowSignInModal(false)}
+          onLogin={handleLogin}
+          onSwitchToSignUp={() => {
+            setShowSignInModal(false);
+            setShowSignUpModal(true);
+          }}
+        />
+      )}
+
+      {showSignUpModal && (
+        <SignUpModal 
+          isOpen={showSignUpModal}
+          onClose={() => setShowSignUpModal(false)}
+          onSwitchToSignIn={() => {
+            setShowSignUpModal(false);
+            setShowSignInModal(true);
+          }}
+        />
+      )}
     </div>
   );
 }
