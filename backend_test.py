@@ -81,27 +81,19 @@ class PhoneFlipAPITester:
         
         return success, response
     
-    def test_login(self):
-        """Test user login"""
-        test_data = {
-            "email": self.test_user_email,
-            "password": self.test_user_password
-        }
+    def test_get_current_user(self):
+        """Test getting current user info"""
+        if not self.auth_token:
+            print("❌ No auth token available, skipping test")
+            return False, {}
         
-        success, response = self.run_test(
-            "User Login",
-            "POST",
-            "api/auth/login",
+        return self.run_test(
+            "Get Current User Info",
+            "GET",
+            "api/auth/me",
             200,
-            data=test_data
+            auth=True
         )
-        
-        if success and "access_token" in response:
-            self.auth_token = response["access_token"]
-            self.user_data = response["user"]
-            print(f"Logged in user with email: {self.test_user_email}")
-        
-        return success, response
     
     def test_api_root(self):
         """Test API root endpoint"""
