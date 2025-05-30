@@ -363,9 +363,6 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Verified that navigation items are displayed correctly in the header. Successfully tested navigation to Accessories and Reviews pages."
-      - working: true
-        agent: "testing"
-        comment: "Verified that navigation items are displayed correctly in the header. Successfully tested navigation to Accessories and Reviews pages."
 
   - task: "Responsive Header Design"
     implemented: true
