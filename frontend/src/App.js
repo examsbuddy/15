@@ -16,7 +16,8 @@ import {
   PriceDropAlertsModal,
   CompareModal,
   PostAdPage,
-  SearchResultsPage
+  SearchResultsPage,
+  ShopOwnerDashboard
 } from './Components';
 
 function App() {
