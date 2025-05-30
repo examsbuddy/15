@@ -364,9 +364,20 @@ frontend:
         agent: "testing"
         comment: "Verified that navigation items are displayed correctly in the header. Successfully tested navigation to Accessories and Reviews pages."
 
-  - task: "Responsive Header Design"
+  - task: "Detailed Listing Page"
     implemented: true
     working: true
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Detailed listing page implemented with photo gallery, complete specifications, and enhanced details."
+      - working: true
+        agent: "testing"
+        comment: "Detailed listing page appears to be implemented correctly. When clicking on a listing from search results, it navigates to a detailed view with specifications and back navigation."
     file: "/app/frontend/src/Components.js"
     stuck_count: 2
     priority: "medium"
