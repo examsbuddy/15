@@ -3903,7 +3903,11 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredListings.map((listing, index) => (
-                  <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                  <div 
+                    key={listing.id || index} 
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+                    onClick={() => onViewListing && onViewListing(listing.id)}
+                  >
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div>
