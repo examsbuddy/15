@@ -1601,12 +1601,13 @@ export const FeaturedPhones = ({ addToCompare, compareList }) => {
   const fetchFeaturedPhones = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/listings`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/listings/featured`);
       const data = await response.json();
       
       if (response.ok) {
-        // Show first 8 phones as featured
-        setFeaturedPhones(data.slice(0, 8));
+        setFeaturedPhones(data);
+      } else {
+        console.error('Failed to fetch featured phones:', data);
       }
     } catch (error) {
       console.error('Error fetching featured phones:', error);
