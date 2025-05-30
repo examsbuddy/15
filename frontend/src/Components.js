@@ -39,7 +39,22 @@ import {
   Clock,
   TrendingUp,
   RefreshCw,
-  ArrowLeft
+  ArrowLeft,
+  Zap,
+  ShoppingBag,
+  Video,
+  FileText,
+  Share2,
+  Users,
+  Award,
+  Globe,
+  Facebook,
+  Instagram,
+  Twitter,
+  Youtube,
+  Sliders,
+  Battery,
+  Play
 } from 'lucide-react';
 
 // Enhanced Sign In Modal
