@@ -387,13 +387,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Responsive Header Design"
-    - "Post an Ad Functionality"
-    - "Search System with Sample Data"
+    - "User Registration (POST /api/auth/register)"
+    - "Authentication Verification (Protected Endpoints)"
+    - "Shop Owner Registration (POST /api/auth/register-shop-owner)"
   stuck_tasks: 
-    - "Responsive Header Design"
-    - "Post an Ad Functionality"
-    - "Search System with Sample Data"
+    - "User Registration (POST /api/auth/register)"
+    - "Authentication Verification (Protected Endpoints)"
+    - "Shop Owner Registration (POST /api/auth/register-shop-owner)"
   test_all: false
   test_priority: "high_first"
 
