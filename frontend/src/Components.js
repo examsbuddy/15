@@ -1956,7 +1956,21 @@ export const PostAdPage = ({ onSubmitSuccess, user }) => {
     seller_name: user?.name || '',
     seller_phone: user?.phone || '',
     seller_email: user?.email || '',
-    features: []
+    features: [],
+    // Enhanced specifications
+    battery: '',
+    screen_size: '',
+    camera: '',
+    processor: '',
+    operating_system: '',
+    network: '',
+    // Mandatory photos
+    photos: [],
+    // Additional metadata
+    purchase_year: '',
+    warranty_months: '',
+    box_included: false,
+    accessories_included: []
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
