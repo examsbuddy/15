@@ -432,22 +432,72 @@ class PhoneFlipAPITester:
         
         return success_listings and success_accessories, {"listings": response_listings, "accessories": response_accessories}
     
-    def test_shop_owner_verification(self):
-        """Test shop owner verification status management (requires admin access)"""
-        print("ℹ️ Shop owner verification requires admin access - Skipping actual verification")
-        print("ℹ️ Testing shop owner registration flow only")
+    def test_get_accessories(self):
+        """Test getting all accessories"""
+        return self.run_test(
+            "Get All Accessories",
+            "GET",
+            "api/accessories",
+            200
+        )
+    
+    def test_get_featured_accessories(self):
+        """Test getting featured accessories"""
+        return self.run_test(
+            "Get Featured Accessories",
+            "GET",
+            "api/accessories/featured",
+            200
+        )
+    
+    def test_filtered_accessories(self):
+        """Test getting filtered accessories"""
+        return self.run_test(
+            "Get Filtered Accessories",
+            "GET",
+            "api/accessories",
+            200,
+            params={"type": "case", "min_price": 500, "max_price": 10000}
+        )
+    
+    def test_duplicate_shop_owner_registration(self):
+        """Test registering a shop owner with an email that already exists"""
+        # First, make sure we have a shop owner registered
+        if not hasattr(self, 'test_shop_owner_email') or not self.test_shop_owner_email:
+            self.test_register_shop_owner()
         
-        # Register a shop owner
-        success, response = self.test_register_shop_owner()
+        # Now try to register another shop owner with the same email
+        test_data = {
+            "name": "Duplicate Shop Owner",
+            "email": self.test_shop_owner_email,  # Use the same email as the already registered shop owner
+            "password": self.test_user_password,
+            "phone": "03009876543",
+            "business_details": {
+                "business_name": "Duplicate Mobile Shop",
+                "business_type": "mobile_shop",
+                "business_address": "123 Test Street",
+                "city": "Karachi",
+                "postal_code": "75000",
+                "business_phone": "03009876543",
+                "website": "https://testshop.com",
+                "description": "This is a duplicate shop for testing.",
+                "years_in_business": 5
+            },
+            "kyc_documents": {
+                "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
+                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",    # test base64 data
+                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
+                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="      # test base64 data
+            }
+        }
         
-        if success and "user_id" in response:
-            shop_owner_id = response["user_id"]
-            print(f"✅ Shop owner registered with ID: {shop_owner_id}")
-            print("✅ Verification status set to UNDER_REVIEW as expected")
-            return True, response
-        else:
-            print("❌ Failed to register shop owner for verification testing")
-            return False, response
+        return self.run_test(
+            "Register Shop Owner with Duplicate Email",
+            "POST",
+            "api/auth/register-shop-owner",
+            400,  # Expect 400 Bad Request
+            data=test_data
+        )
 
 def main():
     # Get backend URL from environment or use default
