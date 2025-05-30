@@ -162,6 +162,78 @@ function App() {
           />
         )}
         
+        {/* Shop Owner Dashboard */}
+        {currentPage === 'dashboard' && user?.role === 'shop_owner' && (
+          <ShopOwnerDashboard 
+            user={user}
+            setCurrentPage={setCurrentPage}
+          />
+        )}
+        
+        {/* Used Phones Page */}
+        {currentPage === 'used-phones' && (
+          <SearchResultsPage 
+            searchFilters={{}}
+            onBack={handleBackToHome}
+          />
+        )}
+        
+        {/* Accessories Page */}
+        {currentPage === 'accessories' && (
+          <SearchResultsPage 
+            searchFilters={{ category: 'accessories' }}
+            onBack={handleBackToHome}
+          />
+        )}
+        
+        {/* Reviews Page */}
+        {currentPage === 'reviews' && (
+          <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+            <div className="max-w-4xl mx-auto px-4">
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-6">Phone Reviews</h1>
+                <p className="text-gray-600 mb-8">Expert reviews and user ratings for the latest mobile phones.</p>
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-semibold text-gray-700 mb-4">Reviews Coming Soon</h3>
+                  <p className="text-gray-500">We're working on bringing you comprehensive phone reviews.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Videos Page */}
+        {currentPage === 'videos' && (
+          <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+            <div className="max-w-4xl mx-auto px-4">
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-6">Phone Videos</h1>
+                <p className="text-gray-600 mb-8">Watch video reviews, unboxings, and comparisons.</p>
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-semibold text-gray-700 mb-4">Videos Coming Soon</h3>
+                  <p className="text-gray-500">We're creating video content for phone enthusiasts.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Blog Page */}
+        {currentPage === 'blog' && (
+          <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+            <div className="max-w-4xl mx-auto px-4">
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-6">PhoneFlip Blog</h1>
+                <p className="text-gray-600 mb-8">Latest news, tips, and insights from the mobile world.</p>
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-semibold text-gray-700 mb-4">Blog Posts Coming Soon</h3>
+                  <p className="text-gray-500">Stay tuned for mobile industry insights and tips.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Other pages would render here based on currentPage */}
       </main>
 
