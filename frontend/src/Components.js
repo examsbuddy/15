@@ -3394,6 +3394,109 @@ export const SearchResultsPage = ({ searchFilters, onBack }) => {
                     ))}
                   </select>
                 </div>
+
+                {/* Advanced Filters Toggle */}
+                <div>
+                  <button
+                    onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                    className="flex items-center justify-between w-full text-left text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    <span>Advanced Filters</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} />
+                  </button>
+                </div>
+
+                {/* Advanced Filters Section */}
+                {showAdvancedFilters && (
+                  <>
+                    {/* Model Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Model</label>
+                      <input
+                        type="text"
+                        value={activeFilters.model}
+                        onChange={(e) => setActiveFilters({ ...activeFilters, model: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        placeholder="e.g. iPhone 15 Pro"
+                      />
+                    </div>
+
+                    {/* Condition Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Condition</label>
+                      <select
+                        value={activeFilters.condition}
+                        onChange={(e) => setActiveFilters({ ...activeFilters, condition: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      >
+                        <option value="">All Conditions</option>
+                        {conditions.map(condition => (
+                          <option key={condition} value={condition}>{condition}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Storage Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Storage</label>
+                      <select
+                        value={activeFilters.storage}
+                        onChange={(e) => setActiveFilters({ ...activeFilters, storage: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      >
+                        <option value="">All Storage</option>
+                        {storageOptions.map(storage => (
+                          <option key={storage} value={storage}>{storage}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* RAM Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">RAM</label>
+                      <select
+                        value={activeFilters.ram}
+                        onChange={(e) => setActiveFilters({ ...activeFilters, ram: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      >
+                        <option value="">All RAM</option>
+                        {ramOptions.map(ram => (
+                          <option key={ram} value={ram}>{ram}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Battery Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Battery</label>
+                      <select
+                        value={activeFilters.battery}
+                        onChange={(e) => setActiveFilters({ ...activeFilters, battery: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      >
+                        <option value="">All Battery</option>
+                        {batteryOptions.map(battery => (
+                          <option key={battery} value={battery}>{battery}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Network Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Network</label>
+                      <select
+                        value={activeFilters.network}
+                        onChange={(e) => setActiveFilters({ ...activeFilters, network: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      >
+                        <option value="">All Networks</option>
+                        {networkOptions.map(network => (
+                          <option key={network} value={network}>{network}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
