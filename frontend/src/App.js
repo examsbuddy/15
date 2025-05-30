@@ -99,7 +99,7 @@ function App() {
       <MobileMenu isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
       
       {/* Main Content */}
-      <main className="min-h-screen">
+      <main className="min-h-screen pb-20 md:pb-0">
         {renderContent()}
       </main>
       
