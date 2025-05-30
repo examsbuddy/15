@@ -2328,34 +2328,97 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
     processor: '',
     operating_system: '',
     network: '',
+    color: '',
     // Mandatory photos
     photos: [],
     // Additional metadata
     purchase_year: '',
+    purchase_date: '',
     warranty_months: '',
+    warranty_status: '',
     box_included: false,
-    accessories_included: []
+    accessories_included: [],
+    battery_health: '',
+    seller_type: user?.role === 'shop_owner' ? 'Shop Owner' : 'Individual'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [submittedListing, setSubmittedListing] = useState(null);
   const [error, setError] = useState('');
   const [photoError, setPhotoError] = useState('');
+  const [availableModels, setAvailableModels] = useState([]);
+  const [availableColors, setAvailableColors] = useState([]);
+  const [isLoadingSpecs, setIsLoadingSpecs] = useState(false);
 
   const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'];
-  const conditions = ['Excellent', 'Very Good', 'Good', 'Fair', 'Poor'];
+  const conditions = ['New', 'Like New', 'Excellent', 'Very Good', 'Good', 'Fair', 'Used', 'Refurbished'];
   const storageOptions = ['32GB', '64GB', '128GB', '256GB', '512GB', '1TB'];
   const ramOptions = ['3GB', '4GB', '6GB', '8GB', '12GB', '16GB', '18GB'];
   const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
   const batteryOptions = ['3000mAh', '3500mAh', '4000mAh', '4500mAh', '5000mAh', '5500mAh', '6000mAh'];
   const screenSizeOptions = ['5.4 inch', '6.1 inch', '6.4 inch', '6.7 inch', '6.8 inch', '7.0 inch'];
   const networkOptions = ['4G', '5G'];
+  const warrantyStatusOptions = ['Active', 'Expired', 'No Warranty'];
+  const batteryHealthOptions = ['Excellent', 'Good', 'Fair', 'Poor'];
   const commonFeatures = [
     'Face ID', 'Fingerprint Scanner', 'Wireless Charging', 'Fast Charging', 
     'Dual SIM', 'NFC', 'Water Resistant', 'Headphone Jack', 
     'Expandable Storage', 'Dual Camera', 'Triple Camera', 'Quad Camera'
   ];
   const commonAccessories = ['Charger', 'Cable', 'Earphones', 'Case', 'Screen Protector', 'Documentation'];
+
+  // Fetch available models when brand changes
+  useEffect(() => {
+    if (formData.brand) {
+      fetchAvailableModels(formData.brand);
+    }
+  }, [formData.brand]);
+
+  // Auto-fetch specifications when model changes
+  useEffect(() => {
+    if (formData.brand && formData.model) {
+      fetchPhoneSpecs(formData.brand, formData.model);
+    }
+  }, [formData.brand, formData.model]);
+
+  const fetchAvailableModels = async (brand) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-models/${brand}`);
+      const data = await response.json();
+      if (response.ok) {
+        setAvailableModels(data.models);
+      }
+    } catch (error) {
+      console.error('Error fetching models:', error);
+    }
+  };
+
+  const fetchPhoneSpecs = async (brand, model) => {
+    try {
+      setIsLoadingSpecs(true);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-specs/${brand}/${model}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Auto-fill specifications
+        setFormData(prev => ({
+          ...prev,
+          battery: data.battery || prev.battery,
+          screen_size: data.screen_size || prev.screen_size,
+          camera: data.camera || prev.camera,
+          processor: data.processor || prev.processor,
+          operating_system: data.operating_system || prev.operating_system,
+          network: data.network || prev.network,
+          ram: data.ram || prev.ram
+        }));
+        setAvailableColors(data.colors || []);
+      }
+    } catch (error) {
+      console.error('Error fetching phone specs:', error);
+    } finally {
+      setIsLoadingSpecs(false);
+    }
+  };
 
   const handleInputChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
