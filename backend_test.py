@@ -151,12 +151,32 @@ class PhoneFlipAPITester:
     
     def test_get_stats(self):
         """Test getting platform statistics"""
-        return self.run_test(
+        success, response = self.run_test(
             "Get Platform Stats",
             "GET",
             "api/stats",
             200
         )
+        
+        # Verify that the stats include accessories count
+        if success and isinstance(response, dict):
+            if "accessories_count" in response:
+                print(f"✅ Stats include accessories count: {response['accessories_count']}")
+            else:
+                print("❌ Stats do not include accessories count")
+                success = False
+                
+            # Check for other expected stats
+            expected_fields = ["total_listings", "total_users", "cities_count", "brands_count"]
+            missing_fields = [field for field in expected_fields if field not in response]
+            
+            if missing_fields:
+                print(f"❌ Stats are incomplete - Missing fields: {', '.join(missing_fields)}")
+                success = False
+            else:
+                print("✅ Stats include all expected fields")
+        
+        return success, response
     
     def test_register_shop_owner(self):
         """Test registering a shop owner"""
