@@ -1558,17 +1558,43 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
           {/* Enhanced Search Bar */}
           <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 max-w-5xl mx-auto border border-white/20">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              {/* Phone Search */}
+              {/* Phone Search with Auto-suggest */}
               <div className="md:col-span-1">
                 <div className="relative">
-                  <Smartphone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                  <Smartphone className="absolute left-3 top-3 w-5 h-5 text-gray-400 z-10" />
                   <input
                     type="text"
                     placeholder="Phone Make or Model"
                     value={searchFilters.query}
-                    onChange={(e) => setSearchFilters({...searchFilters, query: e.target.value})}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    onFocus={() => setShowSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     className="w-full pl-10 pr-4 py-4 border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
                   />
+                  
+                  {/* Auto-suggest Dropdown */}
+                  {showSuggestions && suggestions.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 mt-1 max-h-60 overflow-y-auto">
+                      {suggestions.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleSuggestionClick(suggestion)}
+                          className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-800">{suggestion.display}</span>
+                            <span className={`text-xs px-2 py-1 rounded-full ${
+                              suggestion.type === 'brand' ? 'bg-blue-100 text-blue-700' :
+                              suggestion.type === 'model' ? 'bg-green-100 text-green-700' :
+                              'bg-orange-100 text-orange-700'
+                            }`}>
+                              {suggestion.type}
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
