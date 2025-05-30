@@ -95,7 +95,7 @@ function App() {
     <div className="App min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Desktop Header - hidden on mobile */}
       <div className="hidden md:block">
-        <DesktopHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+        <DesktopHeader activeTab={activeTab} setActiveTab={setActiveTab} setIsPostAdOpen={setIsPostAdOpen} />
       </div>
       
       {/* Mobile Header - visible only on mobile */}
