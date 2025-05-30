@@ -362,7 +362,11 @@ export const DropdownMenu = ({ isOpen, menuId, onClose }) => {
 
 // Desktop Header Component
 export const DesktopHeader = ({ activeTab, setActiveTab }) => {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   
   const menuItems = [
     { id: 'used-phones', label: 'Used Phones', hasDropdown: true },
@@ -374,41 +378,182 @@ export const DesktopHeader = ({ activeTab, setActiveTab }) => {
     { id: 'blog', label: 'Blog' }
   ];
 
+  const handleMenuClick = (itemId) => {
+    setActiveTab(itemId);
+    if (menuDropdowns[itemId]) {
+      setOpenDropdown(openDropdown === itemId ? null : itemId);
+    } else {
+      setOpenDropdown(null);
+      // Navigate to page
+      console.log(`Navigating to ${itemId}`);
+    }
+  };
+
+  const handlePostAd = () => {
+    if (!isLoggedIn) {
+      setIsLoginOpen(true);
+    } else {
+      setActiveTab('sell');
+      console.log('Opening Post Ad form');
+    }
+  };
+
+  const handleLogin = () => {
+    setIsLoginOpen(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUserMenuOpen(false);
+    console.log('User logged out');
+  };
+
   return (
     <header className="hidden md:block bg-blue-900 text-white sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-8">
-            <div className="text-2xl font-bold text-white">
+            <button 
+              onClick={() => setActiveTab('home')}
+              className="text-2xl font-bold text-white hover:text-green-400 transition-colors"
+            >
               PhoneFlip<span className="text-green-400">.PK</span>
-            </div>
+            </button>
             <nav className="hidden md:flex space-x-6">
               {menuItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`px-3 py-2 text-sm font-medium hover:text-green-400 transition-colors ${
-                    activeTab === item.id ? 'text-green-400' : 'text-white'
-                  }`}
-                >
-                  {item.label}
-                  {item.hasDropdown && <ChevronRight className="inline w-3 h-3 ml-1 rotate-90" />}
-                </button>
+                <div key={item.id} className="relative">
+                  <button
+                    onClick={() => handleMenuClick(item.id)}
+                    className={`px-3 py-2 text-sm font-medium hover:text-green-400 transition-colors flex items-center ${
+                      activeTab === item.id ? 'text-green-400' : 'text-white'
+                    }`}
+                  >
+                    {item.label}
+                    {item.hasDropdown && (
+                      <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${
+                        openDropdown === item.id ? 'rotate-180' : ''
+                      }`} />
+                    )}
+                  </button>
+                  {item.hasDropdown && (
+                    <DropdownMenu 
+                      isOpen={openDropdown === item.id}
+                      menuId={item.id}
+                      onClose={() => setOpenDropdown(null)}
+                    />
+                  )}
+                </div>
               ))}
             </nav>
           </div>
           
           <div className="flex items-center space-x-4">
-            <button className="text-white hover:text-green-400">
-              <Bell className="w-5 h-5" />
-            </button>
-            <button className="text-white hover:text-green-400">Login</button>
-            <button className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-medium">
+            {/* Notification Bell */}
+            <div className="relative">
+              <button 
+                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                className="text-white hover:text-green-400 relative"
+              >
+                <Bell className="w-5 h-5" />
+                {notifications.filter(n => n.unread).length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                    {notifications.filter(n => n.unread).length}
+                  </span>
+                )}
+              </button>
+              <NotificationPanel 
+                isOpen={isNotificationOpen} 
+                setIsOpen={setIsNotificationOpen} 
+              />
+            </div>
+
+            {/* User Section */}
+            {isLoggedIn ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center space-x-2 text-white hover:text-green-400"
+                >
+                  <User className="w-5 h-5" />
+                  <span>John Doe</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${
+                    userMenuOpen ? 'rotate-180' : ''
+                  }`} />
+                </button>
+                
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <>
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/20 z-40"
+                        onClick={() => setUserMenuOpen(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+                      >
+                        <div className="py-2">
+                          <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
+                            <User className="w-4 h-4 mr-2" />
+                            My Profile
+                          </button>
+                          <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
+                            <Bookmark className="w-4 h-4 mr-2" />
+                            Saved Phones
+                          </button>
+                          <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
+                            <History className="w-4 h-4 mr-2" />
+                            My Ads
+                          </button>
+                          <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
+                            <MessageCircle className="w-4 h-4 mr-2" />
+                            Messages
+                          </button>
+                          <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center">
+                            <Settings className="w-4 h-4 mr-2" />
+                            Settings
+                          </button>
+                          <div className="border-t border-gray-200 my-1"></div>
+                          <button 
+                            onClick={handleLogout}
+                            className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 flex items-center"
+                          >
+                            <LogOut className="w-4 h-4 mr-2" />
+                            Logout
+                          </button>
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <button 
+                onClick={handleLogin}
+                className="text-white hover:text-green-400 font-medium"
+              >
+                Login
+              </button>
+            )}
+
+            {/* Post Ad Button */}
+            <button 
+              onClick={handlePostAd}
+              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-medium transition-colors"
+            >
               Post an Ad
             </button>
           </div>
         </div>
       </div>
+
+      {/* Login Modal */}
+      <LoginModal isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} />
     </header>
   );
 };
