@@ -871,7 +871,7 @@ export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
       </div>
 
       {/* Login Modal */}
-      <LoginModal isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} />
+      <LoginModal isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} setIsLoggedIn={setIsLoggedIn} />
     </header>
   );
 };
