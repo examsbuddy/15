@@ -10,7 +10,11 @@ import {
   SellingSection,
   Footer,
   MobileMenu,
-  PostAdModal
+  PostAdModal,
+  ReviewsPage,
+  VideosPage,
+  ForumsPage,
+  BlogPage
 } from './Components';
 
 function App() {
@@ -79,6 +83,14 @@ function App() {
             </div>
           </div>
         );
+      case 'reviews':
+        return <ReviewsPage />;
+      case 'videos':
+        return <VideosPage />;
+      case 'forums':
+        return <ForumsPage />;
+      case 'blog':
+        return <BlogPage />;
       default:
         return (
           <>
@@ -93,13 +105,13 @@ function App() {
 
   return (
     <div className="App min-h-screen bg-gray-50 overflow-x-hidden">
-      {/* Desktop Header - hidden on mobile */}
-      <div className="hidden sm:block">
+      {/* Desktop Header - hidden on mobile/tablet */}
+      <div className="hidden md:block">
         <DesktopHeader activeTab={activeTab} setActiveTab={setActiveTab} setIsPostAdOpen={setIsPostAdOpen} />
       </div>
       
-      {/* Mobile Header - visible only on mobile */}
-      <div className="block sm:hidden">
+      {/* Mobile Header - visible on mobile/tablet */}
+      <div className="block md:hidden">
         <MobileHeader 
           isMenuOpen={isMenuOpen} 
           setIsMenuOpen={setIsMenuOpen} 
@@ -117,15 +129,15 @@ function App() {
       />
       
       {/* Main Content */}
-      <main className="min-h-screen pb-20 sm:pb-0">
+      <main className="min-h-screen pb-20 md:pb-0">
         {renderContent()}
       </main>
       
       {/* Footer */}
       <Footer />
       
-      {/* Bottom Navigation - Mobile Only */}
-      <div className="block sm:hidden">
+      {/* Bottom Navigation - Mobile/Tablet Only */}
+      <div className="block md:hidden">
         <BottomNavigation 
           activeTab={activeTab} 
           setActiveTab={setActiveTab} 
