@@ -326,7 +326,7 @@ export const SignupModal = ({ isOpen, onClose, onSignup, onSwitchToLogin }) => {
   );
 };
 
-// Modern Header Component
+// Modern Header Component with Deep Blue Design
 export const Header = ({ 
   currentPage, 
   setCurrentPage, 
@@ -339,26 +339,39 @@ export const Header = ({
 }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showSignInModal, setShowSignInModal] = useState(false);
+  const [showSignUpModal, setShowSignUpModal] = useState(false);
+  const [signUpType, setSignUpType] = useState('normal'); // 'normal' or 'shop_owner'
+  const [showDropdown, setShowDropdown] = useState(null);
 
   const navigation = [
-    { name: 'Used Phones', key: 'used-phones', icon: Smartphone },
-    { name: 'New Phones', key: 'new-phones', icon: Zap },
-    { name: 'Accessories', key: 'accessories', icon: Headphones },
-    { name: 'Phone Store', key: 'phone-store', icon: ShoppingBag },
+    { 
+      name: 'Used Phones', 
+      key: 'used-phones', 
+      icon: Smartphone,
+      dropdownItems: ['iPhone', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'All Brands']
+    },
+    { 
+      name: 'New Phones', 
+      key: 'new-phones', 
+      icon: Zap,
+      dropdownItems: ['Latest Launches', 'Flagship Phones', 'Mid-Range', 'Budget Phones', 'Pre-Order']
+    },
+    { 
+      name: 'Accessories', 
+      key: 'accessories', 
+      icon: Headphones,
+      dropdownItems: ['Phone Cases', 'Screen Protectors', 'Chargers', 'Headphones', 'Power Banks', 'All Accessories']
+    },
     { name: 'Reviews', key: 'reviews', icon: Star },
-    { name: 'Blog', key: 'blog', icon: Globe },
+    { name: 'Videos', key: 'videos', icon: Video },
+    { name: 'Blog', key: 'blog', icon: FileText },
   ];
 
   const handleLogin = (userData) => {
     onLogin(userData);
-    setShowLoginModal(false);
-  };
-
-  const handleSignup = (userData) => {
-    onLogin(userData);
-    setShowSignupModal(false);
+    setShowSignInModal(false);
+    setShowSignUpModal(false);
   };
 
   const handleLogout = () => {
@@ -370,15 +383,19 @@ export const Header = ({
 
   const handlePostAd = () => {
     if (!isLoggedIn) {
-      setShowLoginModal(true);
+      setShowSignInModal(true);
       return;
     }
     setCurrentPage('post-ad');
   };
 
+  const handleDropdownToggle = (itemKey) => {
+    setShowDropdown(showDropdown === itemKey ? null : itemKey);
+  };
+
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg border-b border-gray-100">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-blue-900 text-white shadow-2xl border-b border-blue-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -387,12 +404,12 @@ export const Header = ({
                 onClick={() => setCurrentPage('home')}
                 className="flex items-center space-x-2 hover:opacity-90 transition-opacity"
               >
-                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                   <Smartphone className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <div className="text-xl font-bold text-gray-900">PhoneFlip</div>
-                  <div className="text-xs text-green-600 font-semibold -mt-1">.PK</div>
+                  <div className="text-xl font-bold text-white">PhoneFlip</div>
+                  <div className="text-xs text-blue-300 font-semibold -mt-1">.PK</div>
                 </div>
               </button>
             </div>
@@ -401,43 +418,55 @@ export const Header = ({
             <nav className="hidden lg:flex items-center space-x-1">
               {navigation.map((item) => {
                 const IconComponent = item.icon;
+                const hasDropdown = item.dropdownItems && item.dropdownItems.length > 0;
+                
                 return (
-                  <button
-                    key={item.key}
-                    onClick={() => setCurrentPage(item.key)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                      currentPage === item.key 
-                        ? 'bg-green-50 text-green-700 shadow-sm' 
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                    }`}
-                  >
-                    <IconComponent className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </button>
+                  <div key={item.key} className="relative">
+                    <button
+                      onClick={() => hasDropdown ? handleDropdownToggle(item.key) : setCurrentPage(item.key)}
+                      onMouseEnter={() => hasDropdown && setShowDropdown(item.key)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
+                        currentPage === item.key 
+                          ? 'bg-blue-800 text-white shadow-lg' 
+                          : 'text-blue-100 hover:text-white hover:bg-blue-800'
+                      }`}
+                    >
+                      <IconComponent className="w-4 h-4" />
+                      <span>{item.name}</span>
+                      {hasDropdown && <ChevronDown className="w-3 h-3" />}
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {hasDropdown && showDropdown === item.key && (
+                      <div 
+                        className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
+                        onMouseLeave={() => setShowDropdown(null)}
+                      >
+                        {item.dropdownItems.map((dropdownItem, index) => (
+                          <button
+                            key={index}
+                            onClick={() => {
+                              setCurrentPage(`${item.key}-${dropdownItem.toLowerCase().replace(' ', '-')}`);
+                              setShowDropdown(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-900 transition-colors"
+                          >
+                            {dropdownItem}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </nav>
 
             {/* Right Side Actions */}
             <div className="flex items-center space-x-3">
-              {/* Compare Button */}
-              <button
-                onClick={onCompareClick}
-                className="relative hidden md:flex items-center space-x-2 text-gray-600 hover:text-green-600 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200"
-              >
-                <BarChart2 className="w-5 h-5" />
-                <span className="text-sm font-medium">Compare</span>
-                {compareCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
-                    {compareCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Post an Ad Button - Prominent CTA */}
+              {/* Post an Ad Button - Red Highlighted */}
               <button
                 onClick={handlePostAd}
-                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Post an Ad</span>
@@ -449,7 +478,7 @@ export const Header = ({
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                    className="flex items-center space-x-2 text-blue-100 hover:text-white px-3 py-2 rounded-lg hover:bg-blue-800 transition-all duration-200"
                   >
                     <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-white" />
@@ -495,16 +524,10 @@ export const Header = ({
               ) : (
                 <div className="hidden md:flex items-center space-x-2">
                   <button
-                    onClick={() => setShowLoginModal(true)}
-                    className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-50 font-medium transition-all duration-200"
+                    onClick={() => setShowSignInModal(true)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg"
                   >
                     Sign In
-                  </button>
-                  <button
-                    onClick={() => setShowSignupModal(true)}
-                    className="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
-                  >
-                    Sign Up
                   </button>
                 </div>
               )}
@@ -512,7 +535,7 @@ export const Header = ({
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="lg:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200"
+                className="lg:hidden p-2 rounded-lg text-blue-100 hover:text-white hover:bg-blue-800 transition-all duration-200"
               >
                 {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -522,7 +545,7 @@ export const Header = ({
 
         {/* Mobile Menu */}
         {showMobileMenu && (
-          <div className="lg:hidden border-t border-gray-100 bg-white">
+          <div className="lg:hidden border-t border-blue-800 bg-blue-900">
             <div className="px-4 py-4 space-y-2">
               {/* Navigation Links */}
               {navigation.map((item) => {
@@ -536,8 +559,8 @@ export const Header = ({
                     }}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
                       currentPage === item.key 
-                        ? 'bg-green-50 text-green-700' 
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? 'bg-blue-800 text-white' 
+                        : 'text-blue-100 hover:bg-blue-800 hover:text-white'
                     }`}
                   >
                     <IconComponent className="w-5 h-5" />
@@ -548,38 +571,29 @@ export const Header = ({
 
               {/* Mobile Auth */}
               {!isLoggedIn && (
-                <div className="pt-4 border-t border-gray-100 space-y-2">
+                <div className="pt-4 border-t border-blue-800 space-y-2">
                   <button
                     onClick={() => {
-                      setShowLoginModal(true);
+                      setShowSignInModal(true);
                       setShowMobileMenu(false);
                     }}
                     className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-medium transition-colors"
                   >
                     Sign In
                   </button>
-                  <button
-                    onClick={() => {
-                      setShowSignupModal(true);
-                      setShowMobileMenu(false);
-                    }}
-                    className="w-full border border-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                  >
-                    Sign Up
-                  </button>
                 </div>
               )}
 
               {/* Mobile User Menu */}
               {isLoggedIn && (
-                <div className="pt-4 border-t border-gray-100 space-y-2">
-                  <div className="flex items-center space-x-3 px-4 py-3 bg-gray-50 rounded-lg">
+                <div className="pt-4 border-t border-blue-800 space-y-2">
+                  <div className="flex items-center space-x-3 px-4 py-3 bg-blue-800 rounded-lg">
                     <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center">
                       <User className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900">{user?.name || 'User'}</div>
-                      <div className="text-sm text-gray-500">{user?.email}</div>
+                      <div className="font-medium text-white">{user?.name || 'User'}</div>
+                      <div className="text-sm text-blue-300">{user?.email}</div>
                     </div>
                   </div>
                   <button
@@ -587,7 +601,7 @@ export const Header = ({
                       setCurrentPage('profile');
                       setShowMobileMenu(false);
                     }}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-blue-100 hover:bg-blue-800 hover:text-white rounded-lg"
                   >
                     <User className="w-5 h-5" />
                     <span>My Profile</span>
@@ -597,7 +611,7 @@ export const Header = ({
                       setCurrentPage('my-ads');
                       setShowMobileMenu(false);
                     }}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-blue-100 hover:bg-blue-800 hover:text-white rounded-lg"
                   >
                     <List className="w-5 h-5" />
                     <span>My Ads</span>
@@ -607,7 +621,7 @@ export const Header = ({
                       handleLogout();
                       setShowMobileMenu(false);
                     }}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-red-400 hover:bg-red-900 hover:text-red-300 rounded-lg"
                   >
                     <X className="w-5 h-5" />
                     <span>Sign Out</span>
@@ -619,24 +633,28 @@ export const Header = ({
         )}
       </header>
 
-      {/* Authentication Modals */}
-      <LoginModal 
-        isOpen={showLoginModal} 
-        onClose={() => setShowLoginModal(false)}
+      {/* Enhanced Sign In Modal */}
+      <SignInModal 
+        isOpen={showSignInModal} 
+        onClose={() => setShowSignInModal(false)}
         onLogin={handleLogin}
-        onSwitchToSignup={() => {
-          setShowLoginModal(false);
-          setShowSignupModal(true);
+        onSwitchToSignUp={() => {
+          setShowSignInModal(false);
+          setSignUpType('normal');
+          setShowSignUpModal(true);
         }}
       />
       
-      <SignupModal 
-        isOpen={showSignupModal} 
-        onClose={() => setShowSignupModal(false)}
-        onSignup={handleSignup}
-        onSwitchToLogin={() => {
-          setShowSignupModal(false);
-          setShowLoginModal(true);
+      {/* Enhanced Sign Up Modal */}
+      <SignUpModal 
+        isOpen={showSignUpModal} 
+        onClose={() => setShowSignUpModal(false)}
+        onSignup={handleLogin}
+        signUpType={signUpType}
+        setSignUpType={setSignUpType}
+        onSwitchToSignIn={() => {
+          setShowSignUpModal(false);
+          setShowSignInModal(true);
         }}
       />
     </>
