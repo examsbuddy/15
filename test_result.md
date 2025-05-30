@@ -101,3 +101,101 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Test the PhoneFlip.PK backend authentication system thoroughly. I've just updated the frontend to include new Login and Signup modals that connect to the backend authentication endpoints."
+
+backend:
+  - task: "User Registration (POST /api/auth/register)"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Registration with valid data works correctly, but duplicate email registration returns a 500 error instead of the expected 400 error. The error handling in the registration endpoint needs to be fixed to properly catch and handle duplicate email errors."
+
+  - task: "User Login (POST /api/auth/login)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Login functionality works correctly. Successfully tested login with valid credentials, invalid email, and invalid password. All tests passed with expected status codes."
+
+  - task: "Authentication Verification (Protected Endpoints)"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Protected endpoint access with valid token works correctly, but there are issues with error handling for invalid tokens (returns 500 instead of 401) and missing tokens (returns 403 instead of 401). The error handling in the authentication middleware needs to be improved."
+
+  - task: "Shop Owner Registration (POST /api/auth/register-shop-owner)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Shop owner registration works correctly. Successfully tested registration with valid business details and KYC documents."
+
+frontend:
+  - task: "Login Modal"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/LoginModal.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Frontend testing not performed as per instructions. Focus was on backend authentication testing only."
+
+  - task: "Signup Modal"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/SignupModal.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Frontend testing not performed as per instructions. Focus was on backend authentication testing only."
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "User Registration (POST /api/auth/register)"
+    - "User Login (POST /api/auth/login)"
+    - "Authentication Verification (Protected Endpoints)"
+    - "Shop Owner Registration (POST /api/auth/register-shop-owner)"
+  stuck_tasks:
+    - "User Registration (POST /api/auth/register)"
+    - "Authentication Verification (Protected Endpoints)"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "I've completed testing of the backend authentication system. Found issues with error handling in the registration endpoint (duplicate email returns 500 instead of 400) and authentication verification (invalid token returns 500 instead of 401, missing token returns 403 instead of 401). Login functionality and shop owner registration work correctly."
