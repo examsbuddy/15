@@ -1162,8 +1162,6 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
 };
 
 // Post Ad Modal Component
-// Enhanced Single-Page Post Ad Modal with Confirmation Screen
-export const PostAdModal = ({ isOpen, setIsOpen }) => {
   const [currentView, setCurrentView] = useState('form'); // 'form' or 'confirmation'
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedAdId, setSubmittedAdId] = useState(null);
