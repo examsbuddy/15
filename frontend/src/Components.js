@@ -962,40 +962,68 @@ export const MobileHeader = ({ isMenuOpen, setIsMenuOpen, setIsPostAdOpen, setAc
 };
 
 // Bottom Navigation Component
-export const BottomNavigation = ({ activeTab, setActiveTab }) => {
+export const BottomNavigation = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleSellClick = () => {
+    if (!isLoggedIn) {
+      setIsLoginOpen(true);
+    } else {
+      setIsPostAdOpen(true);
+    }
+  };
+
   const navItems = [
-    { id: 'home', icon: Home, label: 'Home' },
-    { id: 'search', icon: Search, label: 'Search' },
-    { id: 'sell', icon: Plus, label: 'Sell' },
-    { id: 'chat', icon: MessageCircle, label: 'Chat' },
-    { id: 'profile', icon: User, label: 'Profile' }
+    { id: 'home', icon: Home, label: 'Home', action: () => setActiveTab('home') },
+    { id: 'search', icon: Search, label: 'Search', action: () => setActiveTab('search') },
+    { id: 'sell', icon: Plus, label: 'Sell', action: handleSellClick },
+    { id: 'chat', icon: MessageCircle, label: 'Chat', action: () => setActiveTab('chat') },
+    { id: 'profile', icon: User, label: 'Profile', action: () => setActiveTab('profile') }
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-      <div className="flex justify-around py-2">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center py-2 px-3 transition-colors ${
-                isActive 
-                  ? 'text-blue-900' 
-                  : 'text-gray-500'
-              }`}
-            >
-              <Icon className={`w-6 h-6 ${isActive ? 'text-blue-900' : ''}`} />
-              <span className="text-xs mt-1 font-medium">{item.label}</span>
-              {isActive && <div className="w-1 h-1 bg-blue-900 rounded-full mt-1" />}
-            </button>
-          );
-        })}
-      </div>
-    </nav>
+    <>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-bottom">
+        <div className="flex justify-around py-2">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            
+            return (
+              <button
+                key={item.id}
+                onClick={item.action}
+                className={`flex flex-col items-center py-2 px-3 transition-colors touch-target ${
+                  isActive 
+                    ? 'text-blue-900' 
+                    : 'text-gray-500'
+                } ${item.id === 'sell' ? 'relative' : ''}`}
+              >
+                {item.id === 'sell' ? (
+                  <div className="bg-red-600 p-3 rounded-full shadow-lg">
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                ) : (
+                  <Icon className={`w-6 h-6 ${isActive ? 'text-blue-900' : ''}`} />
+                )}
+                <span className={`text-xs mt-1 font-medium ${
+                  item.id === 'sell' ? 'text-red-600' : ''
+                }`}>
+                  {item.label}
+                </span>
+                {isActive && item.id !== 'sell' && (
+                  <div className="w-1 h-1 bg-blue-900 rounded-full mt-1" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+
+      {/* Login Modal */}
+      <LoginModal isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} setIsLoggedIn={setIsLoggedIn} />
+    </>
   );
 };
 
