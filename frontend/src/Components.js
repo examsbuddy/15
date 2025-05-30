@@ -30,20 +30,159 @@ import {
   TrendingUp
 } from 'react-feather';
 
-// Login Modal Component
+// Enhanced Login/Signup Modal Component with Role Selection
 export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
+  const [currentStep, setCurrentStep] = useState('login'); // 'login', 'signup', 'role-select', 'shop-details', 'kyc-upload'
+  const [isLoading, setIsLoading] = useState(false);
+  const [userRole, setUserRole] = useState('');
+  
+  const [loginData, setLoginData] = useState({
     email: '',
-    password: '',
-    name: '',
-    phone: ''
+    password: ''
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsLoggedIn && setIsLoggedIn(true);
+  const [signupData, setSignupData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    role: 'normal_user'
+  });
+
+  const [businessData, setBusinessData] = useState({
+    business_name: '',
+    business_type: 'mobile_shop',
+    business_address: '',
+    city: '',
+    postal_code: '',
+    business_phone: '',
+    website: '',
+    description: '',
+    years_in_business: 1
+  });
+
+  const [kycData, setKycData] = useState({
+    cnic_front: '',
+    cnic_back: '',
+    business_license: '',
+    trade_license: ''
+  });
+
+  const resetForm = () => {
+    setCurrentStep('login');
+    setUserRole('');
+    setIsLoading(false);
+    setLoginData({ email: '', password: '' });
+    setSignupData({ name: '', email: '', password: '', phone: '', role: 'normal_user' });
+    setBusinessData({
+      business_name: '', business_type: 'mobile_shop', business_address: '', city: '', 
+      postal_code: '', business_phone: '', website: '', description: '', years_in_business: 1
+    });
+    setKycData({ cnic_front: '', cnic_back: '', business_license: '', trade_license: '' });
+  };
+
+  const handleClose = () => {
     setIsOpen(false);
+    resetForm();
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${backendUrl}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(loginData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        localStorage.setItem('auth_token', result.access_token);
+        localStorage.setItem('user_data', JSON.stringify(result.user));
+        setIsLoggedIn && setIsLoggedIn(true);
+        alert(`Welcome back, ${result.user.name}!`);
+        handleClose();
+      } else {
+        const error = await response.json();
+        alert('Login failed: ' + (error.detail || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed. Please check your connection.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      if (signupData.role === 'normal_user') {
+        const response = await fetch(`${backendUrl}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(signupData)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          localStorage.setItem('auth_token', result.access_token);
+          localStorage.setItem('user_data', JSON.stringify(result.user));
+          setIsLoggedIn && setIsLoggedIn(true);
+          alert('Account created successfully!');
+          handleClose();
+        } else {
+          const error = await response.json();
+          alert('Signup failed: ' + (error.detail || 'Unknown error'));
+        }
+      } else {
+        // Shop owner registration
+        const shopOwnerData = {
+          name: signupData.name,
+          email: signupData.email,
+          password: signupData.password,
+          phone: signupData.phone,
+          business_details: businessData,
+          kyc_documents: kycData
+        };
+
+        const response = await fetch(`${backendUrl}/api/auth/register-shop-owner`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(shopOwnerData)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          alert('Shop owner registration submitted! Your account is under review and you will be notified once approved.');
+          handleClose();
+        } else {
+          const error = await response.json();
+          alert('Registration failed: ' + (error.detail || 'Unknown error'));
+        }
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      alert('Signup failed. Please check your connection.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFileUpload = (field, event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setKycData({...kycData, [field]: e.target.result.split(',')[1]}); // Remove data:image/jpeg;base64, part
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   if (!isOpen) return null;
@@ -55,91 +194,380 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-        onClick={() => setIsOpen(false)}
+        onClick={handleClose}
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white rounded-lg w-full max-w-md"
+          className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between p-6 border-b">
-            <h2 className="text-xl font-bold">{isLogin ? 'Login' : 'Sign Up'}</h2>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <h2 className="text-xl font-bold">
+              {currentStep === 'login' && 'Login'}
+              {currentStep === 'signup' && 'Sign Up'}
+              {currentStep === 'role-select' && 'Select Account Type'}
+              {currentStep === 'shop-details' && 'Business Details'}
+              {currentStep === 'kyc-upload' && 'KYC Documents'}
+            </h2>
+            <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter your full name"
-                />
+          <div className="p-6">
+            {/* Login Form */}
+            {currentStep === 'login' && (
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={loginData.email}
+                    onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                  <input
+                    type="password"
+                    value={loginData.password}
+                    onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
+                >
+                  {isLoading ? 'Logging in...' : 'Login'}
+                </button>
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep('role-select')}
+                    className="text-blue-600 hover:text-blue-700"
+                  >
+                    Don't have an account? Sign up
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Role Selection */}
+            {currentStep === 'role-select' && (
+              <div className="space-y-4">
+                <p className="text-gray-600 mb-6">Choose your account type to get started:</p>
+                <div className="space-y-4">
+                  <button
+                    onClick={() => {
+                      setUserRole('normal_user');
+                      setSignupData({...signupData, role: 'normal_user'});
+                      setCurrentStep('signup');
+                    }}
+                    className="w-full p-4 border-2 border-gray-200 hover:border-blue-500 rounded-lg text-left transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <div className="text-2xl mr-4">👤</div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Normal User</h3>
+                        <p className="text-sm text-gray-600">Buy and sell phones as an individual</p>
+                      </div>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setUserRole('shop_owner');
+                      setSignupData({...signupData, role: 'shop_owner'});
+                      setCurrentStep('signup');
+                    }}
+                    className="w-full p-4 border-2 border-gray-200 hover:border-green-500 rounded-lg text-left transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <div className="text-2xl mr-4">🏪</div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Shop Owner</h3>
+                        <p className="text-sm text-gray-600">Manage your business with advanced dashboard</p>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+                
+                <div className="text-center mt-6">
+                  <button
+                    onClick={() => setCurrentStep('login')}
+                    className="text-blue-600 hover:text-blue-700"
+                  >
+                    Already have an account? Login
+                  </button>
+                </div>
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter your email"
-              />
-            </div>
-
-            {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter your phone number"
-                />
-              </div>
+            {/* Basic Signup Form */}
+            {currentStep === 'signup' && (
+              <form onSubmit={userRole === 'shop_owner' ? (e) => { e.preventDefault(); setCurrentStep('shop-details'); } : handleSignup} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    value={signupData.name}
+                    onChange={(e) => setSignupData({...signupData, name: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={signupData.email}
+                    onChange={(e) => setSignupData({...signupData, email: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={signupData.phone}
+                    onChange={(e) => setSignupData({...signupData, phone: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="03xx-xxxxxxx"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                  <input
+                    type="password"
+                    value={signupData.password}
+                    onChange={(e) => setSignupData({...signupData, password: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
+                >
+                  {isLoading ? 'Creating Account...' : userRole === 'shop_owner' ? 'Continue' : 'Create Account'}
+                </button>
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep('role-select')}
+                    className="text-gray-600 hover:text-gray-700"
+                  >
+                    ← Back to account types
+                  </button>
+                </div>
+              </form>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter your password"
-              />
-            </div>
+            {/* Business Details Form */}
+            {currentStep === 'shop-details' && (
+              <form onSubmit={(e) => { e.preventDefault(); setCurrentStep('kyc-upload'); }} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
+                  <input
+                    type="text"
+                    value={businessData.business_name}
+                    onChange={(e) => setBusinessData({...businessData, business_name: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
+                  <select
+                    value={businessData.business_type}
+                    onChange={(e) => setBusinessData({...businessData, business_type: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  >
+                    <option value="mobile_shop">Mobile Shop</option>
+                    <option value="electronics_store">Electronics Store</option>
+                    <option value="repair_service">Repair Service</option>
+                    <option value="distributor">Distributor</option>
+                    <option value="online_retailer">Online Retailer</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Business Address</label>
+                  <textarea
+                    value={businessData.business_address}
+                    onChange={(e) => setBusinessData({...businessData, business_address: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg h-20"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                    <select
+                      value={businessData.city}
+                      onChange={(e) => setBusinessData({...businessData, city: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      required
+                    >
+                      <option value="">Select City</option>
+                      <option value="Karachi">Karachi</option>
+                      <option value="Lahore">Lahore</option>
+                      <option value="Islamabad">Islamabad</option>
+                      <option value="Rawalpindi">Rawalpindi</option>
+                      <option value="Faisalabad">Faisalabad</option>
+                      <option value="Multan">Multan</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
+                    <input
+                      type="text"
+                      value={businessData.postal_code}
+                      onChange={(e) => setBusinessData({...businessData, postal_code: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Business Phone</label>
+                  <input
+                    type="tel"
+                    value={businessData.business_phone}
+                    onChange={(e) => setBusinessData({...businessData, business_phone: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Website (Optional)</label>
+                  <input
+                    type="url"
+                    value={businessData.website}
+                    onChange={(e) => setBusinessData({...businessData, website: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Years in Business</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={businessData.years_in_business}
+                    onChange={(e) => setBusinessData({...businessData, years_in_business: parseInt(e.target.value)})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Business Description</label>
+                  <textarea
+                    value={businessData.description}
+                    onChange={(e) => setBusinessData({...businessData, description: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg h-20"
+                    placeholder="Describe your business..."
+                    required
+                  />
+                </div>
+                <div className="flex space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep('signup')}
+                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-medium"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium"
+                  >
+                    Continue
+                  </button>
+                </div>
+              </form>
+            )}
 
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors"
-            >
-              {isLogin ? 'Login' : 'Sign Up'}
-            </button>
-
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-blue-600 hover:text-blue-700"
-              >
-                {isLogin ? "Don't have an account? Sign up" : "Already have an account? Login"}
-              </button>
-            </div>
-          </form>
+            {/* KYC Documents Upload */}
+            {currentStep === 'kyc-upload' && (
+              <form onSubmit={handleSignup} className="space-y-4">
+                <p className="text-sm text-gray-600 mb-4">Please upload clear images of your documents for verification:</p>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">CNIC Front *</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload('cnic_front', e)}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">CNIC Back *</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload('cnic_back', e)}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Business License (Optional)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload('business_license', e)}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Trade License (Optional)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload('trade_license', e)}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+                
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <p className="text-sm text-yellow-800">
+                    ⚠️ Your account will be under review after submission. You'll be notified once approved.
+                  </p>
+                </div>
+                
+                <div className="flex space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep('shop-details')}
+                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-medium"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isLoading || !kycData.cnic_front || !kycData.cnic_back}
+                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
+                  >
+                    {isLoading ? 'Submitting...' : 'Submit Application'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>
