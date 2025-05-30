@@ -2825,7 +2825,12 @@ export const SearchResultsPage = ({ searchFilters, onBack }) => {
   const fetchListings = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/listings`);
+      
+      // Check if searching for accessories
+      const isAccessories = searchFilters?.category === 'accessories';
+      const endpoint = isAccessories ? '/api/accessories' : '/api/listings';
+      
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}${endpoint}`);
       const data = await response.json();
       
       if (response.ok) {
