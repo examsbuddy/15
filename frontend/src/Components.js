@@ -181,11 +181,6 @@ export const DetailedListingPage = ({ listingId, setCurrentPage, onBack }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-
-
-
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
