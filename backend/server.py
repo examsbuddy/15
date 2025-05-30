@@ -181,7 +181,7 @@ class StatusCheckCreate(BaseModel):
 class PhoneListingCreate(BaseModel):
     brand: str
     model: str
-    condition: str
+    condition: str = Field(..., description="Condition: New, Used, Refurbished, Like New")
     price: int
     storage: str
     ram: str
@@ -198,13 +198,18 @@ class PhoneListingCreate(BaseModel):
     processor: Optional[str] = None  # e.g., "Snapdragon 8 Gen 2"
     operating_system: Optional[str] = None  # e.g., "Android 13", "iOS 17"
     network: Optional[str] = None  # e.g., "4G", "5G"
+    color: Optional[str] = None  # Phone color
     # Mandatory photos (base64 encoded)
     photos: List[str] = Field(min_items=1, description="At least one photo is required")
     # Additional metadata
     purchase_year: Optional[int] = None
+    purchase_date: Optional[str] = None  # Full purchase date
     warranty_months: Optional[int] = None
+    warranty_status: Optional[str] = None  # "Active", "Expired", "No Warranty"
     box_included: bool = False
     accessories_included: List[str] = []  # charger, earphones, case, etc.
+    battery_health: Optional[str] = None  # "Excellent", "Good", "Fair", "Poor"
+    seller_type: str = Field(default="Individual", description="Individual, Shop Owner, Verified Seller")
 
 class PhoneListing(BaseModel):
     id: Optional[str] = Field(alias="_id")
@@ -227,13 +232,18 @@ class PhoneListing(BaseModel):
     processor: Optional[str] = None
     operating_system: Optional[str] = None
     network: Optional[str] = None
+    color: Optional[str] = None
     # Photos
     photos: List[str] = []
     # Additional metadata
     purchase_year: Optional[int] = None
+    purchase_date: Optional[str] = None
     warranty_months: Optional[int] = None
+    warranty_status: Optional[str] = None
     box_included: bool = False
     accessories_included: List[str] = []
+    battery_health: Optional[str] = None
+    seller_type: str = "Individual"
     # System fields
     created_at: datetime = Field(default_factory=datetime.utcnow)
     views: int = 0
