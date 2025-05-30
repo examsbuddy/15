@@ -290,6 +290,9 @@ async def register_shop_owner(shop_data: ShopOwnerRegistration):
             "message": "Shop owner registration submitted successfully! Your account is under review and you will be notified once approved.",
             "user_id": str(result.inserted_id)
         }
+    except HTTPException:
+        # Re-raise HTTP exceptions (like 400 for duplicate email)
+        raise
     except Exception as e:
         logger.error(f"Error registering shop owner: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to register shop owner")
