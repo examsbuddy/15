@@ -30,6 +30,538 @@ import {
   TrendingUp
 } from 'react-feather';
 
+// Profile Dashboard Component
+export const ProfileDashboard = () => {
+  const [user, setUser] = useState(null);
+  const [userListings, setUserListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+  useEffect(() => {
+    fetchUserData();
+    fetchUserListings();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) return;
+
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${backendUrl}/api/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchUserListings = async () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+      if (!userData.email) return;
+
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${backendUrl}/api/listings?seller_email=${userData.email}`);
+
+      if (response.ok) {
+        const listings = await response.json();
+        setUserListings(listings);
+      }
+    } catch (error) {
+      console.error('Error fetching user listings:', error);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_data');
+    window.location.reload();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="pt-20 pb-24 md:pb-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-300 rounded w-1/4 mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="h-32 bg-gray-300 rounded"></div>
+              <div className="h-32 bg-gray-300 rounded"></div>
+              <div className="h-32 bg-gray-300 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="pt-20 pb-24 md:pb-8">
+        <div className="max-w-4xl mx-auto px-4 text-center py-20">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Please Login</h2>
+          <p className="text-gray-600 mb-8">You need to login to access your profile</p>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
+            Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <div className="space-y-6">
+            {/* Profile Overview */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900">Profile Information</h3>
+                <button
+                  onClick={() => setIsEditingProfile(true)}
+                  className="text-blue-600 hover:text-blue-700 flex items-center"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Edit Profile
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <p className="text-gray-900">{user.name}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <p className="text-gray-900">{user.email}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <p className="text-gray-900">{user.phone}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    user.role === 'shop_owner' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {user.role === 'shop_owner' ? '🏪 Shop Owner' : '👤 Normal User'}
+                  </span>
+                </div>
+                {user.role === 'shop_owner' && (
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Verification Status</label>
+                    <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${
+                      user.verification_status === 'approved' ? 'bg-green-100 text-green-800' :
+                      user.verification_status === 'under_review' ? 'bg-yellow-100 text-yellow-800' :
+                      user.verification_status === 'rejected' ? 'bg-red-100 text-red-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {user.verification_status === 'approved' && '✅ Verified'}
+                      {user.verification_status === 'under_review' && '⏳ Under Review'}
+                      {user.verification_status === 'rejected' && '❌ Rejected'}
+                      {user.verification_status === 'pending' && '📋 Pending'}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {user.business_details && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4">Business Information</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                      <p className="text-gray-900">{user.business_details.business_name}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Business Type</label>
+                      <p className="text-gray-900">{user.business_details.business_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                      <p className="text-gray-900">{user.business_details.city}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Years in Business</label>
+                      <p className="text-gray-900">{user.business_details.years_in_business} years</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center">
+                  <div className="p-3 bg-blue-100 rounded-lg">
+                    <Smartphone className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Active Listings</p>
+                    <p className="text-2xl font-bold text-gray-900">{userListings.length}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center">
+                  <div className="p-3 bg-green-100 rounded-lg">
+                    <Eye className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Total Views</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {userListings.reduce((sum, listing) => sum + (listing.views || 0), 0)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center">
+                  <div className="p-3 bg-purple-100 rounded-lg">
+                    <Clock className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Member Since</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {new Date(user.created_at).getFullYear()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'listings':
+        return (
+          <div className="bg-white rounded-lg shadow-md">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900">My Listings</h3>
+              <p className="text-gray-600">Manage your posted advertisements</p>
+            </div>
+            
+            {userListings.length > 0 ? (
+              <div className="divide-y divide-gray-200">
+                {userListings.map((listing) => (
+                  <div key={listing.id} className="p-6 hover:bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h4 className="text-lg font-semibold text-gray-900">
+                          {listing.brand} {listing.model}
+                        </h4>
+                        <p className="text-gray-600">{listing.description}</p>
+                        <div className="flex items-center space-x-4 mt-2">
+                          <span className="text-lg font-bold text-blue-600">
+                            PKR {listing.price.toLocaleString()}
+                          </span>
+                          <span className="text-sm text-gray-500 flex items-center">
+                            <MapPin className="w-3 h-3 mr-1" />
+                            {listing.city}
+                          </span>
+                          <span className="text-sm text-gray-500 flex items-center">
+                            <Eye className="w-3 h-3 mr-1" />
+                            {listing.views || 0} views
+                          </span>
+                        </div>
+                      </div>
+                      <div className="ml-4 flex items-center space-x-2">
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          listing.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {listing.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                        <button className="text-blue-600 hover:text-blue-700 p-1">
+                          <User className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-12 text-center">
+                <Smartphone className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">No listings yet</h4>
+                <p className="text-gray-600">Start selling by posting your first phone listing</p>
+                <button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                  Post Your First Ad
+                </button>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'settings':
+        return (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Account Settings</h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-4 border-b border-gray-200">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Email Notifications</h4>
+                    <p className="text-sm text-gray-600">Receive updates about your listings</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+                
+                <div className="flex items-center justify-between py-4 border-b border-gray-200">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">SMS Notifications</h4>
+                    <p className="text-sm text-gray-600">Get text messages for important updates</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+                
+                <div className="pt-4">
+                  <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg mr-4">
+                    Change Password
+                  </button>
+                  <button 
+                    onClick={handleLogout}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="pt-20 pb-24 md:pb-8">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Welcome back, {user.name}!
+              </h1>
+              <p className="text-gray-600">Manage your account and listings</p>
+            </div>
+            {user.role === 'shop_owner' && user.verification_status === 'approved' && (
+              <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                ✅ Verified Shop Owner
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="border-b border-gray-200 mb-8">
+          <nav className="-mb-px flex space-x-8">
+            {[
+              { id: 'overview', name: 'Overview', icon: Home },
+              { id: 'listings', name: 'My Listings', icon: Smartphone },
+              { id: 'settings', name: 'Settings', icon: User }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${
+                  activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <tab.icon className="w-4 h-4 mr-2" />
+                {tab.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {/* Tab Content */}
+        {renderTabContent()}
+      </div>
+    </div>
+  );
+};
+
+// Enhanced MyAds Component
+export const MyAdsPage = () => {
+  const [userListings, setUserListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    checkAuth();
+    fetchUserListings();
+  }, []);
+
+  const checkAuth = () => {
+    const userData = localStorage.getItem('user_data');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  };
+
+  const fetchUserListings = async () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+      if (!userData.email) return;
+
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${backendUrl}/api/listings`);
+
+      if (response.ok) {
+        const allListings = await response.json();
+        // Filter listings by user email
+        const myListings = allListings.filter(listing => 
+          listing.seller_email === userData.email
+        );
+        setUserListings(myListings);
+      }
+    } catch (error) {
+      console.error('Error fetching user listings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="pt-20 pb-24 md:pb-8">
+        <div className="max-w-4xl mx-auto px-4 text-center py-20">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Please Login</h2>
+          <p className="text-gray-600 mb-8">You need to login to view your ads</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="pt-20 pb-24 md:pb-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="animate-pulse space-y-4">
+            {[1,2,3].map(i => (
+              <div key={i} className="bg-gray-300 h-32 rounded-lg"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pt-20 pb-24 md:pb-8">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Ads</h1>
+          <p className="text-gray-600">Manage your posted advertisements</p>
+        </div>
+
+        {userListings.length > 0 ? (
+          <div className="space-y-4">
+            {userListings.map((listing) => (
+              <div key={listing.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h3 className="text-xl font-semibold text-gray-900">
+                        {listing.brand} {listing.model}
+                      </h3>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        listing.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
+                        listing.condition === 'Good' ? 'bg-blue-100 text-blue-800' :
+                        listing.condition === 'Fair' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {listing.condition}
+                      </span>
+                    </div>
+                    
+                    <p className="text-gray-600 mb-3">{listing.description}</p>
+                    
+                    <div className="flex items-center space-x-6 text-sm text-gray-500">
+                      <span className="text-2xl font-bold text-blue-600">
+                        PKR {listing.price.toLocaleString()}
+                      </span>
+                      <span className="flex items-center">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        {listing.city}
+                      </span>
+                      <span className="flex items-center">
+                        <Eye className="w-4 h-4 mr-1" />
+                        {listing.views || 0} views
+                      </span>
+                      <span className="flex items-center">
+                        <Clock className="w-4 h-4 mr-1" />
+                        {new Date(listing.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    
+                    {listing.storage && listing.ram && (
+                      <div className="mt-2 text-sm text-gray-600">
+                        <span className="bg-gray-100 px-2 py-1 rounded mr-2">{listing.storage}</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{listing.ram}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="ml-6 flex flex-col items-end space-y-2">
+                    <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                      listing.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {listing.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                    
+                    <div className="flex space-x-2">
+                      <button className="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded">
+                        <User className="w-4 h-4" />
+                      </button>
+                      <button className="text-gray-600 hover:text-gray-700 p-2 hover:bg-gray-50 rounded">
+                        <Heart className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <Smartphone className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No ads posted yet</h3>
+            <p className="text-gray-600 mb-8">Start selling by posting your first phone listing</p>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+              Post Your First Ad
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // Enhanced Login/Signup Modal Component with Role Selection
 export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
   const [currentStep, setCurrentStep] = useState('login'); // 'login', 'signup', 'role-select', 'shop-details', 'kyc-upload'
