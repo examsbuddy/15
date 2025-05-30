@@ -56,20 +56,17 @@ class PhoneFlipAPITester:
             print(f"❌ Failed - Error: {str(e)}")
             return False, {}
 
-    def test_register_normal_user(self):
-        """Test registering a normal user"""
+    def test_login(self):
+        """Test user login"""
         test_data = {
-            "name": "Test User",
             "email": self.test_user_email,
-            "password": self.test_user_password,
-            "phone": "03001234567",
-            "role": "normal_user"
+            "password": self.test_user_password
         }
         
         success, response = self.run_test(
-            "Register Normal User",
+            "User Login",
             "POST",
-            "api/auth/register",
+            "api/auth/login",
             200,
             data=test_data
         )
@@ -77,7 +74,7 @@ class PhoneFlipAPITester:
         if success and "access_token" in response:
             self.auth_token = response["access_token"]
             self.user_data = response["user"]
-            print(f"Registered user with email: {self.test_user_email}")
+            print(f"Logged in user with email: {self.test_user_email}")
         
         return success, response
     
