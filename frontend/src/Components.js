@@ -939,18 +939,799 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
 };
 
 // Simplified placeholder components
-export const MobileBottomNav = () => <div></div>;
-export const CompareSection = () => <div></div>;
-export const SellSection = () => <div></div>;
-export const FeaturedShopsSection = () => <div></div>;
-export const OurOfferingsSection = () => <div></div>;
-export const BrowseSection = () => <div></div>;
-export const AccessoriesSection = () => <div></div>;
-export const ContentCardsSection = () => <div></div>;
-export const FeaturedPhones = () => <div></div>;
-export const Footer = () => <div></div>;
-export const PriceDropAlertsModal = () => <div></div>;
-export const CompareModal = () => <div></div>;
+export const MobileBottomNav = ({ currentPage, setCurrentPage }) => {
+  const menuItems = [
+    { key: 'home', label: 'Home', icon: Home },
+    { key: 'search', label: 'Search', icon: Search },
+    { key: 'post-ad', label: 'Post Ad', icon: Plus },
+    { key: 'compare', label: 'Compare', icon: BarChart2 },
+    { key: 'profile', label: 'Profile', icon: User },
+  ];
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-40">
+      <div className="grid grid-cols-5">
+        {menuItems.map((item) => {
+          const IconComponent = item.icon;
+          return (
+            <button
+              key={item.key}
+              onClick={() => setCurrentPage(item.key)}
+              className={`flex flex-col items-center py-2 px-1 text-xs transition-colors ${
+                currentPage === item.key 
+                  ? 'text-blue-600 bg-blue-50' 
+                  : 'text-gray-600 hover:text-blue-600'
+              }`}
+            >
+              <IconComponent className="w-5 h-5 mb-1" />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export const CompareSection = ({ compareList, onCompareClick }) => {
+  if (compareList.length === 0) return null;
+
+  return (
+    <div className="bg-blue-50 border-b">
+      <div className="max-w-7xl mx-auto px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <BarChart2 className="w-5 h-5 text-blue-600" />
+            <span className="text-blue-900 font-medium">
+              {compareList.length} phone{compareList.length > 1 ? 's' : ''} selected for comparison
+            </span>
+          </div>
+          <button
+            onClick={onCompareClick}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            Compare Now
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const SellSection = ({ isLoggedIn, setCurrentPage }) => {
+  return (
+    <section className="bg-white py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Sell Your Phone on PhoneFlip and Get the Best Price
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {/* Post Your Ad */}
+          <div className="bg-gray-50 rounded-xl p-6 md:p-8">
+            <h3 className="text-xl font-bold text-gray-900 mb-6">Post your Ad on PhoneFlip</h3>
+            <div className="space-y-4 mb-8">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">Post your Ad for Free in 3 Easy Steps</span>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">Get Genuine offers from Verified Buyers</span>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">Sell your Phone Fast at the Best Price</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setCurrentPage('post-ad')}
+              className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-medium transition-colors w-full md:w-auto"
+            >
+              Post Your Ad
+            </button>
+          </div>
+
+          {/* Sell to PhoneFlip */}
+          <div className="bg-gray-50 rounded-xl p-6 md:p-8 relative">
+            <div className="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+              Quick Sale
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-6">Sell to PhoneFlip</h3>
+            <div className="space-y-4 mb-8">
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">Get Instant Price Quote for your Phone</span>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">Free Home Pickup & Instant Payment</span>
+              </div>
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700">No Hassle, No Waiting, No Commission</span>
+              </div>
+            </div>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors w-full md:w-auto">
+              Get Quote Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const FeaturedShopsSection = () => {
+  const featuredShops = [
+    {
+      name: 'TechMart Karachi',
+      location: 'Saddar, Karachi',
+      rating: 4.8,
+      reviews: 1250,
+      specialties: ['iPhone', 'Samsung', 'Accessories'],
+      yearsInBusiness: 8,
+      phoneCount: 450
+    },
+    {
+      name: 'Mobile Zone Lahore',
+      location: 'Liberty Market, Lahore',
+      rating: 4.7,
+      reviews: 980,
+      specialties: ['All Brands', 'Repair', 'Trade-in'],
+      yearsInBusiness: 12,
+      phoneCount: 680
+    },
+    {
+      name: 'Galaxy Electronics',
+      location: 'Blue Area, Islamabad',
+      rating: 4.9,
+      reviews: 750,
+      specialties: ['Premium Phones', 'Warranty'],
+      yearsInBusiness: 6,
+      phoneCount: 320
+    }
+  ];
+
+  return (
+    <section className="bg-gray-50 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Featured Phone Shops
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Browse phones from verified shops with excellent ratings and genuine products
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {featuredShops.map((shop, index) => (
+            <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1">{shop.name}</h3>
+                  <p className="text-gray-600 text-sm flex items-center">
+                    <MapPin className="w-4 h-4 mr-1" />
+                    {shop.location}
+                  </p>
+                </div>
+                <div className="flex items-center bg-green-100 px-2 py-1 rounded-full">
+                  <Star className="w-4 h-4 text-green-600 mr-1" />
+                  <span className="text-green-800 text-sm font-medium">{shop.rating}</span>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Reviews:</span>
+                  <span className="font-medium">{shop.reviews.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Years in Business:</span>
+                  <span className="font-medium">{shop.yearsInBusiness} years</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Phones Available:</span>
+                  <span className="font-medium">{shop.phoneCount}</span>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Specialties:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {shop.specialties.map((specialty, idx) => (
+                    <span key={idx} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                      {specialty}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors">
+                View Shop
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const OurOfferingsSection = ({ onCompareClick, onPriceAlertsClick }) => {
+  const offerings = [
+    {
+      icon: BarChart2,
+      title: 'Compare Phones',
+      description: 'Compare specifications, prices, and features side by side',
+      action: 'Start Comparing',
+      onClick: onCompareClick
+    },
+    {
+      icon: Shield,
+      title: 'Condition Check',
+      description: 'AI-powered condition assessment for accurate pricing',
+      action: 'Check Condition',
+      onClick: () => {}
+    },
+    {
+      icon: Bell,
+      title: 'Price Alerts',
+      description: 'Get notified when your desired phone drops in price',
+      action: 'Set Alert',
+      onClick: onPriceAlertsClick
+    },
+    {
+      icon: Star,
+      title: 'Expert Reviews',
+      description: 'Read detailed reviews from phone experts and users',
+      action: 'Read Reviews',
+      onClick: () => {}
+    }
+  ];
+
+  return (
+    <section className="bg-white py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Our Offerings
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Everything you need to buy or sell phones with confidence
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {offerings.map((offering, index) => {
+            const IconComponent = offering.icon;
+            return (
+              <div key={index} className="text-center group hover:bg-gray-50 p-6 rounded-xl transition-colors">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
+                  <IconComponent className="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">{offering.title}</h3>
+                <p className="text-gray-600 mb-4 text-sm">{offering.description}</p>
+                <button 
+                  onClick={offering.onClick}
+                  className="text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
+                >
+                  {offering.action} →
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const BrowseSection = () => {
+  const categories = {
+    'By Category': ['Used Phones', 'New Phones', 'Accessories', 'Tablets'],
+    'By City': ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan'],
+    'By Brand': ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'OnePlus'],
+    'By Model': ['iPhone 15', 'Galaxy S24', 'Xiaomi 14', 'Find X7'],
+    'By Budget': ['Under 50K', '50K-100K', '100K-200K', '200K+'],
+    'By Storage': ['64GB', '128GB', '256GB', '512GB', '1TB']
+  };
+
+  return (
+    <section className="bg-gray-50 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Browse Phones
+          </h2>
+          <p className="text-gray-600">
+            Find exactly what you're looking for
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {Object.entries(categories).map(([categoryName, items]) => (
+            <div key={categoryName} className="bg-white rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{categoryName}</h3>
+              <div className="space-y-2">
+                {items.map((item) => (
+                  <button
+                    key={item}
+                    className="block w-full text-left px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const AccessoriesSection = () => {
+  const accessories = [
+    { name: 'Phone Cases', count: 1250, image: '📱' },
+    { name: 'Screen Protectors', count: 890, image: '🛡️' },
+    { name: 'Chargers', count: 650, image: '🔌' },
+    { name: 'Power Banks', count: 420, image: '🔋' },
+    { name: 'Headphones', count: 780, image: '🎧' },
+    { name: 'Car Accessories', count: 340, image: '🚗' }
+  ];
+
+  return (
+    <section className="bg-white py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Phone Accessories
+          </h2>
+          <p className="text-gray-600">
+            Complete your phone setup with quality accessories
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          {accessories.map((accessory, index) => (
+            <div key={index} className="text-center group cursor-pointer">
+              <div className="bg-gray-100 rounded-xl p-6 mb-3 group-hover:bg-gray-200 transition-colors">
+                <div className="text-4xl mb-2">{accessory.image}</div>
+                <h3 className="font-medium text-gray-900 text-sm">{accessory.name}</h3>
+                <p className="text-gray-500 text-xs mt-1">{accessory.count} items</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const ContentCardsSection = () => {
+  const contentCards = [
+    {
+      type: 'Blog',
+      title: 'iPhone 15 vs iPhone 14: Complete Comparison Guide',
+      excerpt: 'Everything you need to know about the differences between iPhone 15 and iPhone 14...',
+      image: '📱',
+      readTime: '5 min read',
+      date: '2 days ago'
+    },
+    {
+      type: 'Video',
+      title: 'How to Check if a Used Phone is Original',
+      excerpt: 'Learn the essential tips to verify authenticity when buying used phones...',
+      image: '🎥',
+      readTime: '8 min watch',
+      date: '1 week ago'
+    },
+    {
+      type: 'News',
+      title: 'Samsung Galaxy S25 Launch Date Revealed',
+      excerpt: 'Latest updates on Samsung\'s upcoming flagship phone and expected features...',
+      image: '📰',
+      readTime: '3 min read',
+      date: '3 days ago'
+    }
+  ];
+
+  return (
+    <section className="bg-gray-50 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Latest Content
+          </h2>
+          <p className="text-gray-600">
+            Stay updated with the latest phone news, reviews, and buying guides
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {contentCards.map((card, index) => (
+            <article key={index} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                    {card.type}
+                  </span>
+                  <span className="text-gray-500 text-xs">{card.date}</span>
+                </div>
+                
+                <div className="text-4xl mb-4">{card.image}</div>
+                
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                  {card.title}
+                </h3>
+                
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                  {card.excerpt}
+                </p>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 text-xs">{card.readTime}</span>
+                  <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    Read More →
+                  </button>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const FeaturedPhones = ({ addToCompare, compareList }) => {
+  const [featuredPhones, setFeaturedPhones] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFeaturedPhones();
+  }, []);
+
+  const fetchFeaturedPhones = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/listings`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Show first 8 phones as featured
+        setFeaturedPhones(data.slice(0, 8));
+      }
+    } catch (error) {
+      console.error('Error fetching featured phones:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section className="bg-white py-12 md:py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading featured phones...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="bg-white py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Featured Phones
+          </h2>
+          <p className="text-gray-600">
+            Handpicked phones with the best value for money
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {featuredPhones.map((phone, index) => (
+            <div key={index} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm">
+                      {phone.brand} {phone.model}
+                    </h3>
+                    <p className="text-lg font-bold text-green-600">
+                      ₨ {phone.price?.toLocaleString()}
+                    </p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    phone.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
+                    phone.condition === 'Very Good' ? 'bg-blue-100 text-blue-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {phone.condition}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-4">
+                  <div>Storage: {phone.storage}</div>
+                  <div>RAM: {phone.ram}</div>
+                  <div>City: {phone.city}</div>
+                  <div>Views: {phone.views}</div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => addToCompare(phone)}
+                    disabled={compareList?.includes(phone)}
+                    className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                      compareList?.includes(phone)
+                        ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                        : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                    }`}
+                  >
+                    {compareList?.includes(phone) ? 'Added' : 'Compare'}
+                  </button>
+                  <button className="text-blue-600 hover:text-blue-700 text-xs font-medium">
+                    View Details →
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop View All Button */}
+        <div className="text-center mt-8 hidden md:block">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+            View All Featured Phones →
+          </button>
+        </div>
+
+        {/* Mobile View All Button */}
+        <div className="text-center mt-8 md:hidden">
+          <button className="text-blue-600 hover:text-blue-700 font-medium">
+            View All Featured Phones →
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const Footer = () => {
+  return (
+    <footer className="bg-gray-900 text-white py-12">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Company Info */}
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <Smartphone className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <div className="text-lg font-bold">PhoneFlip</div>
+                <div className="text-xs text-gray-300">.PK</div>
+              </div>
+            </div>
+            <p className="text-gray-300 text-sm mb-4">
+              Pakistan's largest marketplace for buying and selling mobile phones with confidence.
+            </p>
+            <div className="flex space-x-4">
+              <Facebook className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+              <Instagram className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+              <Twitter className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+              <Youtube className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="font-semibold mb-4">Quick Links</h4>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li><a href="#" className="hover:text-white transition-colors">Used Phones</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">New Phones</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Accessories</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Reviews</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Videos</a></li>
+            </ul>
+          </div>
+
+          {/* Support */}
+          <div>
+            <h4 className="font-semibold mb-4">Support</h4>
+            <ul className="space-y-2 text-sm text-gray-300">
+              <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Report Issue</a></li>
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 className="font-semibold mb-4">Contact Info</h4>
+            <div className="space-y-2 text-sm text-gray-300">
+              <div className="flex items-center space-x-2">
+                <Phone className="w-4 h-4" />
+                <span>+92 300 1234567</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Mail className="w-4 h-4" />
+                <span>support@phoneflip.pk</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <MapPin className="w-4 h-4" />
+                <span>Karachi, Pakistan</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
+          <p>&copy; 2025 PhoneFlip.PK. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export const PriceDropAlertsModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl font-bold text-gray-900">Price Drop Alerts</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="text-center mb-6">
+          <Bell className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+          <h4 className="text-xl font-semibold text-gray-900 mb-2">Stay Updated on Price Drops</h4>
+          <p className="text-gray-600">Get notified when your desired phone drops in price</p>
+        </div>
+
+        <form className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Phone Model</label>
+            <input
+              type="text"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="e.g. iPhone 15 Pro, Galaxy S24"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Target Price (PKR)</label>
+            <input
+              type="number"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="e.g. 125000"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Your Email</label>
+            <input
+              type="email"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="your@email.com"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors"
+          >
+            Set Price Alert
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export const CompareModal = ({ isOpen, onClose, compareList, clearCompare }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-2xl">
+          <div className="flex items-center justify-between">
+            <h3 className="text-2xl font-bold text-gray-900">Compare Phones</h3>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6">
+          {compareList.length === 0 ? (
+            <div className="text-center py-12">
+              <BarChart2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h4 className="text-xl font-semibold text-gray-900 mb-2">No phones to compare</h4>
+              <p className="text-gray-600">Add phones to compare their specifications and prices</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th className="text-left py-4 px-2 font-medium text-gray-700">Specification</th>
+                    {compareList.map((phone, index) => (
+                      <th key={index} className="text-center py-4 px-2 font-medium text-gray-900">
+                        {phone.brand} {phone.model}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  <tr>
+                    <td className="py-3 px-2 font-medium text-gray-700">Price</td>
+                    {compareList.map((phone, index) => (
+                      <td key={index} className="py-3 px-2 text-center text-green-600 font-bold">
+                        ₨ {phone.price?.toLocaleString()}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-2 font-medium text-gray-700">Condition</td>
+                    {compareList.map((phone, index) => (
+                      <td key={index} className="py-3 px-2 text-center">{phone.condition}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-2 font-medium text-gray-700">Storage</td>
+                    {compareList.map((phone, index) => (
+                      <td key={index} className="py-3 px-2 text-center">{phone.storage}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-2 font-medium text-gray-700">RAM</td>
+                    {compareList.map((phone, index) => (
+                      <td key={index} className="py-3 px-2 text-center">{phone.ram}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-2 font-medium text-gray-700">City</td>
+                    {compareList.map((phone, index) => (
+                      <td key={index} className="py-3 px-2 text-center">{phone.city}</td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {compareList.length > 0 && (
+            <div className="mt-6 text-center">
+              <button
+                onClick={clearCompare}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              >
+                Clear All
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Post an Ad Component
 export const PostAdPage = ({ onSubmitSuccess, user }) => {
