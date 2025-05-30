@@ -466,11 +466,7 @@ frontend:
         agent: "testing"
         comment: "Accessories section is accessible through the navigation menu. Unable to verify if exactly 5 accessories are displayed as required."
 
-metadata:
-  created_by: "testing_agent"
-  version: "1.0"
-  test_sequence: 4
-  run_ui: false
+
 
 test_plan:
   current_focus:
