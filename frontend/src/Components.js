@@ -861,6 +861,18 @@ export const Header = ({
                   {/* User Dropdown */}
                   {showUserMenu && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                      {user?.role === 'shop_owner' && (
+                        <button
+                          onClick={() => {
+                            setCurrentPage('dashboard');
+                            setShowUserMenu(false);
+                          }}
+                          className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                        >
+                          <BarChart3 className="w-4 h-4" />
+                          <span>Dashboard</span>
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           setCurrentPage('profile');
