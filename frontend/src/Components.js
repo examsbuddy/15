@@ -1601,8 +1601,14 @@ export const FeaturedPhones = ({ addToCompare, compareList }) => {
   const fetchFeaturedPhones = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/listings/featured`);
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      console.log('Fetching featured phones from:', `${backendUrl}/api/listings/featured`);
+      
+      const response = await fetch(`${backendUrl}/api/listings/featured`);
+      console.log('Featured phones response status:', response.status);
+      
       const data = await response.json();
+      console.log('Featured phones data:', data);
       
       if (response.ok) {
         setFeaturedPhones(data);
