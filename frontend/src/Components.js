@@ -37,7 +37,9 @@ import {
   ChevronDown,
   Sliders,
   Bell,
-  ShoppingBag
+  ShoppingBag,
+  Video,
+  FileText
 } from 'react-feather';
 
 // Authentication Modals
