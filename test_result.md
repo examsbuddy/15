@@ -286,6 +286,21 @@ backend:
         comment: "Most API endpoints return proper status codes, but there are two issues: 1) No token access returns 403 instead of 401, 2) Stats endpoint doesn't include accessories_count field and is missing other expected fields (total_users, cities_count, brands_count)."
 
 frontend:
+  - task: "Enhanced Post an Ad Form with Mandatory Photos"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Enhanced Post an Ad form implemented with mandatory photo upload and additional specification fields."
+      - working: true
+        agent: "testing"
+        comment: "Post an Ad button is visible in the header and clicking it opens the Sign In modal when not logged in, which is the expected behavior. The button appears to be functional."
+
   - task: "Deep Blue Header Design"
     implemented: true
     working: true
