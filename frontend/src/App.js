@@ -16,6 +16,7 @@ import {
 function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isPostAdOpen, setIsPostAdOpen] = useState(false);
 
   const renderContent = () => {
     switch (activeTab) {
