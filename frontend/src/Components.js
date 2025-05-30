@@ -150,6 +150,14 @@ export const SignInModal = ({ isOpen, onClose, onLogin, onSwitchToSignUp }) => {
     </div>
   );
 };
+              Sign up
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Search Results Component with Working Filters
 export const SearchResultsPage = ({ searchFilters, onBack }) => {
