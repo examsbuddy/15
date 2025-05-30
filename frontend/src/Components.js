@@ -756,9 +756,12 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                   <input
                     type="email"
+                    id="login-email"
+                    name="email"
                     value={loginData.email}
                     onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter your email"
                     required
                   />
                 </div>
