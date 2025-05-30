@@ -2650,7 +2650,13 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Brand *</label>
                   <select
                     value={formData.brand}
-                    onChange={(e) => handleInputChange('brand', e.target.value)}
+                    onChange={(e) => {
+                      handleInputChange('brand', e.target.value);
+                      // Reset model when brand changes
+                      setFormData(prev => ({ ...prev, model: '', color: '' }));
+                      setAvailableModels([]);
+                      setAvailableColors([]);
+                    }}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   >
@@ -2662,16 +2668,42 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Model *</label>
-                  <input
-                    type="text"
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Model * 
+                    {isLoadingSpecs && <span className="text-blue-500 text-sm ml-2">(Loading specs...)</span>}
+                  </label>
+                  <select
                     value={formData.model}
                     onChange={(e) => handleInputChange('model', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="e.g. iPhone 15 Pro, Galaxy S24"
                     required
-                  />
+                    disabled={!formData.brand}
+                  >
+                    <option value="">Select Model</option>
+                    {availableModels.map(model => (
+                      <option key={model} value={model}>{model}</option>
+                    ))}
+                  </select>
+                  {!formData.brand && (
+                    <p className="text-sm text-gray-500 mt-1">Please select a brand first</p>
+                  )}
                 </div>
+
+                {availableColors.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                    <select
+                      value={formData.color}
+                      onChange={(e) => handleInputChange('color', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">Select Color</option>
+                      {availableColors.map(color => (
+                        <option key={color} value={color}>{color}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Condition *</label>
