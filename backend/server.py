@@ -820,6 +820,7 @@ async def get_stats():
     try:
         total_listings = await db.phone_listings.count_documents({"is_active": True})
         total_accessories = await db.accessories.count_documents({"is_active": True})
+        total_users = await db.users.count_documents({"is_active": True})
         
         # Get brand counts
         pipeline = [
@@ -829,6 +830,7 @@ async def get_stats():
             {"$limit": 6}
         ]
         brand_stats = await db.phone_listings.aggregate(pipeline).to_list(length=6)
+        brands = [{"name": stat["_id"], "count": stat["count"]} for stat in brand_stats]
         
         # Get city counts
         city_pipeline = [
@@ -838,12 +840,17 @@ async def get_stats():
             {"$limit": 10}
         ]
         city_stats = await db.phone_listings.aggregate(city_pipeline).to_list(length=10)
+        cities = [{"name": stat["_id"], "count": stat["count"]} for stat in city_stats]
         
         return {
             "total_listings": total_listings,
             "total_accessories": total_accessories,
-            "brands": [{"name": stat["_id"], "count": stat["count"]} for stat in brand_stats],
-            "cities": [{"name": stat["_id"], "count": stat["count"]} for stat in city_stats]
+            "accessories_count": total_accessories,  # Alias for compatibility
+            "total_users": total_users,
+            "brands_count": len(brands),
+            "cities_count": len(cities),
+            "brands": brands,
+            "cities": cities
         }
     except Exception as e:
         logger.error(f"Error fetching stats: {str(e)}")
