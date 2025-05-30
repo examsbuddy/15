@@ -1555,14 +1555,14 @@ export const MobileMenu = ({ isOpen, setIsOpen, setActiveTab, setIsPostAdOpen })
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40 sm:hidden"
+              className="fixed inset-0 bg-black/50 z-40 md:hidden"
               onClick={() => setIsOpen(false)}
             />
             <motion.div
               initial={{ x: -300 }}
               animate={{ x: 0 }}
               exit={{ x: -300 }}
-              className="fixed left-0 top-0 h-full w-80 bg-white z-50 sm:hidden overflow-y-auto"
+              className="fixed left-0 top-0 h-full w-80 bg-white z-50 md:hidden overflow-y-auto"
             >
               <div className="p-4">
                 <div className="flex items-center justify-between mb-8">
