@@ -149,6 +149,7 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
 // Post Ad Modal Component
 export const PostAdModal = ({ isOpen, setIsOpen }) => {
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
@@ -158,14 +159,19 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
     ram: '',
     city: '',
     description: '',
+    seller_name: '',
+    seller_phone: '',
+    seller_email: '',
     features: []
   });
 
   const resetForm = () => {
     setStep(1);
     setFormData({
-      brand: '', model: '', condition: '', price: '', storage: '', ram: '', city: '', description: '', features: []
+      brand: '', model: '', condition: '', price: '', storage: '', ram: '', city: '', description: '', 
+      seller_name: '', seller_phone: '', seller_email: '', features: []
     });
+    setIsSubmitting(false);
   };
 
   const handleClose = () => {
@@ -173,9 +179,37 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
     resetForm();
   };
 
-  const handleSubmit = () => {
-    alert('Ad posted successfully!');
-    handleClose();
+  const submitListing = async () => {
+    setIsSubmitting(true);
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${backendUrl}/api/listings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          price: parseInt(formData.price)
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert('🎉 Your listing has been posted successfully! It will appear on the website instantly.');
+        handleClose();
+        // Trigger a page refresh to show the new listing
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        alert('Failed to post listing: ' + (error.detail || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error submitting listing:', error);
+      alert('Failed to post listing. Please check your internet connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -214,6 +248,7 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
                       value={formData.brand}
                       onChange={(e) => setFormData({...formData, brand: e.target.value})}
                       className="w-full p-3 border border-gray-300 rounded-lg"
+                      required
                     >
                       <option value="">Select Brand</option>
                       <option value="iPhone">iPhone</option>
@@ -222,6 +257,9 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
                       <option value="Oppo">Oppo</option>
                       <option value="Vivo">Vivo</option>
                       <option value="OnePlus">OnePlus</option>
+                      <option value="Huawei">Huawei</option>
+                      <option value="Google">Google</option>
+                      <option value="Other">Other</option>
                     </select>
                   </div>
                   <div>
@@ -232,6 +270,7 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
                       onChange={(e) => setFormData({...formData, model: e.target.value})}
                       className="w-full p-3 border border-gray-300 rounded-lg"
                       placeholder="e.g., iPhone 15 Pro"
+                      required
                     />
                   </div>
                 </div>
@@ -242,6 +281,7 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
                       value={formData.condition}
                       onChange={(e) => setFormData({...formData, condition: e.target.value})}
                       className="w-full p-3 border border-gray-300 rounded-lg"
+                      required
                     >
                       <option value="">Select Condition</option>
                       <option value="Excellent">Excellent</option>
@@ -258,12 +298,14 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
                       onChange={(e) => setFormData({...formData, price: e.target.value})}
                       className="w-full p-3 border border-gray-300 rounded-lg"
                       placeholder="150000"
+                      required
                     />
                   </div>
                 </div>
                 <button
                   onClick={() => setStep(2)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium"
+                  disabled={!formData.brand || !formData.model || !formData.condition || !formData.price}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
                 >
                   Next Step
                 </button>
@@ -272,7 +314,7 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
 
             {step === 2 && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Specifications & Location</h3>
+                <h3 className="text-lg font-semibold">Specifications & Details</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Storage</label>
@@ -311,6 +353,7 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
                     value={formData.city}
                     onChange={(e) => setFormData({...formData, city: e.target.value})}
                     className="w-full p-3 border border-gray-300 rounded-lg"
+                    required
                   >
                     <option value="">Select City</option>
                     <option value="Karachi">Karachi</option>
@@ -319,6 +362,8 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
                     <option value="Rawalpindi">Rawalpindi</option>
                     <option value="Faisalabad">Faisalabad</option>
                     <option value="Multan">Multan</option>
+                    <option value="Peshawar">Peshawar</option>
+                    <option value="Quetta">Quetta</option>
                   </select>
                 </div>
                 <div>
@@ -328,50 +373,68 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     className="w-full p-3 border border-gray-300 rounded-lg h-24"
                     placeholder="Describe your phone's condition, accessories included, etc."
+                    required
                   />
                 </div>
-                <div className="flex space-x-4">
-                  <button
-                    onClick={() => setStep(1)}
-                    className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-medium"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => setStep(3)}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium"
-                  >
-                    Review
-                  </button>
-                </div>
+                <button
+                  onClick={() => setStep(3)}
+                  disabled={!formData.city || !formData.description}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
+                >
+                  Next Step
+                </button>
               </div>
             )}
 
             {step === 3 && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Review Your Ad</h3>
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                  <div><strong>Brand:</strong> {formData.brand}</div>
-                  <div><strong>Model:</strong> {formData.model}</div>
-                  <div><strong>Condition:</strong> {formData.condition}</div>
-                  <div><strong>Price:</strong> PKR {formData.price}</div>
-                  <div><strong>Storage:</strong> {formData.storage}</div>
-                  <div><strong>RAM:</strong> {formData.ram}</div>
-                  <div><strong>City:</strong> {formData.city}</div>
-                  <div><strong>Description:</strong> {formData.description}</div>
+                <h3 className="text-lg font-semibold">Contact Information</h3>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                  <input
+                    type="text"
+                    value={formData.seller_name}
+                    onChange={(e) => setFormData({...formData, seller_name: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={formData.seller_phone}
+                    onChange={(e) => setFormData({...formData, seller_phone: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    placeholder="03xx-xxxxxxx"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                  <input
+                    type="email"
+                    value={formData.seller_email}
+                    onChange={(e) => setFormData({...formData, seller_email: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    placeholder="your.email@example.com"
+                    required
+                  />
                 </div>
                 <div className="flex space-x-4">
                   <button
                     onClick={() => setStep(2)}
                     className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-medium"
                   >
-                    Edit
+                    Previous
                   </button>
                   <button
-                    onClick={handleSubmit}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium"
+                    onClick={submitListing}
+                    disabled={isSubmitting || !formData.seller_name || !formData.seller_phone || !formData.seller_email}
+                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-medium"
                   >
-                    Post Ad
+                    {isSubmitting ? 'Posting...' : 'Post Ad'}
                   </button>
                 </div>
               </div>
