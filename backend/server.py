@@ -20,10 +20,18 @@ import base64
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# JWT Configuration
+JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key-change-in-production')
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION_HOURS = 24
+
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+# Security
+security = HTTPBearer()
 
 # Create the main app without a prefix
 app = FastAPI()
@@ -36,6 +44,116 @@ def serialize_doc(doc):
     if doc and "_id" in doc:
         doc["_id"] = str(doc["_id"])
     return doc
+
+# Enums
+class UserRole(str, Enum):
+    NORMAL_USER = "normal_user"
+    SHOP_OWNER = "shop_owner"
+    ADMIN = "admin"
+
+class VerificationStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    UNDER_REVIEW = "under_review"
+
+class BusinessType(str, Enum):
+    MOBILE_SHOP = "mobile_shop"
+    ELECTRONICS_STORE = "electronics_store"
+    REPAIR_SERVICE = "repair_service"
+    DISTRIBUTOR = "distributor"
+    ONLINE_RETAILER = "online_retailer"
+
+# Auth Helper Functions
+def hash_password(password: str) -> str:
+    """Hash password using bcrypt"""
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+
+def verify_password(password: str, hashed: str) -> bool:
+    """Verify password against hash"""
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+
+def create_access_token(data: dict):
+    """Create JWT access token"""
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return encoded_jwt
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Get current user from JWT token"""
+    try:
+        payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+        
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if user is None:
+            raise HTTPException(status_code=401, detail="User not found")
+        
+        return serialize_doc(user)
+    except jwt.JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+# User Models
+class UserRegistration(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    phone: str
+    role: UserRole = UserRole.NORMAL_USER
+
+class BusinessDetails(BaseModel):
+    business_name: str
+    business_type: BusinessType
+    business_address: str
+    city: str
+    postal_code: str
+    business_phone: str
+    website: Optional[str] = None
+    description: str
+    years_in_business: int
+    
+class KYCDocuments(BaseModel):
+    cnic_front: str  # Base64 encoded image
+    cnic_back: str   # Base64 encoded image
+    business_license: Optional[str] = None  # Base64 encoded image
+    trade_license: Optional[str] = None     # Base64 encoded image
+
+class ShopOwnerRegistration(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    phone: str
+    business_details: BusinessDetails
+    kyc_documents: KYCDocuments
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class User(BaseModel):
+    id: Optional[str] = Field(alias="_id")
+    name: str
+    email: EmailStr
+    phone: str
+    role: UserRole
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = True
+    verification_status: VerificationStatus = VerificationStatus.PENDING
+    business_details: Optional[BusinessDetails] = None
+    kyc_documents: Optional[KYCDocuments] = None
+    
+    class Config:
+        populate_by_name = True
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: User
 
 # Define Models
 class StatusCheck(BaseModel):
