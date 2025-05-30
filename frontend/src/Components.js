@@ -1190,7 +1190,6 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
     
     // Additional Features
     features: [],
-    images: [],
     
     // Preferences
     negotiable: true,
@@ -1224,7 +1223,7 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
     setFormData({
       brand: '', model: '', condition: 'Excellent', price: '', storage: '', ram: '', color: '', warranty: '',
       city: 'Karachi', area: '', description: '', seller_name: '', seller_phone: '', seller_email: '',
-      features: [], images: [], negotiable: true, exchange: false, urgent_sale: false
+      features: [], negotiable: true, exchange: false, urgent_sale: false
     });
     setIsSubmitting(false);
     setSubmittedAdId(null);
@@ -1232,7 +1231,7 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
 
   const handleClose = () => {
     setIsOpen(false);
-    setTimeout(resetForm, 300); // Delay reset to avoid visual glitch
+    setTimeout(resetForm, 300);
   };
 
   const handleFeatureToggle = (feature) => {
@@ -1268,7 +1267,6 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       
-      // Prepare the data for submission
       const submissionData = {
         ...formData,
         price: parseInt(formData.price),
