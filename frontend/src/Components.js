@@ -1471,7 +1471,7 @@ export const Header = ({
 };
 
 // Enhanced Hero Section with Advanced Search
-export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
+export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) => {
   const [searchFilters, setSearchFilters] = useState({
     query: '',
     brand: '',
@@ -1483,12 +1483,25 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
   });
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
-  const brands = ['iPhone', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'OnePlus', 'Huawei', 'Realme'];
+  const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'OnePlus', 'Huawei', 'Realme'];
   const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
-  const priceRanges = ['Under 20K', '20K - 50K', '50K - 100K', '100K - 150K', '150K+'];
-  const conditions = ['New', 'Like New', 'Good', 'Fair'];
-  const storageOptions = ['64GB', '128GB', '256GB', '512GB', '1TB'];
-  const ramOptions = ['4GB', '6GB', '8GB', '12GB', '16GB'];
+  const priceRanges = [
+    'Under ₨50,000',
+    '₨50,000 - ₨100,000',
+    '₨100,000 - ₨200,000',
+    '₨200,000 - ₨300,000',
+    '₨300,000 - ₨500,000',
+    'Above ₨500,000'
+  ];
+  const conditions = ['Excellent', 'Very Good', 'Good', 'Fair', 'Poor'];
+  const storageOptions = ['32GB', '64GB', '128GB', '256GB', '512GB', '1TB'];
+  const ramOptions = ['3GB', '4GB', '6GB', '8GB', '12GB', '16GB', '18GB'];
+
+  const handleSearch = () => {
+    if (onSearch) {
+      onSearch(searchFilters);
+    }
+  };
 
   return (
     <section 
