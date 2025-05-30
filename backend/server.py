@@ -352,6 +352,206 @@ async def verify_shop_owner(user_id: str, status: VerificationStatus, current_us
         raise HTTPException(status_code=500, detail="Failed to update verification status")
 
 # Phone Listing Routes
+@api_router.post("/sample-data")
+async def populate_sample_data():
+    """Populate sample data for testing"""
+    try:
+        # Sample phone listings
+        sample_listings = [
+            {
+                "brand": "Apple",
+                "model": "iPhone 15 Pro",
+                "condition": "Excellent",
+                "price": 450000,
+                "storage": "256GB",
+                "ram": "8GB",
+                "city": "Karachi",
+                "description": "Brand new iPhone 15 Pro in excellent condition. Box pack with all accessories. Face ID, wireless charging, triple camera system.",
+                "seller_name": "Ahmed Khan",
+                "seller_phone": "03001234567",
+                "seller_email": "ahmed@example.com",
+                "features": ["Face ID", "Wireless Charging", "Triple Camera", "A17 Pro Chip"],
+                "created_at": datetime.utcnow(),
+                "views": 127,
+                "is_featured": True,
+                "is_active": True
+            },
+            {
+                "brand": "Samsung",
+                "model": "Galaxy S24 Ultra",
+                "condition": "Like New",
+                "price": 380000,
+                "storage": "512GB",
+                "ram": "12GB",
+                "city": "Lahore",
+                "description": "Samsung Galaxy S24 Ultra with S Pen. Perfect condition, barely used. All original accessories included.",
+                "seller_name": "Fatima Ali",
+                "seller_phone": "03121234567",
+                "seller_email": "fatima@example.com",
+                "features": ["S Pen", "200MP Camera", "120Hz Display", "5000mAh Battery"],
+                "created_at": datetime.utcnow() - timedelta(days=1),
+                "views": 89,
+                "is_featured": True,
+                "is_active": True
+            },
+            {
+                "brand": "Xiaomi",
+                "model": "13 Pro",
+                "condition": "Good",
+                "price": 125000,
+                "storage": "256GB",
+                "ram": "8GB",
+                "city": "Islamabad",
+                "description": "Xiaomi 13 Pro in good condition. Minor scratches on back, screen is perfect. Great camera and performance.",
+                "seller_name": "Hassan Shah",
+                "seller_phone": "03331234567",
+                "seller_email": "hassan@example.com",
+                "features": ["Leica Camera", "120W Fast Charging", "Snapdragon 8 Gen 2"],
+                "created_at": datetime.utcnow() - timedelta(days=2),
+                "views": 67,
+                "is_featured": False,
+                "is_active": True
+            },
+            {
+                "brand": "Oppo",
+                "model": "Reno 11 Pro",
+                "condition": "Very Good",
+                "price": 95000,
+                "storage": "256GB",
+                "ram": "8GB",
+                "city": "Rawalpindi",
+                "description": "Oppo Reno 11 Pro with excellent camera quality. Great for photography enthusiasts. All accessories included.",
+                "seller_name": "Aisha Malik",
+                "seller_phone": "03451234567",
+                "seller_email": "aisha@example.com",
+                "features": ["50MP Portrait Camera", "80W SuperVOOC", "ColorOS 14"],
+                "created_at": datetime.utcnow() - timedelta(days=3),
+                "views": 45,
+                "is_featured": False,
+                "is_active": True
+            },
+            {
+                "brand": "Vivo",
+                "model": "V30 Pro",
+                "condition": "Excellent",
+                "price": 110000,
+                "storage": "128GB",
+                "ram": "8GB",
+                "city": "Faisalabad",
+                "description": "Vivo V30 Pro with amazing selfie camera. Perfect for content creators. No issues, all original.",
+                "seller_name": "Bilal Ahmed",
+                "seller_phone": "03411234567",
+                "seller_email": "bilal@example.com",
+                "features": ["50MP Selfie Camera", "80W FlashCharge", "Aura Light Portrait"],
+                "created_at": datetime.utcnow() - timedelta(days=4),
+                "views": 33,
+                "is_featured": False,
+                "is_active": True
+            },
+            {
+                "brand": "Realme",
+                "model": "GT 5 Pro",
+                "condition": "Good",
+                "price": 85000,
+                "storage": "256GB",
+                "ram": "12GB",
+                "city": "Multan",
+                "description": "Realme GT 5 Pro gaming phone. Excellent performance for gaming. Minor wear and tear but works perfectly.",
+                "seller_name": "Zain Abbas",
+                "seller_phone": "03061234567",
+                "seller_email": "zain@example.com",
+                "features": ["Snapdragon 8 Gen 3", "144Hz Display", "100W SuperDart", "Gaming Mode"],
+                "created_at": datetime.utcnow() - timedelta(days=5),
+                "views": 58,
+                "is_featured": False,
+                "is_active": True
+            },
+            {
+                "brand": "Apple",
+                "model": "iPhone 14",
+                "condition": "Very Good",
+                "price": 320000,
+                "storage": "128GB",
+                "ram": "6GB",
+                "city": "Peshawar",
+                "description": "iPhone 14 in very good condition. Single owner, carefully used. Battery health 95%. All accessories.",
+                "seller_name": "Sana Gul",
+                "seller_phone": "03919234567",
+                "seller_email": "sana@example.com",
+                "features": ["Face ID", "Dual Camera", "A15 Bionic", "Ceramic Shield"],
+                "created_at": datetime.utcnow() - timedelta(days=6),
+                "views": 102,
+                "is_featured": True,
+                "is_active": True
+            },
+            {
+                "brand": "Samsung",
+                "model": "Galaxy A54",
+                "condition": "Like New",
+                "price": 65000,
+                "storage": "128GB",
+                "ram": "6GB",
+                "city": "Quetta",
+                "description": "Samsung Galaxy A54 barely used. Excellent mid-range phone with great camera. All original packaging.",
+                "seller_name": "Ali Raza",
+                "seller_phone": "03811234567",
+                "seller_email": "ali@example.com",
+                "features": ["50MP Triple Camera", "5000mAh Battery", "25W Fast Charging", "IP67"],
+                "created_at": datetime.utcnow() - timedelta(days=7),
+                "views": 41,
+                "is_featured": False,
+                "is_active": True
+            },
+            {
+                "brand": "Xiaomi",
+                "model": "Redmi Note 13 Pro",
+                "condition": "Good",
+                "price": 45000,
+                "storage": "128GB",
+                "ram": "8GB",
+                "city": "Karachi",
+                "description": "Redmi Note 13 Pro with excellent value for money. Good camera, fast performance. Minor scratches.",
+                "seller_name": "Sara Khan",
+                "seller_phone": "03002345678",
+                "seller_email": "sara@example.com",
+                "features": ["200MP Camera", "67W Turbo Charging", "120Hz AMOLED", "MediaTek Dimensity"],
+                "created_at": datetime.utcnow() - timedelta(days=8),
+                "views": 76,
+                "is_featured": False,
+                "is_active": True
+            },
+            {
+                "brand": "OnePlus",
+                "model": "12",
+                "condition": "Excellent",
+                "price": 195000,
+                "storage": "256GB",
+                "ram": "12GB",
+                "city": "Lahore",
+                "description": "OnePlus 12 flagship phone. Amazing performance and camera quality. Hasselblad partnership. Like new condition.",
+                "seller_name": "Usman Tariq",
+                "seller_phone": "03123456789",
+                "seller_email": "usman@example.com",
+                "features": ["Hasselblad Camera", "100W SuperVOOC", "120Hz Display", "Snapdragon 8 Gen 3"],
+                "created_at": datetime.utcnow() - timedelta(days=9),
+                "views": 94,
+                "is_featured": True,
+                "is_active": True
+            }
+        ]
+
+        # Clear existing sample data
+        await db.phone_listings.delete_many({})
+        
+        # Insert sample listings
+        await db.phone_listings.insert_many(sample_listings)
+        
+        return {"success": True, "message": f"Successfully populated {len(sample_listings)} sample phone listings"}
+        
+    except Exception as e:
+        logger.error(f"Error populating sample data: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to populate sample data")
+
 @api_router.post("/listings", response_model=dict)
 async def create_listing(listing: PhoneListingCreate):
     """Create a new phone listing"""
