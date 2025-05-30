@@ -651,6 +651,19 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
   const handleSignup = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    
+    // Validate required fields
+    if (!signupData.name || !signupData.email || !signupData.phone || !signupData.password) {
+      alert('Please fill in all required fields');
+      setIsLoading(false);
+      return;
+    }
+    
+    // Ensure role is set
+    if (!signupData.role) {
+      setSignupData({...signupData, role: 'normal_user'});
+    }
+    
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
       console.log('Backend URL:', backendUrl);
