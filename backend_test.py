@@ -225,11 +225,25 @@ def main():
     # Setup tester
     tester = PhoneFlipAPITester(backend_url)
     
-    # Run tests
+    # Run basic API tests
+    print("\n=== Testing Basic API Endpoints ===")
     tester.test_api_root()
     tester.test_get_listings()
     tester.test_get_featured_listings()
     tester.test_get_stats()
+    
+    # Run user authentication tests
+    print("\n=== Testing User Authentication ===")
+    tester.test_register_normal_user()
+    tester.test_login()
+    tester.test_get_current_user()
+    
+    # Run shop owner registration test
+    print("\n=== Testing Shop Owner Registration ===")
+    tester.test_register_shop_owner()
+    
+    # Run listing tests
+    print("\n=== Testing Listing Management ===")
     tester.test_create_listing()
     tester.test_get_listing_by_id()
     tester.test_filtered_listings()
