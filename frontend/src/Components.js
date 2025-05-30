@@ -2529,3 +2529,449 @@ export const FeaturedPhones = ({ addToCompare, compareList }) => {
     </section>
   );
 };
+
+// Post an Ad Component
+export const PostAdPage = ({ onSubmitSuccess, user }) => {
+  const [formData, setFormData] = useState({
+    brand: '',
+    model: '',
+    condition: '',
+    price: '',
+    storage: '',
+    ram: '',
+    city: '',
+    description: '',
+    seller_name: user?.name || '',
+    seller_phone: user?.phone || '',
+    seller_email: user?.email || '',
+    features: []
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [submittedListing, setSubmittedListing] = useState(null);
+  const [error, setError] = useState('');
+
+  const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'];
+  const conditions = ['Excellent', 'Very Good', 'Good', 'Fair', 'Poor'];
+  const storageOptions = ['32GB', '64GB', '128GB', '256GB', '512GB', '1TB'];
+  const ramOptions = ['3GB', '4GB', '6GB', '8GB', '12GB', '16GB', '18GB'];
+  const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
+  const commonFeatures = [
+    'Face ID', 'Fingerprint Scanner', 'Wireless Charging', 'Fast Charging', 
+    'Dual SIM', 'NFC', 'Water Resistant', 'Headphone Jack', 
+    'Expandable Storage', 'Dual Camera', 'Triple Camera', 'Quad Camera'
+  ];
+
+  const handleInputChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    setError('');
+  };
+
+  const handleFeatureToggle = (feature) => {
+    const currentFeatures = formData.features;
+    if (currentFeatures.includes(feature)) {
+      setFormData({
+        ...formData,
+        features: currentFeatures.filter(f => f !== feature)
+      });
+    } else {
+      setFormData({
+        ...formData,
+        features: [...currentFeatures, feature]
+      });
+    }
+  };
+
+  const validateForm = () => {
+    const required = ['brand', 'model', 'condition', 'price', 'storage', 'ram', 'city', 'description'];
+    for (const field of required) {
+      if (!formData[field]) {
+        setError(`${field.charAt(0).toUpperCase() + field.slice(1)} is required`);
+        return false;
+      }
+    }
+    
+    if (isNaN(formData.price) || parseFloat(formData.price) <= 0) {
+      setError('Please enter a valid price');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/listings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          price: parseInt(formData.price)
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmittedListing({ ...formData, id: data.listing_id });
+        setShowPreview(true);
+        if (onSubmitSuccess) {
+          onSubmitSuccess(data);
+        }
+      } else {
+        setError(data.detail || 'Failed to submit listing');
+      }
+    } catch (error) {
+      setError('Network error. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEdit = () => {
+    setShowPreview(false);
+    setSubmittedListing(null);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      brand: '',
+      model: '',
+      condition: '',
+      price: '',
+      storage: '',
+      ram: '',
+      city: '',
+      description: '',
+      seller_name: user?.name || '',
+      seller_phone: user?.phone || '',
+      seller_email: user?.email || '',
+      features: []
+    });
+    setShowPreview(false);
+    setSubmittedListing(null);
+    setError('');
+  };
+
+  if (showPreview && submittedListing) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="text-center mb-8">
+              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Ad Posted Successfully!</h2>
+              <p className="text-gray-600">Your phone listing is now live and visible to potential buyers.</p>
+            </div>
+
+            {/* Listing Preview */}
+            <div className="border border-gray-200 rounded-xl p-6 mb-8">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Listing Preview</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-2xl font-bold text-blue-900">
+                      {submittedListing.brand} {submittedListing.model}
+                    </h4>
+                    <p className="text-3xl font-bold text-green-600">₨ {parseInt(submittedListing.price).toLocaleString()}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium text-gray-700">Condition:</span>
+                      <p className="text-gray-900">{submittedListing.condition}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">Storage:</span>
+                      <p className="text-gray-900">{submittedListing.storage}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">RAM:</span>
+                      <p className="text-gray-900">{submittedListing.ram}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">City:</span>
+                      <p className="text-gray-900">{submittedListing.city}</p>
+                    </div>
+                  </div>
+
+                  {submittedListing.features.length > 0 && (
+                    <div>
+                      <span className="font-medium text-gray-700">Features:</span>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {submittedListing.features.map((feature, index) => (
+                          <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <h5 className="font-medium text-gray-700 mb-2">Description:</h5>
+                  <p className="text-gray-900 mb-4">{submittedListing.description}</p>
+                  
+                  <h5 className="font-medium text-gray-700 mb-2">Seller Contact:</h5>
+                  <div className="space-y-1 text-sm">
+                    <p><span className="font-medium">Name:</span> {submittedListing.seller_name}</p>
+                    <p><span className="font-medium">Phone:</span> {submittedListing.seller_phone}</p>
+                    <p><span className="font-medium">Email:</span> {submittedListing.seller_email}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={handleEdit}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Edit Listing</span>
+              </button>
+              
+              <button
+                onClick={resetForm}
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Post Another Ad</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Post Your Phone Ad</h2>
+            <p className="text-gray-600">Fill in the details to create your phone listing</p>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Phone Details */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Phone Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Brand *</label>
+                  <select
+                    value={formData.brand}
+                    onChange={(e) => handleInputChange('brand', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select Brand</option>
+                    {brands.map(brand => (
+                      <option key={brand} value={brand}>{brand}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Model *</label>
+                  <input
+                    type="text"
+                    value={formData.model}
+                    onChange={(e) => handleInputChange('model', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g. iPhone 15 Pro, Galaxy S24"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Condition *</label>
+                  <select
+                    value={formData.condition}
+                    onChange={(e) => handleInputChange('condition', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select Condition</option>
+                    {conditions.map(condition => (
+                      <option key={condition} value={condition}>{condition}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Price (PKR) *</label>
+                  <input
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g. 125000"
+                    min="1"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Storage *</label>
+                  <select
+                    value={formData.storage}
+                    onChange={(e) => handleInputChange('storage', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select Storage</option>
+                    {storageOptions.map(storage => (
+                      <option key={storage} value={storage}>{storage}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">RAM *</label>
+                  <select
+                    value={formData.ram}
+                    onChange={(e) => handleInputChange('ram', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select RAM</option>
+                    {ramOptions.map(ram => (
+                      <option key={ram} value={ram}>{ram}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Location & Contact */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Location & Contact</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                  <select
+                    value={formData.city}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select City</option>
+                    {cities.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Seller Name</label>
+                  <input
+                    type="text"
+                    value={formData.seller_name}
+                    onChange={(e) => handleInputChange('seller_name', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Your name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={formData.seller_phone}
+                    onChange={(e) => handleInputChange('seller_phone', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="03XX XXXXXXX"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={formData.seller_email}
+                    onChange={(e) => handleInputChange('seller_email', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="your@email.com"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Description</h3>
+              <textarea
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows="4"
+                placeholder="Describe your phone's condition, any accessories included, reason for selling, etc."
+                required
+              />
+            </div>
+
+            {/* Features */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Features (Optional)</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {commonFeatures.map(feature => (
+                  <label key={feature} className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.features.includes(feature)}
+                      onChange={() => handleFeatureToggle(feature)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">{feature}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="text-center">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-12 py-4 rounded-lg font-semibold text-lg transition-colors flex items-center justify-center space-x-3 mx-auto"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Posting Ad...</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-5 h-5" />
+                    <span>Post My Ad</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
