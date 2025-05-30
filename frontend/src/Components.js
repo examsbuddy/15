@@ -69,6 +69,297 @@ const featuredPhones = [
 const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
 const priceRanges = ['Under Rs 25,000', 'Rs 25,000 - 50,000', 'Rs 50,000 - 1,00,000', 'Rs 1,00,000 - 2,00,000', 'Above Rs 2,00,000'];
 
+// Dropdown menu data
+const menuDropdowns = {
+  'used-phones': {
+    categories: [
+      { name: 'By Brand', items: ['iPhone', 'Samsung', 'Xiaomi', 'OnePlus', 'Oppo', 'Vivo', 'Huawei'] },
+      { name: 'By Price', items: ['Under 25K', '25K-50K', '50K-100K', '100K-200K', 'Above 200K'] },
+      { name: 'By Storage', items: ['64GB', '128GB', '256GB', '512GB', '1TB'] },
+      { name: 'By Condition', items: ['Excellent', 'Good', 'Fair', 'Poor'] }
+    ]
+  },
+  'new-phones': {
+    categories: [
+      { name: 'Latest Releases', items: ['iPhone 15 Series', 'Samsung S24', 'Xiaomi 14', 'OnePlus 12'] },
+      { name: 'Popular Brands', items: ['Apple', 'Samsung', 'Xiaomi', 'OnePlus', 'Oppo'] },
+      { name: 'Price Range', items: ['Under 50K', '50K-100K', '100K-200K', 'Above 200K'] }
+    ]
+  },
+  'accessories': {
+    categories: [
+      { name: 'Protection', items: ['Cases & Covers', 'Screen Protectors', 'Tempered Glass'] },
+      { name: 'Audio', items: ['Earphones', 'Wireless Earbuds', 'Speakers', 'Headphones'] },
+      { name: 'Charging', items: ['Chargers', 'Power Banks', 'Wireless Chargers', 'Cables'] },
+      { name: 'Other', items: ['Phone Stands', 'Car Mounts', 'Selfie Sticks', 'Ring Holders'] }
+    ]
+  }
+};
+
+// Notifications data
+const notifications = [
+  { id: 1, title: 'New message from buyer', message: 'Someone is interested in your iPhone 14 Pro', time: '2 min ago', type: 'message', unread: true },
+  { id: 2, title: 'Price drop alert', message: 'Samsung Galaxy S23 Ultra price dropped by Rs 15,000', time: '1 hour ago', type: 'alert', unread: true },
+  { id: 3, title: 'Your ad has been viewed', message: 'Your Xiaomi 13 Pro listing has 25 new views', time: '3 hours ago', type: 'info', unread: false },
+  { id: 4, title: 'New phones in your area', message: '5 new phones posted in Karachi today', time: '1 day ago', type: 'info', unread: false }
+];
+
+// Login Modal Component
+export const LoginModal = ({ isOpen, setIsOpen }) => {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: '',
+    phone: ''
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle login/signup logic here
+    console.log('Form submitted:', formData);
+    setIsOpen(false);
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setIsOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-xl p-6 w-full max-w-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {isSignUp ? 'Sign Up' : 'Login'} to PhoneFlip.PK
+                </h2>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {isSignUp && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter your full name"
+                      required={isSignUp}
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter your email"
+                    required
+                  />
+                </div>
+
+                {isSignUp && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="03XX XXXXXXX"
+                      required={isSignUp}
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter your password"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-lg font-medium transition-colors"
+                >
+                  {isSignUp ? 'Create Account' : 'Login'}
+                </button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <p className="text-gray-600">
+                  {isSignUp ? 'Already have an account?' : "Don't have an account?"}
+                  <button
+                    onClick={() => setIsSignUp(!isSignUp)}
+                    className="text-blue-600 hover:text-blue-700 font-medium ml-1"
+                  >
+                    {isSignUp ? 'Login' : 'Sign Up'}
+                  </button>
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
+// Notification Panel Component
+export const NotificationPanel = ({ isOpen, setIsOpen }) => {
+  const [unreadCount, setUnreadCount] = useState(notifications.filter(n => n.unread).length);
+
+  const markAsRead = (notificationId) => {
+    // Mark notification as read logic
+    setUnreadCount(prev => Math.max(0, prev - 1));
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/20 z-40"
+            onClick={() => setIsOpen(false)}
+          />
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+          >
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-gray-900">Notifications</h3>
+                {unreadCount > 0 && (
+                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+              </div>
+            </div>
+            
+            <div className="max-h-96 overflow-y-auto">
+              {notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
+                    notification.unread ? 'bg-blue-50' : ''
+                  }`}
+                  onClick={() => markAsRead(notification.id)}
+                >
+                  <div className="flex items-start space-x-3">
+                    <div className={`w-2 h-2 rounded-full mt-2 ${
+                      notification.unread ? 'bg-blue-500' : 'bg-gray-300'
+                    }`} />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium text-gray-900">
+                        {notification.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {notification.message}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        {notification.time}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="p-4 border-t border-gray-200">
+              <button className="w-full text-center text-blue-600 hover:text-blue-700 text-sm font-medium">
+                View All Notifications
+              </button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
+// Dropdown Menu Component
+export const DropdownMenu = ({ isOpen, menuId, onClose }) => {
+  const menuData = menuDropdowns[menuId];
+  
+  if (!menuData || !isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+      >
+        <div className="p-4">
+          {menuData.categories.map((category, index) => (
+            <div key={index} className="mb-4 last:mb-0">
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm">
+                {category.name}
+              </h4>
+              <ul className="space-y-1">
+                {category.items.map((item, itemIndex) => (
+                  <li key={itemIndex}>
+                    <button
+                      onClick={() => {
+                        console.log(`Selected: ${item}`);
+                        onClose();
+                      }}
+                      className="text-gray-600 hover:text-blue-600 text-sm hover:bg-blue-50 w-full text-left px-2 py-1 rounded transition-colors"
+                    >
+                      {item}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
 // Desktop Header Component
 export const DesktopHeader = ({ activeTab, setActiveTab }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
