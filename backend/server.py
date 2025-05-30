@@ -889,30 +889,6 @@ async def get_listing_details(listing_id: str):
     except Exception as e:
         logger.error(f"Error fetching listing details: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch listing details")
-    try:
-        # Validate ObjectId
-        if not ObjectId.is_valid(listing_id):
-            raise HTTPException(status_code=400, detail="Invalid listing ID")
-        
-        # Find the listing
-        listing = await db.phone_listings.find_one({"_id": ObjectId(listing_id), "is_active": True})
-        
-        if not listing:
-            raise HTTPException(status_code=404, detail="Listing not found")
-        
-        # Increment view count
-        await db.phone_listings.update_one(
-            {"_id": ObjectId(listing_id)},
-            {"$inc": {"views": 1}}
-        )
-        
-        listing = serialize_doc(listing)
-        return PhoneListing(**listing)
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error fetching listing {listing_id}: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to fetch listing")
 
 @api_router.get("/stats")
 async def get_stats():
