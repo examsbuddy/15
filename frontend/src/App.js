@@ -19,7 +19,8 @@ import {
   SignUpModal,
   PostAdPage,
   SearchResultsPage,
-  ShopOwnerDashboard
+  ShopOwnerDashboard,
+  DetailedListingPage
 } from './Components';
 
 function App() {
