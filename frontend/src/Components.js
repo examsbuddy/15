@@ -142,9 +142,447 @@ export const SignInModal = ({ isOpen, onClose, onLogin, onSwitchToSignUp }) => {
               onClick={onSwitchToSignUp}
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
-              Sign up
-            </button>
-          </p>
+// Search Results Component with Working Filters
+export const SearchResultsPage = ({ searchFilters, onBack }) => {
+  const [listings, setListings] = useState([]);
+  const [filteredListings, setFilteredListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeFilters, setActiveFilters] = useState({
+    brand: '',
+    city: '',
+    condition: '',
+    priceRange: '',
+    storage: '',
+    ram: ''
+  });
+  const [sortBy, setSortBy] = useState('newest');
+
+  const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'];
+  const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
+  const conditions = ['Excellent', 'Very Good', 'Good', 'Fair', 'Poor'];
+  const priceRanges = [
+    'Under ₨50,000',
+    '₨50,000 - ₨100,000',
+    '₨100,000 - ₨200,000',
+    '₨200,000 - ₨300,000',
+    '₨300,000 - ₨500,000',
+    'Above ₨500,000'
+  ];
+  const storageOptions = ['32GB', '64GB', '128GB', '256GB', '512GB', '1TB'];
+  const ramOptions = ['3GB', '4GB', '6GB', '8GB', '12GB', '16GB', '18GB'];
+
+  useEffect(() => {
+    fetchListings();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [listings, activeFilters, sortBy]);
+
+  const fetchListings = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/listings`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setListings(data);
+        // Apply initial search filters if any
+        if (searchFilters) {
+          setActiveFilters({
+            ...activeFilters,
+            ...searchFilters
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching listings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const applyFilters = () => {
+    let filtered = [...listings];
+
+    // Apply text search
+    if (activeFilters.query) {
+      filtered = filtered.filter(listing => 
+        listing.brand.toLowerCase().includes(activeFilters.query.toLowerCase()) ||
+        listing.model.toLowerCase().includes(activeFilters.query.toLowerCase())
+      );
+    }
+
+    // Apply brand filter
+    if (activeFilters.brand) {
+      filtered = filtered.filter(listing => listing.brand === activeFilters.brand);
+    }
+
+    // Apply city filter
+    if (activeFilters.city) {
+      filtered = filtered.filter(listing => listing.city === activeFilters.city);
+    }
+
+    // Apply condition filter
+    if (activeFilters.condition) {
+      filtered = filtered.filter(listing => listing.condition === activeFilters.condition);
+    }
+
+    // Apply storage filter
+    if (activeFilters.storage) {
+      filtered = filtered.filter(listing => listing.storage === activeFilters.storage);
+    }
+
+    // Apply RAM filter
+    if (activeFilters.ram) {
+      filtered = filtered.filter(listing => listing.ram === activeFilters.ram);
+    }
+
+    // Apply price range filter
+    if (activeFilters.priceRange) {
+      filtered = filtered.filter(listing => {
+        const price = listing.price;
+        switch (activeFilters.priceRange) {
+          case 'Under ₨50,000':
+            return price < 50000;
+          case '₨50,000 - ₨100,000':
+            return price >= 50000 && price <= 100000;
+          case '₨100,000 - ₨200,000':
+            return price >= 100000 && price <= 200000;
+          case '₨200,000 - ₨300,000':
+            return price >= 200000 && price <= 300000;
+          case '₨300,000 - ₨500,000':
+            return price >= 300000 && price <= 500000;
+          case 'Above ₨500,000':
+            return price > 500000;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Apply sorting
+    switch (sortBy) {
+      case 'price_low':
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case 'price_high':
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+      case 'newest':
+        filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        break;
+      case 'oldest':
+        filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        break;
+      default:
+        break;
+    }
+
+    setFilteredListings(filtered);
+  };
+
+  const clearFilters = () => {
+    setActiveFilters({
+      brand: '',
+      city: '',
+      condition: '',
+      priceRange: '',
+      storage: '',
+      ram: '',
+      query: ''
+    });
+  };
+
+  const getActiveFilterCount = () => {
+    return Object.values(activeFilters).filter(value => value !== '').length;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <span className="ml-3 text-lg text-gray-600">Loading listings...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={onBack}
+                className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                <ArrowRight className="w-5 h-5 rotate-180" />
+                <span>Back to Home</span>
+              </button>
+              <h1 className="text-3xl font-bold text-gray-900">Search Results</h1>
+            </div>
+            <div className="text-gray-600">
+              {filteredListings.length} phones found
+            </div>
+          </div>
+          
+          {/* Active Search Query */}
+          {searchFilters?.query && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <p className="text-blue-700">
+                Searching for: <span className="font-semibold">"{searchFilters.query}"</span>
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filters Sidebar */}
+          <div className="lg:w-1/4">
+            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-24">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+                {getActiveFilterCount() > 0 && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    Clear All ({getActiveFilterCount()})
+                  </button>
+                )}
+              </div>
+
+              <div className="space-y-6">
+                {/* Search */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                  <input
+                    type="text"
+                    value={activeFilters.query || ''}
+                    onChange={(e) => setActiveFilters({ ...activeFilters, query: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    placeholder="Search by brand or model"
+                  />
+                </div>
+
+                {/* Brand Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
+                  <select
+                    value={activeFilters.brand}
+                    onChange={(e) => setActiveFilters({ ...activeFilters, brand: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">All Brands</option>
+                    {brands.map(brand => (
+                      <option key={brand} value={brand}>{brand}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* City Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                  <select
+                    value={activeFilters.city}
+                    onChange={(e) => setActiveFilters({ ...activeFilters, city: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">All Cities</option>
+                    {cities.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Condition Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Condition</label>
+                  <select
+                    value={activeFilters.condition}
+                    onChange={(e) => setActiveFilters({ ...activeFilters, condition: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">All Conditions</option>
+                    {conditions.map(condition => (
+                      <option key={condition} value={condition}>{condition}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Price Range Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
+                  <select
+                    value={activeFilters.priceRange}
+                    onChange={(e) => setActiveFilters({ ...activeFilters, priceRange: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">All Prices</option>
+                    {priceRanges.map(range => (
+                      <option key={range} value={range}>{range}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Storage Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Storage</label>
+                  <select
+                    value={activeFilters.storage}
+                    onChange={(e) => setActiveFilters({ ...activeFilters, storage: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">All Storage</option>
+                    {storageOptions.map(storage => (
+                      <option key={storage} value={storage}>{storage}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* RAM Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">RAM</label>
+                  <select
+                    value={activeFilters.ram}
+                    onChange={(e) => setActiveFilters({ ...activeFilters, ram: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">All RAM</option>
+                    {ramOptions.map(ram => (
+                      <option key={ram} value={ram}>{ram}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Results */}
+          <div className="lg:w-3/4">
+            {/* Sort Options */}
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-lg font-medium text-gray-900">
+                {filteredListings.length} Results
+              </h4>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Sort by:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="price_low">Price: Low to High</option>
+                  <option value="price_high">Price: High to Low</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Listings Grid */}
+            {filteredListings.length === 0 ? (
+              <div className="text-center py-12">
+                <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No phones found</h3>
+                <p className="text-gray-600 mb-4">Try adjusting your filters or search criteria</p>
+                <button
+                  onClick={clearFilters}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredListings.map((listing) => (
+                  <div key={listing.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                    <div className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900">
+                            {listing.brand} {listing.model}
+                          </h3>
+                          <p className="text-2xl font-bold text-green-600">
+                            ₨ {listing.price.toLocaleString()}
+                          </p>
+                        </div>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          listing.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
+                          listing.condition === 'Very Good' ? 'bg-blue-100 text-blue-800' :
+                          listing.condition === 'Good' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {listing.condition}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                        <div>
+                          <span className="text-gray-600">Storage:</span>
+                          <p className="font-medium">{listing.storage}</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">RAM:</span>
+                          <p className="font-medium">{listing.ram}</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">City:</span>
+                          <p className="font-medium">{listing.city}</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Views:</span>
+                          <p className="font-medium">{listing.views}</p>
+                        </div>
+                      </div>
+
+                      <p className="text-gray-700 text-sm mb-4 line-clamp-2">
+                        {listing.description}
+                      </p>
+
+                      {listing.features && listing.features.length > 0 && (
+                        <div className="mb-4">
+                          <div className="flex flex-wrap gap-2">
+                            {listing.features.slice(0, 3).map((feature, index) => (
+                              <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                                {feature}
+                              </span>
+                            ))}
+                            {listing.features.length > 3 && (
+                              <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                                +{listing.features.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                        <div className="text-sm text-gray-600">
+                          <p className="font-medium">{listing.seller_name}</p>
+                          <p>{listing.seller_phone}</p>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            Call
+                          </button>
+                          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            Message
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
