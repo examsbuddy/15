@@ -177,6 +177,15 @@ function App() {
           />
         )}
         
+        {/* Dedicated Search Page */}
+        {currentPage === 'dedicated-search' && (
+          <DedicatedSearchPage 
+            onBack={handleBackToHome}
+            onViewListing={handleViewListing}
+            initialFilters={searchFilters}
+          />
+        )}
+        
         {/* Search Results Page */}
         {currentPage === 'search-results' && (
           <SearchResultsPage 
