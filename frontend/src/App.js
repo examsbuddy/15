@@ -117,7 +117,7 @@ function App() {
       />
       
       {/* Main Content */}
-      <main className="min-h-screen pb-20 lg:pb-0">
+      <main className="min-h-screen pb-20 sm:pb-0">
         {renderContent()}
       </main>
       
@@ -125,7 +125,7 @@ function App() {
       <Footer />
       
       {/* Bottom Navigation - Mobile Only */}
-      <div className="block lg:hidden">
+      <div className="block sm:hidden">
         <BottomNavigation 
           activeTab={activeTab} 
           setActiveTab={setActiveTab} 
