@@ -1066,7 +1066,7 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="hidden md:block max-w-4xl mx-auto"
+          className="hidden lg:block max-w-4xl mx-auto"
         >
           <div className="bg-white rounded-lg p-6 shadow-xl">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
