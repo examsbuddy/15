@@ -370,34 +370,67 @@ class PhoneFlipAPITester:
     
     def test_verify_sample_data(self):
         """Test verifying sample data exists and is complete"""
-        success, response = self.run_test(
+        # Check phone listings
+        success_listings, response_listings = self.run_test(
             "Get All Listings to Verify Sample Data",
             "GET",
             "api/listings",
             200
         )
         
-        if success and isinstance(response, list):
-            if len(response) > 0:
-                print(f"✅ Sample data exists - Found {len(response)} listings")
-                
-                # Check if sample data has all required fields
-                required_fields = ["brand", "model", "condition", "price", "storage", "ram", "city", "description"]
-                sample_item = response[0]
-                missing_fields = [field for field in required_fields if field not in sample_item]
-                
-                if missing_fields:
-                    print(f"❌ Sample data is incomplete - Missing fields: {', '.join(missing_fields)}")
-                    return False, response
-                else:
-                    print("✅ Sample data is complete - All required fields present")
-                    return True, response
-            else:
-                print("❌ No sample data found")
-                return False, response
+        # Check accessories
+        success_accessories, response_accessories = self.run_test(
+            "Get All Accessories to Verify Sample Data",
+            "GET",
+            "api/accessories",
+            200
+        )
+        
+        listings_count = len(response_listings) if success_listings and isinstance(response_listings, list) else 0
+        accessories_count = len(response_accessories) if success_accessories and isinstance(response_accessories, list) else 0
+        
+        print(f"✅ Sample data exists - Found {listings_count} phone listings and {accessories_count} accessories")
+        
+        # Verify we have the expected number of items
+        expected_listings = 12
+        expected_accessories = 5
+        
+        if listings_count < expected_listings:
+            print(f"❌ Expected at least {expected_listings} phone listings, but found {listings_count}")
+            success_listings = False
         else:
-            print("❌ Failed to verify sample data")
-            return False, response
+            print(f"✅ Found expected number of phone listings: {listings_count}")
+        
+        if accessories_count < expected_accessories:
+            print(f"❌ Expected at least {expected_accessories} accessories, but found {accessories_count}")
+            success_accessories = False
+        else:
+            print(f"✅ Found expected number of accessories: {accessories_count}")
+        
+        # Check if sample data has all required fields
+        if success_listings and listings_count > 0:
+            required_fields = ["brand", "model", "condition", "price", "storage", "ram", "city", "description"]
+            sample_item = response_listings[0]
+            missing_fields = [field for field in required_fields if field not in sample_item]
+            
+            if missing_fields:
+                print(f"❌ Phone listing data is incomplete - Missing fields: {', '.join(missing_fields)}")
+                success_listings = False
+            else:
+                print("✅ Phone listing data is complete - All required fields present")
+        
+        if success_accessories and accessories_count > 0:
+            required_fields = ["category", "type", "brand", "model", "condition", "price", "city", "description"]
+            sample_item = response_accessories[0]
+            missing_fields = [field for field in required_fields if field not in sample_item]
+            
+            if missing_fields:
+                print(f"❌ Accessory data is incomplete - Missing fields: {', '.join(missing_fields)}")
+                success_accessories = False
+            else:
+                print("✅ Accessory data is complete - All required fields present")
+        
+        return success_listings and success_accessories, {"listings": response_listings, "accessories": response_accessories}
     
     def test_shop_owner_verification(self):
         """Test shop owner verification status management (requires admin access)"""
