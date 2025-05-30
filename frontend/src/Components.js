@@ -2331,6 +2331,460 @@ export const PostAdPage = ({ onSubmitSuccess, user }) => {
   );
 };
 
+//Shop Owner Dashboard Component
+export const ShopOwnerDashboard = ({ user, setCurrentPage }) => {
+  const [stats, setStats] = useState({
+    totalListings: 0,
+    activeListings: 0,
+    totalViews: 0,
+    totalInquiries: 0,
+    revenue: 0,
+    pendingOrders: 0
+  });
+  const [recentListings, setRecentListings] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      // Fetch shop owner stats
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/shop-owner/dashboard`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data.stats || {});
+        setRecentListings(data.listings || []);
+        setNotifications(data.notifications || []);
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const StatCard = ({ title, value, icon: Icon, color, change }) => (
+    <div className="bg-white rounded-xl shadow-lg p-6 border-l-4" style={{ borderLeftColor: color }}>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-600">{title}</p>
+          <p className="text-2xl font-bold text-gray-900">{value}</p>
+          {change && (
+            <p className={`text-sm ${change > 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {change > 0 ? '+' : ''}{change}% vs last month
+            </p>
+          )}
+        </div>
+        <div className="p-3 rounded-full" style={{ backgroundColor: `${color}20` }}>
+          <Icon className="w-6 h-6" style={{ color }} />
+        </div>
+      </div>
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <span className="ml-3 text-lg text-gray-600">Loading dashboard...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Shop Owner Dashboard</h1>
+              <p className="text-gray-600 mt-1">Welcome back, {user?.businessName || user?.name}</p>
+            </div>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setCurrentPage('post-ad')}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Add New Listing</span>
+              </button>
+              <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                <Bell className="w-5 h-5" />
+                <span>Notifications</span>
+                {notifications.length > 0 && (
+                  <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {notifications.length}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Verification Status */}
+          <div className="mt-4">
+            {user?.verification_status === 'pending' && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-center space-x-3">
+                  <Clock className="w-5 h-5 text-yellow-600" />
+                  <div>
+                    <h4 className="font-medium text-yellow-900">Verification Pending</h4>
+                    <p className="text-sm text-yellow-700">Your documents are being reviewed. This process usually takes 24-48 hours.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            {user?.verification_status === 'verified' && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <div>
+                    <h4 className="font-medium text-green-900">Verified Shop Owner</h4>
+                    <p className="text-sm text-green-700">Your account is verified and you can access all shop owner features.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatCard
+            title="Total Listings"
+            value={stats.totalListings || 0}
+            icon={Smartphone}
+            color="#3B82F6"
+            change={12}
+          />
+          <StatCard
+            title="Active Listings"
+            value={stats.activeListings || 0}
+            icon={Eye}
+            color="#10B981"
+            change={8}
+          />
+          <StatCard
+            title="Total Views"
+            value={stats.totalViews || 0}
+            icon={BarChart2}
+            color="#F59E0B"
+            change={25}
+          />
+          <StatCard
+            title="Inquiries"
+            value={stats.totalInquiries || 0}
+            icon={MessageCircle}
+            color="#8B5CF6"
+            change={-3}
+          />
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-8 px-6">
+              {[
+                { key: 'overview', label: 'Overview', icon: Home },
+                { key: 'listings', label: 'My Listings', icon: Smartphone },
+                { key: 'analytics', label: 'Analytics', icon: BarChart2 },
+                { key: 'boost', label: 'Boost Ads', icon: Zap },
+                { key: 'settings', label: 'Settings', icon: User }
+              ].map((tab) => {
+                const IconComponent = tab.icon;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 transition-colors ${
+                      activeTab === tab.key
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <IconComponent className="w-4 h-4" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          <div className="p-6">
+            {activeTab === 'overview' && (
+              <div className="space-y-6">
+                {/* Quick Actions */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button
+                      onClick={() => setCurrentPage('post-ad')}
+                      className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left hover:bg-blue-100 transition-colors"
+                    >
+                      <Plus className="w-8 h-8 text-blue-600 mb-2" />
+                      <h4 className="font-medium text-blue-900">Post New Ad</h4>
+                      <p className="text-sm text-blue-700">List a new phone for sale</p>
+                    </button>
+                    
+                    <button className="bg-green-50 border border-green-200 rounded-lg p-4 text-left hover:bg-green-100 transition-colors">
+                      <Zap className="w-8 h-8 text-green-600 mb-2" />
+                      <h4 className="font-medium text-green-900">Boost Listing</h4>
+                      <p className="text-sm text-green-700">Increase visibility of your ads</p>
+                    </button>
+                    
+                    <button className="bg-purple-50 border border-purple-200 rounded-lg p-4 text-left hover:bg-purple-100 transition-colors">
+                      <BarChart2 className="w-8 h-8 text-purple-600 mb-2" />
+                      <h4 className="font-medium text-purple-900">View Analytics</h4>
+                      <p className="text-sm text-purple-700">Track your performance</p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+                  <div className="space-y-3">
+                    {[
+                      { action: 'New inquiry on iPhone 15 Pro', time: '2 hours ago', type: 'inquiry' },
+                      { action: 'Galaxy S24 listing viewed 15 times', time: '4 hours ago', type: 'view' },
+                      { action: 'Xiaomi 13 Pro ad expired', time: '1 day ago', type: 'expired' }
+                    ].map((activity, index) => (
+                      <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div className={`w-2 h-2 rounded-full ${
+                          activity.type === 'inquiry' ? 'bg-blue-500' :
+                          activity.type === 'view' ? 'bg-green-500' : 'bg-red-500'
+                        }`}></div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                          <p className="text-xs text-gray-500">{activity.time}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'listings' && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900">My Listings</h3>
+                  <button
+                    onClick={() => setCurrentPage('post-ad')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add New</span>
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  {recentListings.length > 0 ? recentListings.map((listing, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                            <Smartphone className="w-8 h-8 text-gray-400" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{listing.brand} {listing.model}</h4>
+                            <p className="text-lg font-bold text-green-600">₨ {listing.price?.toLocaleString()}</p>
+                            <p className="text-sm text-gray-500">{listing.condition} • {listing.city}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="flex space-x-2 mb-2">
+                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                              Active
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-500">{listing.views || 0} views</p>
+                          <div className="flex space-x-2 mt-2">
+                            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">Edit</button>
+                            <button className="text-green-600 hover:text-green-700 text-sm font-medium">Boost</button>
+                            <button className="text-red-600 hover:text-red-700 text-sm font-medium">Delete</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-12">
+                      <Smartphone className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <h4 className="text-xl font-semibold text-gray-900 mb-2">No listings yet</h4>
+                      <p className="text-gray-600 mb-4">Start by posting your first phone listing</p>
+                      <button
+                        onClick={() => setCurrentPage('post-ad')}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                      >
+                        Post Your First Ad
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'analytics' && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Performance Analytics</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <h4 className="font-medium text-gray-900 mb-4">Listing Performance</h4>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Average Views per Listing</span>
+                        <span className="font-semibold text-gray-900">24</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Response Rate</span>
+                        <span className="font-semibold text-gray-900">68%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Average Days to Sell</span>
+                        <span className="font-semibold text-gray-900">12</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <h4 className="font-medium text-gray-900 mb-4">Top Performing Models</h4>
+                    <div className="space-y-3">
+                      {['iPhone 15 Pro', 'Galaxy S24', 'Xiaomi 13'].map((model, index) => (
+                        <div key={index} className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">{model}</span>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-16 bg-gray-200 rounded-full h-2">
+                              <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${80 - index * 20}%` }}></div>
+                            </div>
+                            <span className="text-sm font-medium text-gray-900">{80 - index * 20}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'boost' && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Boost Your Ads</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {[
+                    { name: 'Basic Boost', price: 500, duration: '3 days', features: ['Top of search results', '2x more views'] },
+                    { name: 'Premium Boost', price: 1200, duration: '7 days', features: ['Featured listing', '5x more views', 'Priority support'] },
+                    { name: 'Ultimate Boost', price: 2000, duration: '14 days', features: ['Homepage featured', '10x more views', 'Dedicated support', 'Social media promotion'] }
+                  ].map((plan, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-6 hover:border-blue-300 transition-colors">
+                      <h4 className="font-semibold text-gray-900 mb-2">{plan.name}</h4>
+                      <p className="text-2xl font-bold text-blue-600 mb-1">₨ {plan.price}</p>
+                      <p className="text-sm text-gray-500 mb-4">for {plan.duration}</p>
+                      <ul className="space-y-2 mb-6">
+                        {plan.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-center space-x-2 text-sm text-gray-600">
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors">
+                        Choose Plan
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'settings' && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Account Settings</h3>
+                <div className="space-y-6">
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <h4 className="font-medium text-gray-900 mb-4">Business Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
+                        <input
+                          type="text"
+                          value={user?.businessName || ''}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          readOnly
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
+                        <input
+                          type="text"
+                          value={user?.businessType || ''}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          readOnly
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input
+                          type="email"
+                          value={user?.email || ''}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          readOnly
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                        <input
+                          type="tel"
+                          value={user?.phone || ''}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          readOnly
+                        />
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-4">
+                      To update your business information, please contact support.
+                    </p>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <h4 className="font-medium text-gray-900 mb-4">Notification Preferences</h4>
+                    <div className="space-y-3">
+                      {[
+                        'Email notifications for new inquiries',
+                        'SMS alerts for urgent messages',
+                        'Weekly performance reports',
+                        'Marketing updates and promotions'
+                      ].map((pref, index) => (
+                        <label key={index} className="flex items-center space-x-3">
+                          <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" defaultChecked />
+                          <span className="text-sm text-gray-700">{pref}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Search Results Component with Working Filters
 export const SearchResultsPage = ({ searchFilters, onBack }) => {
   const [listings, setListings] = useState([]);
