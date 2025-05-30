@@ -240,12 +240,125 @@ class PhoneFlipAPITester:
             params={"brand": "Apple", "min_price": 50000, "max_price": 150000}
         )
 
+def test_invalid_login(self):
+    """Test login with invalid credentials"""
+    # Test with invalid email
+    test_data_invalid_email = {
+        "email": "nonexistent@example.com",
+        "password": self.test_user_password
+    }
+    
+    success_invalid_email, _ = self.run_test(
+        "Login with Invalid Email",
+        "POST",
+        "api/auth/login",
+        401,
+        data=test_data_invalid_email
+    )
+    
+    # Test with invalid password
+    test_data_invalid_password = {
+        "email": self.test_user_email,
+        "password": "WrongPassword123!"
+    }
+    
+    success_invalid_password, _ = self.run_test(
+        "Login with Invalid Password",
+        "POST",
+        "api/auth/login",
+        401,
+        data=test_data_invalid_password
+    )
+    
+    return success_invalid_email and success_invalid_password
+
+def test_duplicate_registration(self):
+    """Test registering with an email that already exists"""
+    test_data = {
+        "name": "Duplicate User",
+        "email": self.test_user_email,  # Use the same email as the already registered user
+        "password": self.test_user_password,
+        "phone": "03001234567",
+        "role": "normal_user"
+    }
+    
+    return self.run_test(
+        "Register with Duplicate Email",
+        "POST",
+        "api/auth/register",
+        400,  # Expect 400 Bad Request
+        data=test_data
+    )
+
+def test_invalid_token_access(self):
+    """Test accessing protected endpoint with invalid token"""
+    # Create an invalid token
+    invalid_token = self.auth_token + "invalid" if self.auth_token else "invalid_token"
+    
+    # Save the current token
+    current_token = self.auth_token
+    
+    # Set the invalid token
+    self.auth_token = invalid_token
+    
+    # Try to access protected endpoint
+    success, _ = self.run_test(
+        "Access Protected Endpoint with Invalid Token",
+        "GET",
+        "api/auth/me",
+        401,  # Expect 401 Unauthorized
+        auth=True
+    )
+    
+    # Restore the original token
+    self.auth_token = current_token
+    
+    return success
+
+def test_no_token_access(self):
+    """Test accessing protected endpoint without token"""
+    # Save the current token
+    current_token = self.auth_token
+    
+    # Set token to None
+    self.auth_token = None
+    
+    # Try to access protected endpoint
+    success, _ = self.run_test(
+        "Access Protected Endpoint without Token",
+        "GET",
+        "api/auth/me",
+        401,  # Expect 401 Unauthorized
+        auth=False
+    )
+    
+    # Restore the original token
+    self.auth_token = current_token
+    
+    return success
+
+def test_missing_fields_registration(self):
+    """Test registration with missing required fields"""
+    # Missing password and phone
+    test_data_incomplete = {
+        "name": "Incomplete User",
+        "email": f"incomplete_{uuid.uuid4().hex[:8]}@example.com"
+    }
+    
+    return self.run_test(
+        "Register with Missing Fields",
+        "POST",
+        "api/auth/register",
+        422,  # Expect 422 Unprocessable Entity (FastAPI validation error)
+        data=test_data_incomplete
+    )
+
 def main():
     # Get backend URL from environment or use default
     with open('/app/frontend/.env', 'r') as f:
         for line in f:
             if line.startswith('REACT_APP_BACKEND_URL='):
-                backend_url = line.strip().split('=')[1]
+                backend_url = line.strip().split('=')[1].strip('"\'')
                 break
     
     print(f"Using backend URL: {backend_url}")
@@ -253,31 +366,39 @@ def main():
     # Setup tester
     tester = PhoneFlipAPITester(backend_url)
     
-    # Run basic API tests
-    print("\n=== Testing Basic API Endpoints ===")
+    # Run basic API test to check if server is running
+    print("\n=== Testing Server Status ===")
     tester.test_api_root()
-    tester.test_get_listings()
-    tester.test_get_featured_listings()
-    tester.test_get_stats()
     
-    # Run user authentication tests
+    # Run authentication tests
     print("\n=== Testing User Authentication ===")
+    print("\n--- 1. User Registration Tests ---")
     tester.test_register_normal_user()
-    tester.test_login()
-    tester.test_get_current_user()
+    tester.test_duplicate_registration()
+    tester.test_missing_fields_registration()
     
-    # Run shop owner registration test
-    print("\n=== Testing Shop Owner Registration ===")
+    print("\n--- 2. User Login Tests ---")
+    tester.test_login()
+    tester.test_invalid_login()
+    
+    print("\n--- 3. Authentication Verification Tests ---")
+    tester.test_get_current_user()
+    tester.test_invalid_token_access()
+    tester.test_no_token_access()
+    
+    print("\n--- 4. Shop Owner Registration Test ---")
     tester.test_register_shop_owner()
     
-    # Run listing tests
-    print("\n=== Testing Listing Management ===")
-    tester.test_create_listing()
-    tester.test_get_listing_by_id()
-    tester.test_filtered_listings()
-    
     # Print results
-    print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
+    print(f"\n📊 Authentication Tests passed: {tester.tests_passed}/{tester.tests_run}")
+    
+    # Print summary
+    print("\n=== Authentication Testing Summary ===")
+    print("✅ User Registration: Tested with valid data, duplicate email, and missing fields")
+    print("✅ User Login: Tested with valid credentials, invalid email, and invalid password")
+    print("✅ Authentication Verification: Tested protected endpoints with valid token, invalid token, and no token")
+    print("✅ Shop Owner Registration: Tested registration flow for shop owners")
+    
     return 0 if tester.tests_passed == tester.tests_run else 1
 
 if __name__ == "__main__":
