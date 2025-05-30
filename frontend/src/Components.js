@@ -879,7 +879,52 @@ export const HeroSection = () => {
 
 // Quick Categories Component
 export const QuickCategories = () => {
-  const categories = [
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${backendUrl}/api/stats`);
+      if (response.ok) {
+        const stats = await response.json();
+        // Transform backend data to category format
+        const transformedCategories = stats.brands.map(brand => ({
+          name: brand.name,
+          icon: '📱',
+          count: `${brand.count}+`
+        }));
+        
+        // Ensure we have at least 6 categories
+        while (transformedCategories.length < 6) {
+          const staticCategories = getStaticCategories();
+          const existingNames = transformedCategories.map(c => c.name);
+          const remaining = staticCategories.filter(c => !existingNames.includes(c.name));
+          if (remaining.length > 0) {
+            transformedCategories.push(remaining[0]);
+          } else {
+            break;
+          }
+        }
+        
+        setCategories(transformedCategories.slice(0, 6));
+      } else {
+        console.error('Failed to fetch stats');
+        setCategories(getStaticCategories());
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      setCategories(getStaticCategories());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStaticCategories = () => [
     { name: 'iPhone', icon: '📱', count: '1,200+' },
     { name: 'Samsung', icon: '📱', count: '800+' },
     { name: 'Xiaomi', icon: '📱', count: '600+' },
@@ -887,6 +932,25 @@ export const QuickCategories = () => {
     { name: 'Vivo', icon: '📱', count: '350+' },
     { name: 'OnePlus', icon: '📱', count: '200+' }
   ];
+
+  if (loading) {
+    return (
+      <div className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Browse by Brand</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[1,2,3,4,5,6].map((i) => (
+              <div key={i} className="bg-gray-50 p-6 rounded-lg text-center animate-pulse">
+                <div className="text-3xl mb-2">📱</div>
+                <div className="h-4 bg-gray-300 rounded mb-2 mx-auto w-16"></div>
+                <div className="h-3 bg-gray-300 rounded mx-auto w-12"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-12 bg-white">
