@@ -669,8 +669,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Featured Phones Display"
-    - "Responsive Header Design"
+    - "Phone Specs Auto-Fetch System"
+    - "Enhanced Listing Form"
+    - "Advanced Multi-Select Filtering"
+    - "Filter Tags & UX"
+    - "Enhanced Listing Cards"
+    - "Auto-Suggest Search"
+    - "Seller Type System"
+    - "Mobile Experience"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
