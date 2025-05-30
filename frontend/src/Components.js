@@ -415,7 +415,7 @@ export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
 
   return (
     <>
-      <header className="hidden md:block bg-blue-900 text-white sticky top-0 z-50">
+      <header className="hidden sm:block bg-blue-900 text-white sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between py-4">
             <div 
@@ -579,7 +579,7 @@ export const BottomNavigation = ({ activeTab, setActiveTab, setIsPostAdOpen }) =
 
   return (
     <>
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-bottom">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-bottom">
         <div className="flex justify-around py-2">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -616,14 +616,14 @@ export const BottomNavigation = ({ activeTab, setActiveTab, setIsPostAdOpen }) =
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40 md:hidden"
+              className="fixed inset-0 bg-black/50 z-40 sm:hidden"
               onClick={() => setIsMoreOpen(false)}
             />
             <motion.div
               initial={{ y: 300 }}
               animate={{ y: 0 }}
               exit={{ y: 300 }}
-              className="fixed bottom-16 left-4 right-4 bg-white rounded-t-2xl z-50 md:hidden max-h-96 overflow-y-auto"
+              className="fixed bottom-16 left-4 right-4 bg-white rounded-t-2xl z-50 sm:hidden max-h-96 overflow-y-auto"
             >
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
@@ -682,12 +682,12 @@ export const HeroSection = () => {
 
   return (
     <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-white">
-      <div className="max-w-7xl mx-auto px-4 py-16 md:py-24">
+      <div className="max-w-7xl mx-auto px-4 py-16 sm:py-24">
         <div className="text-center mb-12">
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-6xl font-bold mb-6"
+            className="text-4xl sm:text-6xl font-bold mb-6"
           >
             Find Used Mobile Phones in Pakistan
           </motion.h1>
@@ -695,7 +695,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl md:text-2xl text-blue-100"
+            className="text-xl sm:text-2xl text-blue-100"
           >
             Buy & Sell Phones with Confidence
           </motion.p>
@@ -706,9 +706,9 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="hidden md:block bg-white rounded-lg p-6 shadow-2xl"
+          className="hidden sm:block bg-white rounded-lg p-6 shadow-2xl"
         >
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Phone Brand/Model</label>
               <input
@@ -769,7 +769,7 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="block md:hidden mx-4"
+          className="block sm:hidden mx-4"
         >
           <div className="bg-white rounded-lg p-4 shadow-xl">
             <div className="space-y-4">
@@ -829,7 +829,7 @@ export const QuickCategories = () => {
     <div className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4">
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Browse by Brand</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((category, index) => (
             <motion.div
               key={category.name}
@@ -902,7 +902,7 @@ export const FeaturedPhones = () => {
           <button className="text-blue-600 hover:text-blue-700 font-medium">View All</button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredPhones.map((phone, index) => (
             <motion.div
               key={phone.id}
@@ -957,7 +957,7 @@ export const SellingSection = () => {
     <div className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Sell Your Phone on PhoneFlip and Get the Best Price
           </h2>
         </div>
@@ -1025,7 +1025,7 @@ export const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-12">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-8">
           <div>
             <div className="text-2xl font-bold mb-4">
               PhoneFlip<span className="text-green-400">.PK</span>
@@ -1126,14 +1126,14 @@ export const ReviewsPage = () => {
   ];
 
   return (
-    <div className="pt-20 pb-24 md:pb-8">
+    <div className="pt-20 pb-24 sm:pb-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Phone Reviews</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Phone Reviews</h1>
           <p className="text-lg text-gray-600">Expert reviews and detailed analysis of the latest mobile phones</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {phoneReviews.map((review, index) => (
             <motion.div
               key={review.id}
@@ -1213,14 +1213,14 @@ export const VideosPage = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
 
   return (
-    <div className="pt-20 pb-24 md:pb-8">
+    <div className="pt-20 pb-24 sm:pb-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Phone Videos</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Phone Videos</h1>
           <p className="text-lg text-gray-600">Watch reviews, unboxings, and tutorials</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {phoneVideos.map((video, index) => (
             <motion.div
               key={video.id}
@@ -1347,10 +1347,10 @@ export const ForumsPage = () => {
   ];
 
   return (
-    <div className="pt-20 pb-24 md:pb-8">
+    <div className="pt-20 pb-24 sm:pb-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Community Forums</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Community Forums</h1>
           <p className="text-lg text-gray-600">Join discussions with fellow phone enthusiasts</p>
         </div>
 
@@ -1440,14 +1440,14 @@ export const BlogPage = () => {
   ];
 
   return (
-    <div className="pt-20 pb-24 md:pb-8">
+    <div className="pt-20 pb-24 sm:pb-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">PhoneFlip Blog</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">PhoneFlip Blog</h1>
           <p className="text-lg text-gray-600">Insights, tips, and news about the mobile phone market</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {blogPosts.map((post, index) => (
             <motion.article
               key={post.id}
