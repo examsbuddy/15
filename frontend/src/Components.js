@@ -2485,10 +2485,13 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
       const data = await response.json();
 
       if (response.ok) {
-        setSubmittedListing({ ...formData, id: data.listing_id });
+        setSubmittedListing({ ...formData, id: data.id });
         setShowPreview(true);
-        if (onSubmitSuccess) {
-          onSubmitSuccess(data);
+        // Redirect to detailed listing view after successful submission
+        if (onViewListing && data.id) {
+          setTimeout(() => {
+            onViewListing(data.id);
+          }, 2000); // Show preview for 2 seconds then redirect
         }
       } else {
         setError(data.detail || 'Failed to submit listing');
