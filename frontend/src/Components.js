@@ -25,7 +25,7 @@ import {
   Eye,
   Heart,
   BarChart2,
-  BarChart3,
+  // BarChart3 is not available in react-feather, using BarChart2 instead
   Users,
   Award,
   Zap,
