@@ -425,45 +425,257 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
               </button>
             </form>
           ) : (
-            /* Shop Owner Registration - Abbreviated for space */
-            <div className="text-center py-8">
-              <ShoppingBag className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-              <h4 className="text-xl font-semibold text-gray-900 mb-2">Shop Owner Registration</h4>
-              <p className="text-gray-600 mb-4">Complete KYC process with business documents</p>
-              <form onSubmit={handleShopOwnerSubmit}>
-                <div className="space-y-4">
-                  <input
-                    type="text"
-                    placeholder="Business Name"
-                    value={shopOwnerData.businessName}
-                    onChange={(e) => setShopOwnerData({...shopOwnerData, businessName: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                  <input
-                    type="email"
-                    placeholder="Business Email"
-                    value={shopOwnerData.email}
-                    onChange={(e) => setShopOwnerData({...shopOwnerData, email: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={shopOwnerData.password}
-                    onChange={(e) => setShopOwnerData({...shopOwnerData, password: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
+            /* Shop Owner Registration */
+            <div>
+              {/* Progress Bar */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
+                  <span>Step {currentStep} of 3</span>
+                  <span>{Math.round((currentStep / 3) * 100)}% Complete</span>
                 </div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full mt-4 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition-colors"
-                >
-                  {isLoading ? 'Creating account...' : 'Create Shop Owner Account'}
-                </button>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(currentStep / 3) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              <form onSubmit={handleShopOwnerSubmit} className="space-y-6">
+                {currentStep === 1 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Personal Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                        <input
+                          type="text"
+                          required
+                          value={shopOwnerData.name}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, name: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter your full name"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input
+                          type="email"
+                          required
+                          value={shopOwnerData.email}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, email: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter your email"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <input
+                          type="tel"
+                          required
+                          value={shopOwnerData.phone}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, phone: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="03XX XXXXXXX"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                        <select
+                          required
+                          value={shopOwnerData.city}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, city: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="">Select your city</option>
+                          {cities.map(city => (
+                            <option key={city} value={city}>{city}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">CNIC Number</label>
+                        <input
+                          type="text"
+                          required
+                          value={shopOwnerData.cnicNumber}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, cnicNumber: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="XXXXX-XXXXXXX-X"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input
+                          type="password"
+                          required
+                          value={shopOwnerData.password}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, password: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Create a password"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                        <input
+                          type="password"
+                          required
+                          value={shopOwnerData.confirmPassword}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, confirmPassword: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Confirm your password"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 2 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Business Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
+                        <input
+                          type="text"
+                          required
+                          value={shopOwnerData.businessName}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, businessName: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter business name"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
+                        <select
+                          required
+                          value={shopOwnerData.businessType}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, businessType: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="">Select business type</option>
+                          {businessTypes.map(type => (
+                            <option key={type} value={type}>{type}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Years in Business</label>
+                        <input
+                          type="number"
+                          required
+                          min="0"
+                          value={shopOwnerData.yearsInBusiness}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, yearsInBusiness: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Years in business"
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Business Address</label>
+                        <textarea
+                          required
+                          value={shopOwnerData.businessAddress}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, businessAddress: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter complete business address"
+                          rows="3"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 3 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Document Upload (KYC)</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Business License</label>
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(e) => handleFileChange('businessLicense', e.target.files[0])}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Upload your business license (PDF or Image)</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">CNIC Front Side</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleFileChange('cnicFront', e.target.files[0])}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Upload front side of your CNIC</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">CNIC Back Side</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleFileChange('cnicBack', e.target.files[0])}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Upload back side of your CNIC</p>
+                      </div>
+
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-start space-x-3">
+                          <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+                          <div>
+                            <h5 className="font-medium text-blue-900">Verification Process</h5>
+                            <p className="text-sm text-blue-700 mt-1">
+                              Your documents will be reviewed within 24-48 hours. You'll receive an email notification once your shop owner account is verified.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-between">
+                  {currentStep > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(currentStep - 1)}
+                      className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      Previous
+                    </button>
+                  )}
+                  
+                  {currentStep < 3 ? (
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(currentStep + 1)}
+                      className="ml-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                    >
+                      Next
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="ml-auto bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      {isLoading ? 'Creating account...' : 'Create Shop Owner Account'}
+                    </button>
+                  )}
+                </div>
               </form>
             </div>
           )}
