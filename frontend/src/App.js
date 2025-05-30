@@ -126,7 +126,11 @@ function App() {
       
       {/* Bottom Navigation - Mobile Only */}
       <div className="block md:hidden">
-        <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+        <BottomNavigation 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          setIsPostAdOpen={setIsPostAdOpen}
+        />
       </div>
 
       {/* Post Ad Modal */}
