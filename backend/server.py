@@ -784,16 +784,51 @@ async def get_featured_listings(limit: int = 4):
         raise HTTPException(status_code=500, detail="Failed to fetch featured listings")
 
 @api_router.get("/listings", response_model=List[PhoneListing])
-async def get_listings(skip: int = 0, limit: int = 50, city: Optional[str] = None, brand: Optional[str] = None, min_price: Optional[int] = None, max_price: Optional[int] = None):
-    """Get phone listings with optional filters"""
+async def get_listings(
+    skip: int = 0, 
+    limit: int = 50, 
+    # Basic filters
+    city: Optional[str] = None, 
+    brand: Optional[str] = None, 
+    model: Optional[str] = None,
+    condition: Optional[str] = None,
+    # Price filters
+    min_price: Optional[int] = None, 
+    max_price: Optional[int] = None,
+    # Specification filters
+    storage: Optional[str] = None,
+    ram: Optional[str] = None,
+    battery: Optional[str] = None,
+    network: Optional[str] = None,
+    # Search query
+    search: Optional[str] = None
+):
+    """Get phone listings with advanced filters"""
     try:
         # Build query filter
         query = {"is_active": True}
         
+        # Basic filters
         if city:
             query["city"] = {"$regex": city, "$options": "i"}
         if brand:
             query["brand"] = {"$regex": brand, "$options": "i"}
+        if model:
+            query["model"] = {"$regex": model, "$options": "i"}
+        if condition:
+            query["condition"] = {"$regex": condition, "$options": "i"}
+            
+        # Specification filters
+        if storage:
+            query["storage"] = {"$regex": storage, "$options": "i"}
+        if ram:
+            query["ram"] = {"$regex": ram, "$options": "i"}
+        if battery:
+            query["battery"] = {"$regex": battery, "$options": "i"}
+        if network:
+            query["network"] = {"$regex": network, "$options": "i"}
+            
+        # Price range filter
         if min_price is not None or max_price is not None:
             price_filter = {}
             if min_price is not None:
@@ -801,6 +836,16 @@ async def get_listings(skip: int = 0, limit: int = 50, city: Optional[str] = Non
             if max_price is not None:
                 price_filter["$lte"] = max_price
             query["price"] = price_filter
+            
+        # Search across multiple fields
+        if search:
+            search_regex = {"$regex": search, "$options": "i"}
+            query["$or"] = [
+                {"brand": search_regex},
+                {"model": search_regex},
+                {"description": search_regex},
+                {"features": {"$in": [search_regex]}}
+            ]
         
         # Get listings sorted by creation date (newest first)
         cursor = db.phone_listings.find(query).sort("created_at", -1).skip(skip).limit(limit)
@@ -815,9 +860,35 @@ async def get_listings(skip: int = 0, limit: int = 50, city: Optional[str] = Non
         logger.error(f"Error fetching listings: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch listings")
 
-@api_router.get("/listings/{listing_id}")
-async def get_listing(listing_id: str):
-    """Get a specific listing by ID"""
+@api_router.get("/listings/{listing_id}", response_model=PhoneListing)
+async def get_listing_details(listing_id: str):
+    """Get detailed information for a specific listing"""
+    try:
+        # Validate ObjectId format
+        if not ObjectId.is_valid(listing_id):
+            raise HTTPException(status_code=400, detail="Invalid listing ID format")
+            
+        # Find the listing
+        listing = await db.phone_listings.find_one({"_id": ObjectId(listing_id), "is_active": True})
+        
+        if not listing:
+            raise HTTPException(status_code=404, detail="Listing not found")
+        
+        # Increment view count
+        await db.phone_listings.update_one(
+            {"_id": ObjectId(listing_id)},
+            {"$inc": {"views": 1}}
+        )
+        
+        # Serialize and return
+        listing = serialize_doc(listing)
+        return PhoneListing(**listing)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching listing details: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch listing details")
     try:
         # Validate ObjectId
         if not ObjectId.is_valid(listing_id):
