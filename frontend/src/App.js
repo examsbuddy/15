@@ -100,11 +100,21 @@ function App() {
       
       {/* Mobile Header - visible only on mobile */}
       <div className="block md:hidden">
-        <MobileHeader isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+        <MobileHeader 
+          isMenuOpen={isMenuOpen} 
+          setIsMenuOpen={setIsMenuOpen} 
+          setIsPostAdOpen={setIsPostAdOpen}
+          setActiveTab={setActiveTab}
+        />
       </div>
       
       {/* Mobile Side Menu */}
-      <MobileMenu isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
+      <MobileMenu 
+        isOpen={isMenuOpen} 
+        setIsOpen={setIsMenuOpen} 
+        setActiveTab={setActiveTab}
+        setIsPostAdOpen={setIsPostAdOpen}
+      />
       
       {/* Main Content */}
       <main className="min-h-screen pb-20 md:pb-0">
