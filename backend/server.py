@@ -244,9 +244,229 @@ class PhoneListing(BaseModel):
         populate_by_name = True
 
 # Existing routes
-@api_router.get("/")
-async def root():
-    return {"message": "PhoneFlip.PK API is running"}
+# Phone Specifications Database
+PHONE_SPECS_DATABASE = {
+    "Apple": {
+        "iPhone 15 Pro Max": {
+            "battery": "4441mAh",
+            "screen_size": "6.7 inch",
+            "camera": "48MP Triple Camera",
+            "processor": "A17 Pro",
+            "operating_system": "iOS 17",
+            "network": "5G",
+            "colors": ["Natural Titanium", "Blue Titanium", "White Titanium", "Black Titanium"],
+            "storage_options": ["256GB", "512GB", "1TB"],
+            "ram": "8GB",
+            "launch_year": 2023
+        },
+        "iPhone 15 Pro": {
+            "battery": "3274mAh",
+            "screen_size": "6.1 inch", 
+            "camera": "48MP Triple Camera",
+            "processor": "A17 Pro",
+            "operating_system": "iOS 17",
+            "network": "5G",
+            "colors": ["Natural Titanium", "Blue Titanium", "White Titanium", "Black Titanium"],
+            "storage_options": ["128GB", "256GB", "512GB", "1TB"],
+            "ram": "8GB",
+            "launch_year": 2023
+        },
+        "iPhone 15": {
+            "battery": "3349mAh",
+            "screen_size": "6.1 inch",
+            "camera": "48MP Dual Camera", 
+            "processor": "A16 Bionic",
+            "operating_system": "iOS 17",
+            "network": "5G",
+            "colors": ["Pink", "Yellow", "Green", "Blue", "Black"],
+            "storage_options": ["128GB", "256GB", "512GB"],
+            "ram": "6GB",
+            "launch_year": 2023
+        },
+        "iPhone 15 Plus": {
+            "battery": "4383mAh",
+            "screen_size": "6.7 inch",
+            "camera": "48MP Dual Camera",
+            "processor": "A16 Bionic", 
+            "operating_system": "iOS 17",
+            "network": "5G",
+            "colors": ["Pink", "Yellow", "Green", "Blue", "Black"],
+            "storage_options": ["128GB", "256GB", "512GB"],
+            "ram": "6GB",
+            "launch_year": 2023
+        },
+        "iPhone 14 Pro Max": {
+            "battery": "4323mAh",
+            "screen_size": "6.7 inch",
+            "camera": "48MP Triple Camera",
+            "processor": "A16 Bionic",
+            "operating_system": "iOS 16",
+            "network": "5G",
+            "colors": ["Deep Purple", "Gold", "Silver", "Space Black"],
+            "storage_options": ["128GB", "256GB", "512GB", "1TB"],
+            "ram": "6GB",
+            "launch_year": 2022
+        },
+        "iPhone 14": {
+            "battery": "3279mAh",
+            "screen_size": "6.1 inch",
+            "camera": "12MP Dual Camera",
+            "processor": "A15 Bionic",
+            "operating_system": "iOS 16", 
+            "network": "5G",
+            "colors": ["Blue", "Purple", "Midnight", "Starlight", "Red"],
+            "storage_options": ["128GB", "256GB", "512GB"],
+            "ram": "6GB",
+            "launch_year": 2022
+        }
+    },
+    "Samsung": {
+        "Galaxy S24 Ultra": {
+            "battery": "5000mAh",
+            "screen_size": "6.8 inch",
+            "camera": "200MP Quad Camera",
+            "processor": "Snapdragon 8 Gen 3",
+            "operating_system": "Android 14",
+            "network": "5G",
+            "colors": ["Titanium Gray", "Titanium Black", "Titanium Violet", "Titanium Yellow"],
+            "storage_options": ["256GB", "512GB", "1TB"],
+            "ram": "12GB",
+            "launch_year": 2024
+        },
+        "Galaxy S24 Plus": {
+            "battery": "4900mAh", 
+            "screen_size": "6.7 inch",
+            "camera": "50MP Triple Camera",
+            "processor": "Snapdragon 8 Gen 3",
+            "operating_system": "Android 14",
+            "network": "5G",
+            "colors": ["Onyx Black", "Marble Gray", "Cobalt Violet", "Amber Yellow"],
+            "storage_options": ["256GB", "512GB"],
+            "ram": "12GB",
+            "launch_year": 2024
+        },
+        "Galaxy S24": {
+            "battery": "4000mAh",
+            "screen_size": "6.2 inch", 
+            "camera": "50MP Triple Camera",
+            "processor": "Snapdragon 8 Gen 3",
+            "operating_system": "Android 14",
+            "network": "5G",
+            "colors": ["Onyx Black", "Marble Gray", "Cobalt Violet", "Amber Yellow"],
+            "storage_options": ["128GB", "256GB"],
+            "ram": "8GB",
+            "launch_year": 2024
+        },
+        "Galaxy A54": {
+            "battery": "5000mAh",
+            "screen_size": "6.4 inch",
+            "camera": "50MP Triple Camera", 
+            "processor": "Exynos 1380",
+            "operating_system": "Android 13",
+            "network": "5G",
+            "colors": ["Awesome Graphite", "Awesome Violet", "Awesome White", "Awesome Lime"],
+            "storage_options": ["128GB", "256GB"],
+            "ram": "6GB",
+            "launch_year": 2023
+        }
+    },
+    "Xiaomi": {
+        "13 Pro": {
+            "battery": "4820mAh",
+            "screen_size": "6.73 inch",
+            "camera": "50MP Leica Triple Camera", 
+            "processor": "Snapdragon 8 Gen 2",
+            "operating_system": "MIUI 14",
+            "network": "5G",
+            "colors": ["Ceramic Black", "Ceramic White", "Flora Green"],
+            "storage_options": ["256GB", "512GB"],
+            "ram": "8GB",
+            "launch_year": 2023
+        },
+        "Redmi Note 13 Pro": {
+            "battery": "5100mAh",
+            "screen_size": "6.67 inch",
+            "camera": "200MP Triple Camera",
+            "processor": "MediaTek Dimensity 7200",
+            "operating_system": "MIUI 14", 
+            "network": "4G",
+            "colors": ["Midnight Black", "Aurora Purple", "Ocean Teal"],
+            "storage_options": ["128GB", "256GB"],
+            "ram": "8GB",
+            "launch_year": 2023
+        }
+    },
+    "OnePlus": {
+        "12": {
+            "battery": "5400mAh",
+            "screen_size": "6.82 inch",
+            "camera": "50MP Hasselblad Triple Camera",
+            "processor": "Snapdragon 8 Gen 3",
+            "operating_system": "OxygenOS 14",
+            "network": "5G",
+            "colors": ["Silky Black", "Flowy Emerald", "Glacial White"],
+            "storage_options": ["256GB", "512GB"],
+            "ram": "12GB",
+            "launch_year": 2024
+        }
+    },
+    "Google": {
+        "Pixel 8 Pro": {
+            "battery": "5050mAh",
+            "screen_size": "6.7 inch", 
+            "camera": "50MP Triple Camera",
+            "processor": "Google Tensor G3",
+            "operating_system": "Android 14",
+            "network": "5G",
+            "colors": ["Obsidian", "Porcelain", "Bay"],
+            "storage_options": ["128GB", "256GB", "512GB"],
+            "ram": "12GB",
+            "launch_year": 2023
+        }
+    }
+}
+
+# Add API endpoint to get phone specifications
+@api_router.get("/phone-specs/{brand}/{model}")
+async def get_phone_specs(brand: str, model: str):
+    """Get phone specifications for a specific brand and model"""
+    try:
+        brand_data = PHONE_SPECS_DATABASE.get(brand)
+        if not brand_data:
+            raise HTTPException(status_code=404, detail="Brand not found")
+        
+        model_data = brand_data.get(model)
+        if not model_data:
+            raise HTTPException(status_code=404, detail="Model not found")
+        
+        return model_data
+    except Exception as e:
+        logger.error(f"Error fetching phone specs: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch phone specifications")
+
+# Add API endpoint to get available models for a brand
+@api_router.get("/phone-models/{brand}")
+async def get_phone_models(brand: str):
+    """Get available phone models for a specific brand"""
+    try:
+        brand_data = PHONE_SPECS_DATABASE.get(brand)
+        if not brand_data:
+            raise HTTPException(status_code=404, detail="Brand not found")
+        
+        return {"models": list(brand_data.keys())}
+    except Exception as e:
+        logger.error(f"Error fetching phone models: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch phone models")
+
+# Add API endpoint to get all brands
+@api_router.get("/phone-brands")
+async def get_phone_brands():
+    """Get all available phone brands"""
+    try:
+        return {"brands": list(PHONE_SPECS_DATABASE.keys())}
+    except Exception as e:
+        logger.error(f"Error fetching phone brands: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch phone brands")
 
 # Authentication Routes
 @api_router.post("/auth/register", response_model=LoginResponse)
