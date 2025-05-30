@@ -1577,7 +1577,7 @@ export const FeaturedPhones = ({ addToCompare, compareList }) => {
                           : 'bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-600 hover:text-blue-500'
                       }`}
                     >
-                      <GitCompare className="w-4 h-4" />
+                      <BarChart2 className="w-4 h-4" />
                     </button>
                   </div>
 
