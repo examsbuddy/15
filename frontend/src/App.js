@@ -104,6 +104,7 @@ function App() {
             <HeroSection 
               onCompareClick={() => setShowCompareModal(true)}
               onPriceAlertsClick={() => setShowPriceAlertsModal(true)}
+              onSearch={handleSearch}
             />
             
             {/* Compare Section */}
@@ -142,6 +143,22 @@ function App() {
             {/* Browse Section */}
             <BrowseSection />
           </div>
+        )}
+        
+        {/* Post an Ad Page */}
+        {currentPage === 'post-ad' && (
+          <PostAdPage 
+            onSubmitSuccess={() => setCurrentPage('home')}
+            user={user}
+          />
+        )}
+        
+        {/* Search Results Page */}
+        {currentPage === 'search-results' && (
+          <SearchResultsPage 
+            searchFilters={searchFilters}
+            onBack={handleBackToHome}
+          />
         )}
         
         {/* Other pages would render here based on currentPage */}
