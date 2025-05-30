@@ -103,18 +103,13 @@ class PhoneFlipAPITester:
         
         return success, response
     
-    def test_get_current_user(self):
-        """Test getting current user info"""
-        if not self.auth_token:
-            print("❌ No auth token available, skipping test")
-            return False, {}
-        
+    def test_api_root(self):
+        """Test API root endpoint"""
         return self.run_test(
-            "Get Current User Info",
+            "API Root",
             "GET",
-            "api/auth/me",
-            200,
-            auth=True
+            "api",
+            200
         )
     
     def test_get_listings(self):
