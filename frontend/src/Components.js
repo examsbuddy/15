@@ -706,9 +706,9 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="hidden md:block bg-white rounded-lg p-6 shadow-2xl"
+          className="hidden lg:block bg-white rounded-lg p-6 shadow-2xl"
         >
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Phone Brand/Model</label>
               <input
@@ -769,7 +769,7 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="block md:hidden mx-4"
+          className="block lg:hidden mx-4"
         >
           <div className="bg-white rounded-lg p-4 shadow-xl">
             <div className="space-y-4">
