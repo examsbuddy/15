@@ -1442,72 +1442,233 @@ export const Footer = () => {
 };
 
 // Mobile Menu Component
-export const MobileMenu = ({ isOpen, setIsOpen }) => {
-  const menuItems = [
-    { id: 'used-phones', label: 'Used Phones', icon: Smartphone },
-    { id: 'new-phones', label: 'New Phones', icon: Phone },
-    { id: 'accessories', label: 'Accessories', icon: Battery },
-    { id: 'reviews', label: 'Reviews', icon: Star },
-    { id: 'videos', label: 'Videos', icon: Camera },
-    { id: 'forums', label: 'Forums', icon: MessageCircle },
-    { id: 'blog', label: 'Blog', icon: Eye }
+export const MobileMenu = ({ isOpen, setIsOpen, setActiveTab, setIsPostAdOpen }) => {
+  const [expandedSection, setExpandedSection] = useState(null);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const menuSections = [
+    {
+      id: 'used-phones',
+      label: 'Used Phones',
+      icon: Smartphone,
+      hasSubmenu: true,
+      items: [
+        { category: 'By Brand', items: ['iPhone', 'Samsung', 'Xiaomi', 'OnePlus', 'Oppo', 'Vivo', 'Huawei'] },
+        { category: 'By Price', items: ['Under 25K', '25K-50K', '50K-100K', '100K-200K', 'Above 200K'] },
+        { category: 'By Storage', items: ['64GB', '128GB', '256GB', '512GB', '1TB'] },
+        { category: 'By Condition', items: ['Excellent', 'Good', 'Fair', 'Poor'] }
+      ]
+    },
+    {
+      id: 'new-phones',
+      label: 'New Phones',
+      icon: Phone,
+      hasSubmenu: true,
+      items: [
+        { category: 'Latest Releases', items: ['iPhone 15 Series', 'Samsung S24', 'Xiaomi 14', 'OnePlus 12'] },
+        { category: 'Popular Brands', items: ['Apple', 'Samsung', 'Xiaomi', 'OnePlus', 'Oppo'] },
+        { category: 'Price Range', items: ['Under 50K', '50K-100K', '100K-200K', 'Above 200K'] }
+      ]
+    },
+    {
+      id: 'accessories',
+      label: 'Accessories',
+      icon: Battery,
+      hasSubmenu: true,
+      items: [
+        { category: 'Protection', items: ['Cases & Covers', 'Screen Protectors', 'Tempered Glass'] },
+        { category: 'Audio', items: ['Earphones', 'Wireless Earbuds', 'Speakers', 'Headphones'] },
+        { category: 'Charging', items: ['Chargers', 'Power Banks', 'Wireless Chargers', 'Cables'] },
+        { category: 'Other', items: ['Phone Stands', 'Car Mounts', 'Selfie Sticks', 'Ring Holders'] }
+      ]
+    },
+    { id: 'reviews', label: 'Reviews', icon: Star, hasSubmenu: false },
+    { id: 'videos', label: 'Videos', icon: Camera, hasSubmenu: false },
+    { id: 'forums', label: 'Forums', icon: MessageCircle, hasSubmenu: false },
+    { id: 'blog', label: 'Blog', icon: Eye, hasSubmenu: false }
   ];
 
+  const handleMenuClick = (sectionId) => {
+    const section = menuSections.find(s => s.id === sectionId);
+    if (section.hasSubmenu) {
+      setExpandedSection(expandedSection === sectionId ? null : sectionId);
+    } else {
+      setActiveTab(sectionId);
+      setIsOpen(false);
+    }
+  };
+
+  const handleSubItemClick = (item) => {
+    console.log(`Selected: ${item}`);
+    setIsOpen(false);
+  };
+
+  const handlePostAd = () => {
+    if (!isLoggedIn) {
+      setIsLoginOpen(true);
+    } else {
+      setIsPostAdOpen(true);
+      setIsOpen(false);
+    }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setIsOpen(false);
+  };
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
-            onClick={() => setIsOpen(false)}
-          />
-          <motion.div
-            initial={{ x: -300 }}
-            animate={{ x: 0 }}
-            exit={{ x: -300 }}
-            className="fixed left-0 top-0 h-full w-80 bg-white z-50 md:hidden"
-          >
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-8">
-                <div className="text-xl font-bold text-blue-900">
-                  PhoneFlip<span className="text-green-600">.PK</span>
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-40 md:hidden"
+              onClick={() => setIsOpen(false)}
+            />
+            <motion.div
+              initial={{ x: -300 }}
+              animate={{ x: 0 }}
+              exit={{ x: -300 }}
+              className="fixed left-0 top-0 h-full w-80 bg-white z-50 md:hidden overflow-y-auto"
+            >
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="text-xl font-bold text-blue-900">
+                    PhoneFlip<span className="text-green-600">.PK</span>
+                  </div>
+                  <button onClick={() => setIsOpen(false)}>
+                    <X className="w-6 h-6 text-gray-600" />
+                  </button>
                 </div>
-                <button onClick={() => setIsOpen(false)}>
-                  <X className="w-6 h-6 text-gray-600" />
-                </button>
-              </div>
-              
-              <nav className="space-y-2">
-                {menuItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => setIsOpen(false)}
-                      className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+
+                {/* User Section */}
+                {isLoggedIn ? (
+                  <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">John Doe</h3>
+                        <p className="text-sm text-gray-600">john@example.com</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <button className="w-full text-left text-sm text-gray-700 py-1 flex items-center">
+                        <Bookmark className="w-4 h-4 mr-2" />
+                        Saved Phones
+                      </button>
+                      <button className="w-full text-left text-sm text-gray-700 py-1 flex items-center">
+                        <History className="w-4 h-4 mr-2" />
+                        My Ads
+                      </button>
+                      <button className="w-full text-left text-sm text-gray-700 py-1 flex items-center">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Settings
+                      </button>
+                      <button 
+                        onClick={handleLogout}
+                        className="w-full text-left text-sm text-red-600 py-1 flex items-center"
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-6">
+                    <button 
+                      onClick={() => setIsLoginOpen(true)}
+                      className="w-full bg-blue-900 text-white py-3 rounded-lg font-medium mb-2"
                     >
-                      <Icon className="w-5 h-5" />
-                      <span>{item.label}</span>
+                      Login / Sign Up
                     </button>
-                  );
-                })}
-              </nav>
-              
-              <div className="mt-8 space-y-3">
-                <button className="w-full bg-blue-900 text-white py-3 rounded-lg font-medium">
-                  Login / Sign Up
-                </button>
-                <button className="w-full bg-red-600 text-white py-3 rounded-lg font-medium">
-                  Post an Ad
-                </button>
+                  </div>
+                )}
+                
+                {/* Navigation Menu */}
+                <nav className="space-y-2">
+                  {menuSections.map((section) => {
+                    const Icon = section.icon;
+                    const isExpanded = expandedSection === section.id;
+                    
+                    return (
+                      <div key={section.id}>
+                        <button
+                          onClick={() => handleMenuClick(section.id)}
+                          className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <Icon className="w-5 h-5" />
+                            <span>{section.label}</span>
+                          </div>
+                          {section.hasSubmenu && (
+                            <ChevronDown className={`w-4 h-4 transition-transform ${
+                              isExpanded ? 'rotate-180' : ''
+                            }`} />
+                          )}
+                        </button>
+                        
+                        {/* Submenu */}
+                        <AnimatePresence>
+                          {section.hasSubmenu && isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden ml-4"
+                            >
+                              <div className="py-2 space-y-3">
+                                {section.items.map((category, categoryIndex) => (
+                                  <div key={categoryIndex} className="pl-4">
+                                    <h4 className="font-medium text-gray-900 text-sm mb-1">
+                                      {category.category}
+                                    </h4>
+                                    <div className="space-y-1">
+                                      {category.items.map((item, itemIndex) => (
+                                        <button
+                                          key={itemIndex}
+                                          onClick={() => handleSubItemClick(item)}
+                                          className="block text-sm text-gray-600 hover:text-blue-600 py-1 transition-colors"
+                                        >
+                                          {item}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </nav>
+                
+                {/* Post Ad Button */}
+                <div className="mt-8">
+                  <button 
+                    onClick={handlePostAd}
+                    className="w-full bg-red-600 text-white py-3 rounded-lg font-medium flex items-center justify-center"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Post an Ad
+                  </button>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Login Modal */}
+      <LoginModal isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} setIsLoggedIn={setIsLoggedIn} />
+    </>
   );
 };
