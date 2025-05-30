@@ -67,6 +67,12 @@ function App() {
   const handleBackToHome = () => {
     setCurrentPage('home');
     setSearchFilters(null);
+    setCurrentListingId(null);
+  };
+
+  const handleViewListing = (listingId) => {
+    setCurrentListingId(listingId);
+    setCurrentPage('listing-details');
   };
 
   const addToCompare = (phone) => {
