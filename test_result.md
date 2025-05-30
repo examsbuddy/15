@@ -246,14 +246,15 @@ metadata:
 
 test_plan:
   current_focus:
-    - "User Registration (POST /api/auth/register)"
-    - "User Login (POST /api/auth/login)"
-    - "Authentication Verification (Protected Endpoints)"
-    - "Shop Owner Registration (POST /api/auth/register-shop-owner)"
-  stuck_tasks:
-    - "User Registration (POST /api/auth/register)"
-    - "Authentication Verification (Protected Endpoints)"
-  test_all: false
+    - "Deep Blue Header Design"
+    - "Navigation Items & Dropdowns"
+    - "Responsive Header Design"
+    - "Sign In Modal"
+    - "Sign Up Modal with User Types"
+    - "Shop Owner Registration Process"
+    - "Hero Section with Blue Theme"
+  stuck_tasks: []
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
