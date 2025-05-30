@@ -378,6 +378,10 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Detailed listing page appears to be implemented correctly. When clicking on a listing from search results, it navigates to a detailed view with specifications and back navigation."
+
+  - task: "Responsive Header Design"
+    implemented: true
+    working: true
     file: "/app/frontend/src/Components.js"
     stuck_count: 2
     priority: "medium"
