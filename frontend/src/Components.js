@@ -1242,7 +1242,7 @@ export const CompareModal = ({ isOpen, onClose, compareList, onRemove }) => {
 
         {compareList.length === 0 ? (
           <div className="text-center py-12">
-            <GitCompare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <BarChart2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h4 className="text-lg font-medium text-gray-900 mb-2">No phones to compare</h4>
             <p className="text-gray-600">Add phones to your comparison list to see them here</p>
           </div>
