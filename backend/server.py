@@ -202,6 +202,10 @@ class PhoneListing(BaseModel):
         populate_by_name = True
 
 # Existing routes
+@api_router.get("/")
+async def root():
+    return {"message": "PhoneFlip.PK API is running"}
+
 # Authentication Routes
 @api_router.post("/auth/register", response_model=LoginResponse)
 async def register_normal_user(user_data: UserRegistration):
