@@ -289,7 +289,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
               onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
               className="text-blue-600 hover:text-blue-700 font-medium flex items-center space-x-1 mx-auto"
             >
-              <SlidersHorizontal className="w-4 h-4" />
+              <Sliders className="w-4 h-4" />
               <span>{showAdvancedFilters ? 'Hide' : 'Show'} Advanced Filters</span>
             </button>
 
