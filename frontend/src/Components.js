@@ -653,6 +653,8 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
     setIsLoading(true);
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      console.log('Backend URL:', backendUrl);
+      console.log('Signup data:', signupData);
       
       if (signupData.role === 'normal_user') {
         const response = await fetch(`${backendUrl}/api/auth/register`, {
@@ -660,6 +662,9 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(signupData)
         });
+
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
 
         if (response.ok) {
           const result = await response.json();
@@ -669,8 +674,16 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
           alert('Account created successfully!');
           handleClose();
         } else {
-          const error = await response.json();
-          alert('Signup failed: ' + (error.detail || 'Unknown error'));
+          const errorText = await response.text();
+          console.log('Error response text:', errorText);
+          let errorMessage = 'Unknown error';
+          try {
+            const error = JSON.parse(errorText);
+            errorMessage = error.detail || 'Unknown error';
+          } catch (e) {
+            errorMessage = errorText || 'Failed to register user';
+          }
+          alert('Signup failed: ' + errorMessage);
         }
       } else {
         // Shop owner registration
@@ -683,24 +696,36 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
           kyc_documents: kycData
         };
 
+        console.log('Shop owner data:', shopOwnerData);
+
         const response = await fetch(`${backendUrl}/api/auth/register-shop-owner`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(shopOwnerData)
         });
 
+        console.log('Shop owner response status:', response.status);
+
         if (response.ok) {
           const result = await response.json();
           alert('Shop owner registration submitted! Your account is under review and you will be notified once approved.');
           handleClose();
         } else {
-          const error = await response.json();
-          alert('Registration failed: ' + (error.detail || 'Unknown error'));
+          const errorText = await response.text();
+          console.log('Shop owner error response:', errorText);
+          let errorMessage = 'Unknown error';
+          try {
+            const error = JSON.parse(errorText);
+            errorMessage = error.detail || 'Unknown error';
+          } catch (e) {
+            errorMessage = errorText || 'Failed to register shop owner';
+          }
+          alert('Registration failed: ' + errorMessage);
         }
       }
     } catch (error) {
       console.error('Signup error:', error);
-      alert('Signup failed. Please check your connection.');
+      alert('Signup failed: ' + error.message);
     } finally {
       setIsLoading(false);
     }
