@@ -107,7 +107,9 @@ function App() {
       <Footer />
       
       {/* Bottom Navigation - Mobile Only */}
-      <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="block md:hidden">
+        <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+      </div>
     </div>
   );
 }
