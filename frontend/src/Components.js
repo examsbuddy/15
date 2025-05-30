@@ -105,7 +105,7 @@ const notifications = [
 ];
 
 // Login Modal Component
-export const LoginModal = ({ isOpen, setIsOpen }) => {
+export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
