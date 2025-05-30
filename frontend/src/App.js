@@ -14,7 +14,9 @@ import {
   FeaturedPhones, 
   Footer,
   PriceDropAlertsModal,
-  CompareModal
+  CompareModal,
+  PostAdPage,
+  SearchResultsPage
 } from './Components';
 
 function App() {
