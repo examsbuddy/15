@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the PhoneFlip.PK backend authentication system thoroughly. I've just updated the frontend to include new Login and Signup modals that connect to the backend authentication endpoints."
+user_problem_statement: "Test the redesigned PhoneFlip.PK header and authentication system thoroughly. I've just implemented a completely new deep blue header design with enhanced Sign In/Sign Up functionality."
 
 backend:
   - task: "User Registration (POST /api/auth/register)"
