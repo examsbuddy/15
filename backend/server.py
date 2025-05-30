@@ -191,6 +191,20 @@ class PhoneListingCreate(BaseModel):
     seller_phone: str
     seller_email: str
     features: List[str] = []
+    # Enhanced specifications
+    battery: Optional[str] = None  # e.g., "4000mAh", "5000mAh"
+    screen_size: Optional[str] = None  # e.g., "6.1 inch", "6.7 inch"
+    camera: Optional[str] = None  # e.g., "48MP", "108MP Triple"
+    processor: Optional[str] = None  # e.g., "Snapdragon 8 Gen 2"
+    operating_system: Optional[str] = None  # e.g., "Android 13", "iOS 17"
+    network: Optional[str] = None  # e.g., "4G", "5G"
+    # Mandatory photos (base64 encoded)
+    photos: List[str] = Field(min_items=1, description="At least one photo is required")
+    # Additional metadata
+    purchase_year: Optional[int] = None
+    warranty_months: Optional[int] = None
+    box_included: bool = False
+    accessories_included: List[str] = []  # charger, earphones, case, etc.
 
 class PhoneListing(BaseModel):
     id: Optional[str] = Field(alias="_id")
@@ -206,6 +220,21 @@ class PhoneListing(BaseModel):
     seller_phone: str
     seller_email: str
     features: List[str] = []
+    # Enhanced specifications
+    battery: Optional[str] = None
+    screen_size: Optional[str] = None
+    camera: Optional[str] = None
+    processor: Optional[str] = None
+    operating_system: Optional[str] = None
+    network: Optional[str] = None
+    # Photos
+    photos: List[str] = []
+    # Additional metadata
+    purchase_year: Optional[int] = None
+    warranty_months: Optional[int] = None
+    box_included: bool = False
+    accessories_included: List[str] = []
+    # System fields
     created_at: datetime = Field(default_factory=datetime.utcnow)
     views: int = 0
     is_featured: bool = False
