@@ -94,12 +94,12 @@ function App() {
   return (
     <div className="App min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Desktop Header - hidden on mobile */}
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <DesktopHeader activeTab={activeTab} setActiveTab={setActiveTab} setIsPostAdOpen={setIsPostAdOpen} />
       </div>
       
       {/* Mobile Header - visible only on mobile */}
-      <div className="block md:hidden">
+      <div className="block lg:hidden">
         <MobileHeader 
           isMenuOpen={isMenuOpen} 
           setIsMenuOpen={setIsMenuOpen} 
