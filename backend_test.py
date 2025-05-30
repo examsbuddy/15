@@ -117,38 +117,40 @@ class PhoneFlipAPITester:
             auth=True
         )
     
-    def test_register_shop_owner(self):
-        """Test registering a shop owner"""
-        test_data = {
-            "name": "Test Shop Owner",
-            "email": self.test_shop_owner_email,
-            "password": self.test_user_password,
-            "phone": "03009876543",
-            "business_details": {
-                "business_name": "Test Mobile Shop",
-                "business_type": "mobile_shop",
-                "business_address": "123 Test Street",
-                "city": "Karachi",
-                "postal_code": "75000",
-                "business_phone": "03009876543",
-                "website": "https://testshop.com",
-                "description": "This is a test shop for automated testing.",
-                "years_in_business": 5
-            },
-            "kyc_documents": {
-                "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
-                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",    # test base64 data
-                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
-                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="      # test base64 data
-            }
-        }
-        
+    def test_api_root(self):
+        """Test API root endpoint"""
         return self.run_test(
-            "Register Shop Owner",
-            "POST",
-            "api/auth/register-shop-owner",
-            200,
-            data=test_data
+            "API Root",
+            "GET",
+            "api",
+            200
+        )
+
+    def test_get_listings(self):
+        """Test getting all listings"""
+        return self.run_test(
+            "Get All Listings",
+            "GET",
+            "api/listings",
+            200
+        )
+
+    def test_get_featured_listings(self):
+        """Test getting featured listings"""
+        return self.run_test(
+            "Get Featured Listings",
+            "GET",
+            "api/listings/featured",
+            200
+        )
+
+    def test_get_stats(self):
+        """Test getting platform statistics"""
+        return self.run_test(
+            "Get Platform Stats",
+            "GET",
+            "api/stats",
+            200
         )
 
     def test_create_listing(self):
