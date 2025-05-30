@@ -1,52 +1,109 @@
-import { useEffect } from "react";
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React, { useState } from 'react';
+import './App.css';
+import {
+  DesktopHeader,
+  MobileHeader,
+  BottomNavigation,
+  HeroSection,
+  QuickCategories,
+  FeaturedPhones,
+  SellingSection,
+  Footer,
+  MobileMenu
+} from './Components';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+function App() {
+  const [activeTab, setActiveTab] = useState('home');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return (
+          <>
+            <HeroSection />
+            <QuickCategories />
+            <FeaturedPhones />
+            <SellingSection />
+          </>
+        );
+      case 'search':
+        return (
+          <div className="pt-20 pb-24 md:pb-8">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Advanced Search</h2>
+                <p className="text-gray-600">Search functionality coming soon...</p>
+              </div>
+            </div>
+          </div>
+        );
+      case 'sell':
+        return (
+          <div className="pt-20 pb-24 md:pb-8">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Sell Your Phone</h2>
+                <p className="text-gray-600">Sell phone form coming soon...</p>
+              </div>
+            </div>
+          </div>
+        );
+      case 'chat':
+        return (
+          <div className="pt-20 pb-24 md:pb-8">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Messages</h2>
+                <p className="text-gray-600">Chat functionality coming soon...</p>
+              </div>
+            </div>
+          </div>
+        );
+      case 'profile':
+        return (
+          <div className="pt-20 pb-24 md:pb-8">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Profile</h2>
+                <p className="text-gray-600">Profile section coming soon...</p>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <>
+            <HeroSection />
+            <QuickCategories />
+            <FeaturedPhones />
+            <SellingSection />
+          </>
+        );
     }
   };
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
-
-function App() {
-  return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+    <div className="App min-h-screen bg-gray-50">
+      {/* Desktop Header */}
+      <DesktopHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+      
+      {/* Mobile Header */}
+      <MobileHeader isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+      
+      {/* Mobile Side Menu */}
+      <MobileMenu isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
+      
+      {/* Main Content */}
+      <main className="min-h-screen">
+        {renderContent()}
+      </main>
+      
+      {/* Footer */}
+      <Footer />
+      
+      {/* Bottom Navigation - Mobile Only */}
+      <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 }
