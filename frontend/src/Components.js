@@ -1657,7 +1657,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
 export const MobileBottomNav = ({ currentPage, setCurrentPage }) => {
   const menuItems = [
     { key: 'home', label: 'Home', icon: Home },
-    { key: 'search', label: 'Search', icon: Search },
+    { key: 'dedicated-search', label: 'Search', icon: Search },
     { key: 'post-ad', label: 'Post Ad', icon: Plus },
     { key: 'compare', label: 'Compare', icon: BarChart2 },
     { key: 'profile', label: 'Profile', icon: User },
