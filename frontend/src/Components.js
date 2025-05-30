@@ -894,9 +894,12 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
                   <input
                     type="password"
+                    id="signup-password"
+                    name="password"
                     value={signupData.password}
                     onChange={(e) => setSignupData({...signupData, password: e.target.value})}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="Create a strong password"
                     required
                   />
                 </div>
