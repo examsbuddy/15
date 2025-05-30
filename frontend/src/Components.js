@@ -1,9 +1,3 @@
-      {/* Login Modal */}
-      <LoginModal isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} setIsLoggedIn={setIsLoggedIn} />
-    </>
-  );
-};
-
 // Mobile Header Component - Simplified to only show logo
 export const MobileHeader = () => {
   return (
@@ -413,4 +407,5 @@ export const BlogPage = () => {
         </div>
       </div>
     </div>
-  </div>
+  );
+};
