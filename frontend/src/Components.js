@@ -1053,81 +1053,103 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
   const ramOptions = ['4GB', '6GB', '8GB', '12GB', '16GB'];
 
   return (
-    <section className="bg-gradient-to-br from-green-600 via-green-700 to-green-800 text-white py-12 md:py-20">
-      <div className="max-w-7xl mx-auto px-4">
+    <section 
+      className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 text-white py-16 md:py-24 overflow-hidden"
+      style={{
+        backgroundImage: `linear-gradient(rgba(30, 58, 138, 0.85), rgba(30, 58, 138, 0.85)), url('https://images.unsplash.com/photo-1562575214-da9fcf59b907')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Background overlay with animated elements */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/50 to-transparent"></div>
+      <div className="absolute top-10 left-10 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-green-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
+      <div className="relative max-w-7xl mx-auto px-4 z-10">
         <div className="text-center mb-8 md:mb-12">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">
-            Find Used Mobile Phones in Pakistan
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            Find Your Perfect
+            <span className="block text-transparent bg-gradient-to-r from-green-400 to-green-600 bg-clip-text">
+              Mobile Phone
+            </span>
           </h1>
-          <p className="text-lg md:text-xl text-green-100 mb-8">
-            With thousands of phones, we have just the right one for you
+          <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            Pakistan's largest marketplace for new and used mobile phones. 
+            Compare prices, read reviews, and find the best deals in your city.
           </p>
 
           {/* Quick Action Buttons */}
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <div className="flex flex-wrap justify-center gap-4 mb-10">
             <button
               onClick={onCompareClick}
-              className="bg-white hover:bg-gray-100 text-green-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 shadow-lg"
+              className="bg-white hover:bg-gray-100 text-blue-900 px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-3 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
             >
-              <BarChart2 className="w-5 h-5" />
+              <BarChart2 className="w-6 h-6" />
               <span>Compare Phones</span>
             </button>
             <button
               onClick={onPriceAlertsClick}
-              className="bg-green-800 hover:bg-green-900 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 shadow-lg"
+              className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center space-x-3 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
             >
-              <Bell className="w-5 h-5" />
+              <Bell className="w-6 h-6" />
               <span>Price Alerts</span>
             </button>
           </div>
 
           {/* Enhanced Search Bar */}
-          <div className="bg-white rounded-xl shadow-2xl p-4 md:p-6 max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 max-w-5xl mx-auto border border-white/20">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               {/* Phone Search */}
               <div className="md:col-span-1">
-                <input
-                  type="text"
-                  placeholder="Phone Make or Model"
-                  value={searchFilters.query}
-                  onChange={(e) => setSearchFilters({...searchFilters, query: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
+                <div className="relative">
+                  <Smartphone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Phone Make or Model"
+                    value={searchFilters.query}
+                    onChange={(e) => setSearchFilters({...searchFilters, query: e.target.value})}
+                    className="w-full pl-10 pr-4 py-4 border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
+                  />
+                </div>
               </div>
 
               {/* City Dropdown */}
               <div className="relative">
+                <MapPin className="absolute left-3 top-4 w-5 h-5 text-gray-400 z-10" />
                 <select
                   value={searchFilters.city}
                   onChange={(e) => setSearchFilters({...searchFilters, city: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none"
+                  className="w-full pl-10 pr-10 py-4 border border-gray-300 rounded-xl text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none shadow-sm"
                 >
                   <option value="">All Cities</option>
                   {cities.map(city => (
                     <option key={city} value={city}>{city}</option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-4 w-5 h-5 text-gray-400 pointer-events-none" />
               </div>
 
               {/* Price Range */}
               <div className="relative">
+                <span className="absolute left-3 top-4 text-gray-400 text-lg font-bold">₨</span>
                 <select
                   value={searchFilters.priceRange}
                   onChange={(e) => setSearchFilters({...searchFilters, priceRange: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none"
+                  className="w-full pl-10 pr-10 py-4 border border-gray-300 rounded-xl text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none shadow-sm"
                 >
                   <option value="">Price Range</option>
                   {priceRanges.map(range => (
                     <option key={range} value={range}>{range}</option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-3 w-5 h-5 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-4 w-5 h-5 text-gray-400 pointer-events-none" />
               </div>
 
               {/* Search Button */}
-              <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 shadow-lg">
-                <Search className="w-5 h-5" />
+              <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                <Search className="w-6 h-6" />
                 <span>Search</span>
               </button>
             </div>
@@ -1135,7 +1157,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
             {/* Advanced Filters Toggle */}
             <button
               onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              className="text-green-600 hover:text-green-700 font-medium flex items-center space-x-1 mx-auto"
+              className="text-blue-600 hover:text-blue-700 font-medium flex items-center space-x-2 mx-auto transition-colors"
             >
               <Sliders className="w-4 h-4" />
               <span>{showAdvancedFilters ? 'Hide' : 'Show'} Advanced Filters</span>
