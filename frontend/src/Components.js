@@ -3077,13 +3077,18 @@ export const SearchResultsPage = ({ searchFilters, onBack }) => {
   const [loading, setLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState({
     brand: '',
+    model: '',
     city: '',
     condition: '',
     priceRange: '',
     storage: '',
-    ram: ''
+    ram: '',
+    battery: '',
+    network: '',
+    search: ''
   });
   const [sortBy, setSortBy] = useState('newest');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'];
   const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
@@ -3098,6 +3103,8 @@ export const SearchResultsPage = ({ searchFilters, onBack }) => {
   ];
   const storageOptions = ['32GB', '64GB', '128GB', '256GB', '512GB', '1TB'];
   const ramOptions = ['3GB', '4GB', '6GB', '8GB', '12GB', '16GB', '18GB'];
+  const batteryOptions = ['3000mAh', '3500mAh', '4000mAh', '4500mAh', '5000mAh', '5500mAh', '6000mAh'];
+  const networkOptions = ['4G', '5G'];
 
   useEffect(() => {
     fetchListings();
