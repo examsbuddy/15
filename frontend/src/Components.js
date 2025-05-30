@@ -4585,3 +4585,580 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
     </div>
   );
 };
+
+// New Comprehensive Dedicated Search Page
+export const DedicatedSearchPage = ({ onBack, onViewListing, initialFilters = {} }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [userLocation, setUserLocation] = useState('');
+  const [locationLoading, setLocationLoading] = useState(true);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [recentSearches, setRecentSearches] = useState([]);
+  const [trendingSearches, setTrendingSearches] = useState([]);
+  const [activeTab, setActiveTab] = useState('search');
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  
+  // Search data and options
+  const phoneModels = [
+    'iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14',
+    'Samsung Galaxy S24 Ultra', 'Samsung Galaxy S24+', 'Samsung Galaxy S24', 'Samsung Galaxy A55', 'Samsung Galaxy A35',
+    'Xiaomi 14', 'Xiaomi 13T Pro', 'Xiaomi Redmi Note 13 Pro+', 'Xiaomi Redmi Note 13 Pro', 'Xiaomi Redmi Note 13',
+    'Oppo Find X7', 'Oppo Reno 11 Pro', 'Oppo A79', 'Vivo V29 Pro', 'Vivo V29', 'Vivo Y100',
+    'Realme GT 5 Pro', 'Realme 12 Pro+', 'Realme C67', 'OnePlus 12', 'OnePlus 11T', 'OnePlus Nord CE4',
+    'Google Pixel 8 Pro', 'Google Pixel 8', 'Google Pixel 7a', 'Nothing Phone 2a', 'Nothing Phone 2'
+  ];
+
+  const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'];
+  const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
+  const priceRanges = [
+    { label: 'Under ₨25,000', value: 'under-25k', min: 0, max: 25000 },
+    { label: '₨25,000 - ₨50,000', value: '25k-50k', min: 25000, max: 50000 },
+    { label: '₨50,000 - ₨100,000', value: '50k-100k', min: 50000, max: 100000 },
+    { label: '₨100,000 - ₨200,000', value: '100k-200k', min: 100000, max: 200000 },
+    { label: '₨200,000 - ₨300,000', value: '200k-300k', min: 200000, max: 300000 },
+    { label: 'Above ₨300,000', value: 'above-300k', min: 300000, max: 999999999 }
+  ];
+  const conditions = ['New', 'Like New', 'Excellent', 'Very Good', 'Good', 'Fair'];
+
+  // Get user location
+  useEffect(() => {
+    const detectLocation = async () => {
+      try {
+        if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              try {
+                // In a real app, you'd use a geocoding service
+                // For now, we'll use a mock location based on common Pakistani cities
+                const mockCities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad'];
+                const randomCity = mockCities[Math.floor(Math.random() * mockCities.length)];
+                setUserLocation(randomCity);
+              } catch (error) {
+                setUserLocation('Pakistan');
+              } finally {
+                setLocationLoading(false);
+              }
+            },
+            () => {
+              setUserLocation('Pakistan');
+              setLocationLoading(false);
+            }
+          );
+        } else {
+          setUserLocation('Pakistan');
+          setLocationLoading(false);
+        }
+      } catch (error) {
+        setUserLocation('Pakistan');
+        setLocationLoading(false);
+      }
+    };
+
+    // Load recent searches from localStorage
+    const savedSearches = localStorage.getItem('phoneflip_recent_searches');
+    if (savedSearches) {
+      setRecentSearches(JSON.parse(savedSearches).slice(0, 5));
+    }
+
+    // Mock trending searches based on location
+    const mockTrending = [
+      'iPhone 15 Pro Max', 'Samsung Galaxy S24', 'Xiaomi 14', 'Under ₨50,000',
+      'New condition', 'Samsung Galaxy A55', 'iPhone 14', 'Oppo Reno 11'
+    ];
+    setTrendingSearches(mockTrending);
+
+    detectLocation();
+    
+    // Apply initial filters if provided
+    if (initialFilters.brand) {
+      setSearchQuery(initialFilters.brand);
+      setActiveTab('brand');
+    } else if (initialFilters.priceRange) {
+      setSearchQuery(initialFilters.priceRange);
+      setActiveTab('price');
+    } else if (initialFilters.condition) {
+      setSearchQuery(initialFilters.condition);
+      setActiveTab('condition');
+    }
+  }, [initialFilters]);
+
+  // Generate search suggestions with debouncing
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      if (searchQuery.length > 0) {
+        generateSuggestions(searchQuery);
+      } else {
+        setSuggestions([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
+
+  const generateSuggestions = (query) => {
+    const suggestions = [];
+    const lowerQuery = query.toLowerCase();
+
+    // Brand suggestions
+    brands.forEach(brand => {
+      if (brand.toLowerCase().includes(lowerQuery)) {
+        suggestions.push({
+          type: 'brand',
+          value: brand,
+          display: brand,
+          icon: '📱',
+          category: 'Brand'
+        });
+      }
+    });
+
+    // Model suggestions
+    phoneModels.forEach(model => {
+      if (model.toLowerCase().includes(lowerQuery)) {
+        suggestions.push({
+          type: 'model',
+          value: model,
+          display: model,
+          icon: '📱',
+          category: 'Model'
+        });
+      }
+    });
+
+    setSuggestions(suggestions.slice(0, 8));
+    setShowSuggestions(suggestions.length > 0);
+  };
+
+  const saveRecentSearch = (searchTerm) => {
+    const updatedSearches = [searchTerm, ...recentSearches.filter(s => s !== searchTerm)].slice(0, 5);
+    setRecentSearches(updatedSearches);
+    localStorage.setItem('phoneflip_recent_searches', JSON.stringify(updatedSearches));
+  };
+
+  const handleSearch = async (searchTerm = searchQuery, type = 'general') => {
+    if (!searchTerm.trim() && type === 'general') return;
+    
+    setLoading(true);
+    setHasSearched(true);
+    
+    if (searchTerm.trim()) {
+      saveRecentSearch(searchTerm);
+    }
+
+    try {
+      // Mock search API call - replace with actual API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Generate mock results based on search term
+      const mockResults = [];
+      for (let i = 0; i < Math.floor(Math.random() * 20) + 10; i++) {
+        mockResults.push({
+          id: `listing_${i}`,
+          brand: brands[Math.floor(Math.random() * brands.length)],
+          model: phoneModels[Math.floor(Math.random() * phoneModels.length)],
+          price: Math.floor(Math.random() * 300000) + 25000,
+          condition: conditions[Math.floor(Math.random() * conditions.length)],
+          city: cities[Math.floor(Math.random() * cities.length)],
+          images: [`https://picsum.photos/400/300?random=${i}`],
+          seller_name: `Seller ${i + 1}`,
+          posted_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
+          featured: Math.random() > 0.8,
+          verified_seller: Math.random() > 0.7
+        });
+      }
+      
+      setSearchResults(mockResults);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setSearchQuery(suggestion.display);
+    setShowSuggestions(false);
+    handleSearch(suggestion.display, suggestion.type);
+  };
+
+  const handleQuickSearch = (searchTerm, type = 'quick') => {
+    setSearchQuery(searchTerm);
+    handleSearch(searchTerm, type);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+    setHasSearched(false);
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  const tabs = [
+    { id: 'search', label: 'Search', icon: Search },
+    { id: 'brand', label: 'By Brand', icon: Smartphone },
+    { id: 'price', label: 'By Price', icon: DollarSign },
+    { id: 'location', label: 'Near Me', icon: MapPin }
+  ];
+
+  if (loading && hasSearched) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-white shadow-sm sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <button onClick={onBack} className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                <span>Back</span>
+              </button>
+              <h1 className="text-lg font-semibold text-gray-900">Search</h1>
+              <div className="w-16"></div>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Searching for phones...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <button onClick={onBack} className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              <span>Back</span>
+            </button>
+            <h1 className="text-lg font-semibold text-gray-900">
+              {hasSearched ? `${searchResults.length} Results` : 'Find Your Perfect Phone'}
+            </h1>
+            {hasSearched && (
+              <button onClick={clearSearch} className="text-blue-600 hover:text-blue-700 font-medium">
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {!hasSearched ? (
+          <>
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-4 mb-6 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <MapPin className="w-5 h-5 mr-2" />
+                  <span className="font-medium">
+                    {locationLoading ? 'Detecting location...' : `Searching in ${userLocation}`}
+                  </span>
+                </div>
+                <button className="text-blue-200 hover:text-white transition-colors">
+                  <span className="text-sm">Change</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-8 relative">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search for phones, brands, models..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setShowSuggestions(suggestions.length > 0)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  className="w-full pl-12 pr-12 py-4 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 mt-2 max-h-80 overflow-y-auto">
+                  {suggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 flex items-center justify-between"
+                    >
+                      <div className="flex items-center">
+                        <span className="mr-3 text-lg">{suggestion.icon}</span>
+                        <div>
+                          <span className="text-gray-900 font-medium">{suggestion.display}</span>
+                          <div className="text-xs text-gray-500">{suggestion.category}</div>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-400" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {searchQuery && (
+                <button
+                  onClick={() => handleSearch()}
+                  className="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2"
+                >
+                  <Search className="w-5 h-5" />
+                  <span>Search</span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex overflow-x-auto pb-1 mb-8 space-x-2">
+              {tabs.map((tab) => {
+                const IconComponent = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                    }`}
+                  >
+                    <IconComponent className="w-4 h-4 mr-2" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="space-y-6">
+              {activeTab === 'search' && (
+                <>
+                  {recentSearches.length > 0 && (
+                    <div className="bg-white rounded-xl shadow-sm p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <Clock className="w-5 h-5 mr-2 text-gray-400" />
+                        Recent Searches
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {recentSearches.map((search, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleQuickSearch(search)}
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm transition-colors flex items-center space-x-2"
+                          >
+                            <span>{search}</span>
+                            <X 
+                              className="w-3 h-3 opacity-50 hover:opacity-100"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const updated = recentSearches.filter((_, i) => i !== index);
+                                setRecentSearches(updated);
+                                localStorage.setItem('phoneflip_recent_searches', JSON.stringify(updated));
+                              }}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="bg-white rounded-xl shadow-sm p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <TrendingUp className="w-5 h-5 mr-2 text-gray-400" />
+                      Trending in {userLocation}
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {trendingSearches.map((search, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleQuickSearch(search)}
+                          className="bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-800 p-3 rounded-lg text-sm font-medium transition-all duration-300 text-center"
+                        >
+                          {search}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {activeTab === 'brand' && (
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Browse by Brand</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {brands.map((brand, index) => (
+                      <button
+                        key={brand}
+                        onClick={() => handleQuickSearch(brand)}
+                        className="group bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-xl p-4 transition-all duration-300 text-center"
+                      >
+                        <div className="text-3xl mb-2">📱</div>
+                        <div className="font-medium text-gray-900 group-hover:text-blue-700">{brand}</div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {Math.floor(Math.random() * 200) + 50} listings
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'price' && (
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Browse by Price Range</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {priceRanges.map((range, index) => (
+                      <button
+                        key={range.value}
+                        onClick={() => handleQuickSearch(range.label)}
+                        className="group bg-gray-50 hover:bg-green-50 border border-gray-200 hover:border-green-300 rounded-xl p-4 transition-all duration-300 text-left flex items-center justify-between"
+                      >
+                        <div>
+                          <div className="font-medium text-gray-900 group-hover:text-green-700">
+                            {range.label}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            {Math.floor(Math.random() * 150) + 30} listings available
+                          </div>
+                        </div>
+                        <div className="text-2xl">💰</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'location' && (
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Phones Near You</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {cities.map((city, index) => (
+                      <button
+                        key={city}
+                        onClick={() => handleQuickSearch(`${city} phones`)}
+                        className={`group border rounded-xl p-4 transition-all duration-300 text-left flex items-center justify-between ${
+                          city === userLocation
+                            ? 'bg-blue-50 border-blue-300'
+                            : 'bg-gray-50 hover:bg-blue-50 border-gray-200 hover:border-blue-300'
+                        }`}
+                      >
+                        <div>
+                          <div className={`font-medium ${
+                            city === userLocation ? 'text-blue-700' : 'text-gray-900 group-hover:text-blue-700'
+                          }`}>
+                            {city}
+                            {city === userLocation && ' (Your Location)'}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            {Math.floor(Math.random() * 300) + 50} listings available
+                          </div>
+                        </div>
+                        <div className="text-2xl">📍</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Found {searchResults.length} phones
+                  </h2>
+                  <p className="text-gray-600 mt-1">for "{searchQuery}"</p>
+                </div>
+                <button 
+                  onClick={() => handleSearch(searchQuery)}
+                  className="text-blue-600 hover:text-blue-700 font-medium flex items-center"
+                >
+                  <RefreshCw className="w-4 h-4 mr-1" />
+                  Refresh
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {searchResults.map((listing, index) => (
+                <div
+                  key={listing.id}
+                  className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden cursor-pointer"
+                  onClick={() => onViewListing && onViewListing(listing)}
+                >
+                  <div className="relative">
+                    <img
+                      src={listing.images[0]}
+                      alt={`${listing.brand} ${listing.model}`}
+                      className="w-full h-48 object-cover"
+                    />
+                    {listing.featured && (
+                      <div className="absolute top-3 left-3 bg-yellow-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
+                        Featured
+                      </div>
+                    )}
+                    {listing.verified_seller && (
+                      <div className="absolute top-3 right-3 bg-green-500 text-white p-1.5 rounded-full">
+                        <Check className="w-3 h-3" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-gray-900 text-lg">
+                        {listing.brand} {listing.model}
+                      </h3>
+                      <div className="text-right">
+                        <div className="text-xl font-bold text-blue-600">
+                          ₨{listing.price.toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                      <span className="bg-gray-100 px-2 py-1 rounded">{listing.condition}</span>
+                      <span className="flex items-center">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        {listing.city}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <span>{listing.seller_name}</span>
+                      <span>{Math.floor((Date.now() - new Date(listing.posted_at)) / (1000 * 60 * 60 * 24))} days ago</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {searchResults.length === 0 && (
+              <div className="text-center py-12">
+                <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No phones found</h3>
+                <p className="text-gray-600 mb-4">Try adjusting your search terms or browse by category</p>
+                <button
+                  onClick={clearSearch}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                >
+                  Start New Search
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
