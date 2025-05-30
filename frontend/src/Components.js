@@ -1018,31 +1018,6 @@ export const Header = ({
           </div>
         )}
       </header>
-
-      {/* Enhanced Sign In Modal */}
-      <SignInModal 
-        isOpen={showSignInModal} 
-        onClose={() => setShowSignInModal(false)}
-        onLogin={handleLogin}
-        onSwitchToSignUp={() => {
-          setShowSignInModal(false);
-          setSignUpType('normal');
-          setShowSignUpModal(true);
-        }}
-      />
-      
-      {/* Enhanced Sign Up Modal */}
-      <SignUpModal 
-        isOpen={showSignUpModal} 
-        onClose={() => setShowSignUpModal(false)}
-        onSignup={handleLogin}
-        signUpType={signUpType}
-        setSignUpType={setSignUpType}
-        onSwitchToSignIn={() => {
-          setShowSignUpModal(false);
-          setShowSignInModal(true);
-        }}
-      />
     </>
   );
 };
