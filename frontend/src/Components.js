@@ -3641,14 +3641,40 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
       // Build query parameters for advanced filtering
       const params = new URLSearchParams();
       
-      if (activeFilters.brand) params.append('brand', activeFilters.brand);
+      // Handle multi-select filters (arrays)
+      if (activeFilters.brand.length > 0) {
+        activeFilters.brand.forEach(brand => params.append('brand', brand));
+      }
+      if (activeFilters.city.length > 0) {
+        activeFilters.city.forEach(city => params.append('city', city));
+      }
+      if (activeFilters.condition.length > 0) {
+        activeFilters.condition.forEach(condition => params.append('condition', condition));
+      }
+      if (activeFilters.color.length > 0) {
+        activeFilters.color.forEach(color => params.append('color', color));
+      }
+      if (activeFilters.storage.length > 0) {
+        activeFilters.storage.forEach(storage => params.append('storage', storage));
+      }
+      if (activeFilters.ram.length > 0) {
+        activeFilters.ram.forEach(ram => params.append('ram', ram));
+      }
+      if (activeFilters.battery.length > 0) {
+        activeFilters.battery.forEach(battery => params.append('battery', battery));
+      }
+      if (activeFilters.battery_health.length > 0) {
+        activeFilters.battery_health.forEach(health => params.append('battery_health', health));
+      }
+      if (activeFilters.network.length > 0) {
+        activeFilters.network.forEach(network => params.append('network', network));
+      }
+      if (activeFilters.seller_type.length > 0) {
+        activeFilters.seller_type.forEach(type => params.append('seller_type', type));
+      }
+      
+      // Handle single-select filters
       if (activeFilters.model) params.append('model', activeFilters.model);
-      if (activeFilters.city) params.append('city', activeFilters.city);
-      if (activeFilters.condition) params.append('condition', activeFilters.condition);
-      if (activeFilters.storage) params.append('storage', activeFilters.storage);
-      if (activeFilters.ram) params.append('ram', activeFilters.ram);
-      if (activeFilters.battery) params.append('battery', activeFilters.battery);
-      if (activeFilters.network) params.append('network', activeFilters.network);
       if (activeFilters.search) params.append('search', activeFilters.search);
       
       // Handle price range
@@ -3669,6 +3695,13 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
         }
       }
       
+      // Add sorting
+      params.append('sort_by', sortBy);
+      
+      // Add pagination
+      params.append('skip', (currentPage - 1) * itemsPerPage);
+      params.append('limit', itemsPerPage);
+      
       const queryString = params.toString();
       const url = `${process.env.REACT_APP_BACKEND_URL}${endpoint}${queryString ? `?${queryString}` : ''}`;
       
@@ -3677,14 +3710,15 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
       
       if (response.ok) {
         setListings(data);
-        setFilteredListings(data); // Set filtered listings directly from backend
+        setFilteredListings(data);
+        setTotalResults(data.length); // In a real app, you'd get total count from API
         
         // Apply initial search filters if any
         if (searchFilters) {
-          setActiveFilters({
-            ...activeFilters,
+          setActiveFilters(prev => ({
+            ...prev,
             ...searchFilters
-          });
+          }));
         }
       }
     } catch (error) {
