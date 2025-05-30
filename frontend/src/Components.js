@@ -2307,7 +2307,7 @@ export const CompareModal = ({ isOpen, onClose, compareList, clearCompare }) => 
 };
 
 // Post an Ad Component
-export const PostAdPage = ({ onSubmitSuccess, user }) => {
+export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
