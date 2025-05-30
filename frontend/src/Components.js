@@ -2904,8 +2904,8 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
 
             {/* Purchase Information */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Purchase Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Purchase & Warranty Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Purchase Year</label>
                   <select
@@ -2921,6 +2921,30 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Purchase Date (Optional)</label>
+                  <input
+                    type="date"
+                    value={formData.purchase_date}
+                    onChange={(e) => handleInputChange('purchase_date', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Warranty Status</label>
+                  <select
+                    value={formData.warranty_status}
+                    onChange={(e) => handleInputChange('warranty_status', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Status</option>
+                    {warrantyStatusOptions.map(status => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Warranty (Months)</label>
                   <input
                     type="number"
@@ -2929,8 +2953,22 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="0"
                     min="0"
-                    max="24"
+                    max="36"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Battery Health (For Used Phones)</label>
+                  <select
+                    value={formData.battery_health}
+                    onChange={(e) => handleInputChange('battery_health', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Battery Health</option>
+                    {batteryHealthOptions.map(health => (
+                      <option key={health} value={health}>{health}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="flex items-center pt-8">
