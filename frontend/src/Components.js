@@ -3435,7 +3435,7 @@ export const ShopOwnerDashboard = ({ user, setCurrentPage }) => {
 };
 
 // Search Results Component with Working Filters
-export const SearchResultsPage = ({ searchFilters, onBack }) => {
+export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
   const [listings, setListings] = useState([]);
   const [filteredListings, setFilteredListings] = useState([]);
   const [loading, setLoading] = useState(true);
