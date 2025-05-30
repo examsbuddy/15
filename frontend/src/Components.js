@@ -855,9 +855,12 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                   <input
                     type="text"
+                    id="signup-name"
+                    name="name"
                     value={signupData.name}
                     onChange={(e) => setSignupData({...signupData, name: e.target.value})}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter your full name"
                     required
                   />
                 </div>
