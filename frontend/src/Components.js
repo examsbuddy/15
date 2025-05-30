@@ -374,7 +374,7 @@ export const CompareSection = ({ compareList, onCompareClick }) => {
       <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <GitCompare className="w-5 h-5 text-blue-600" />
+            <BarChart2 className="w-5 h-5 text-blue-600" />
             <span className="text-blue-900 font-medium">
               {compareList.length} phone{compareList.length > 1 ? 's' : ''} selected for comparison
             </span>
