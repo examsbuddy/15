@@ -1503,6 +1503,12 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
     }
   };
 
+  const handleSearch = () => {
+    if (onSearch) {
+      onSearch(searchFilters);
+    }
+  };
+
   return (
     <section 
       className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 text-white py-16 md:py-24 overflow-hidden"
