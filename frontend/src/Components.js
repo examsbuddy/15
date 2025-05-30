@@ -40,7 +40,293 @@ import {
   ShoppingBag
 } from 'react-feather';
 
-// Header Component
+// Authentication Modals
+export const LoginModal = ({ isOpen, onClose, onLogin, onSwitchToSignup }) => {
+  const [loginData, setLoginData] = useState({
+    email: '',
+    password: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        onLogin(data.user);
+        onClose();
+        setLoginData({ email: '', password: '' });
+      } else {
+        setError(data.detail || 'Login failed');
+      }
+    } catch (error) {
+      setError('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl font-bold text-gray-900">Welcome Back</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input
+              type="email"
+              required
+              value={loginData.email}
+              onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Enter your email"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <input
+              type="password"
+              required
+              value={loginData.password}
+              onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Enter your password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition-colors"
+          >
+            {isLoading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-gray-600">
+            Don't have an account?{' '}
+            <button 
+              onClick={onSwitchToSignup}
+              className="text-green-600 hover:text-green-700 font-medium"
+            >
+              Sign up
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const SignupModal = ({ isOpen, onClose, onSignup, onSwitchToLogin }) => {
+  const [signupData, setSignupData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: '',
+    city: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    if (signupData.password !== signupData.confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: signupData.name,
+          email: signupData.email,
+          password: signupData.password,
+          phone: signupData.phone,
+          city: signupData.city
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        onSignup(data.user);
+        onClose();
+        setSignupData({ name: '', email: '', password: '', confirmPassword: '', phone: '', city: '' });
+      } else {
+        setError(data.detail || 'Registration failed');
+      }
+    } catch (error) {
+      setError('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-2xl font-bold text-gray-900">Join PhoneFlip.PK</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+            <input
+              type="text"
+              required
+              value={signupData.name}
+              onChange={(e) => setSignupData({...signupData, name: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Enter your full name"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input
+              type="email"
+              required
+              value={signupData.email}
+              onChange={(e) => setSignupData({...signupData, email: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Enter your email"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+            <input
+              type="tel"
+              required
+              value={signupData.phone}
+              onChange={(e) => setSignupData({...signupData, phone: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="03XX XXXXXXX"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+            <select
+              required
+              value={signupData.city}
+              onChange={(e) => setSignupData({...signupData, city: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            >
+              <option value="">Select your city</option>
+              {cities.map(city => (
+                <option key={city} value={city}>{city}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <input
+              type="password"
+              required
+              value={signupData.password}
+              onChange={(e) => setSignupData({...signupData, password: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Create a password"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+            <input
+              type="password"
+              required
+              value={signupData.confirmPassword}
+              onChange={(e) => setSignupData({...signupData, confirmPassword: e.target.value})}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Confirm your password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition-colors"
+          >
+            {isLoading ? 'Creating account...' : 'Create Account'}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-gray-600">
+            Already have an account?{' '}
+            <button 
+              onClick={onSwitchToLogin}
+              className="text-green-600 hover:text-green-700 font-medium"
+            >
+              Sign in
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Modern Header Component
 export const Header = ({ 
   currentPage, 
   setCurrentPage, 
@@ -53,133 +339,307 @@ export const Header = ({
 }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
 
   const navigation = [
-    { name: 'Used Phones', key: 'used-phones', color: 'text-white hover:text-gray-200' },
-    { name: 'New Phones', key: 'new-phones', color: 'text-white hover:text-gray-200' },
-    { name: 'Accessories', key: 'accessories', color: 'text-white hover:text-gray-200' },
-    { name: 'Phone Store', key: 'phone-store', color: 'text-white hover:text-gray-200' },
-    { name: 'Reviews', key: 'reviews', color: 'text-white hover:text-gray-200' },
-    { name: 'Videos', key: 'videos', color: 'text-white hover:text-gray-200' },
-    { name: 'Forums', key: 'forums', color: 'text-white hover:text-gray-200' },
-    { name: 'Blog', key: 'blog', color: 'text-white hover:text-gray-200' },
+    { name: 'Used Phones', key: 'used-phones', icon: Smartphone },
+    { name: 'New Phones', key: 'new-phones', icon: Zap },
+    { name: 'Accessories', key: 'accessories', icon: Headphones },
+    { name: 'Phone Store', key: 'phone-store', icon: ShoppingBag },
+    { name: 'Reviews', key: 'reviews', icon: Star },
+    { name: 'Blog', key: 'blog', icon: Globe },
   ];
 
+  const handleLogin = (userData) => {
+    onLogin(userData);
+    setShowLoginModal(false);
+  };
+
+  const handleSignup = (userData) => {
+    onLogin(userData);
+    setShowSignupModal(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    onLogout();
+    setShowUserMenu(false);
+  };
+
+  const handlePostAd = () => {
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+    setCurrentPage('post-ad');
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-slate-800 text-white shadow-lg">
-      {/* Top Bar */}
-      <div className="bg-slate-900 px-4 py-1 text-sm hidden md:block">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-4 text-gray-300">
-            <span className="flex items-center">
-              <Phone className="w-3 h-3 mr-1" />
-              Download App via SMS
-            </span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-orange-400">اردو</span>
-            <button className="hover:text-white transition-colors">Sign Up</button>
-            <button className="hover:text-white transition-colors">Sign In</button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Header */}
-      <div className="px-4 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center">
-            <button
-              onClick={() => setCurrentPage('home')}
-              className="flex items-center space-x-2 hover:opacity-90 transition-opacity"
-            >
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <Smartphone className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="text-xl font-bold text-white">PhoneFlip</div>
-                <div className="text-xs text-gray-300 -mt-1">.PK</div>
-              </div>
-            </button>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-6">
-            {navigation.map((item) => (
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center">
               <button
-                key={item.key}
-                onClick={() => setCurrentPage(item.key)}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  currentPage === item.key 
-                    ? 'bg-blue-600 text-white' 
-                    : item.color
-                }`}
+                onClick={() => setCurrentPage('home')}
+                className="flex items-center space-x-2 hover:opacity-90 transition-opacity"
               >
-                {item.name}
+                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Smartphone className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <div className="text-xl font-bold text-gray-900">PhoneFlip</div>
+                  <div className="text-xs text-green-600 font-semibold -mt-1">.PK</div>
+                </div>
               </button>
-            ))}
-          </nav>
+            </div>
 
-          {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
-            {/* Compare Button */}
-            <button
-              onClick={onCompareClick}
-              className="relative hidden md:flex items-center space-x-1 text-white hover:text-blue-300 transition-colors"
-            >
-              <BarChart2 className="w-5 h-5" />
-              <span className="text-sm">Compare</span>
-              {compareCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {compareCount}
-                </span>
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center space-x-1">
+              {navigation.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => setCurrentPage(item.key)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
+                      currentPage === item.key 
+                        ? 'bg-green-50 text-green-700 shadow-sm' 
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    }`}
+                  >
+                    <IconComponent className="w-4 h-4" />
+                    <span>{item.name}</span>
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Right Side Actions */}
+            <div className="flex items-center space-x-3">
+              {/* Compare Button */}
+              <button
+                onClick={onCompareClick}
+                className="relative hidden md:flex items-center space-x-2 text-gray-600 hover:text-green-600 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200"
+              >
+                <BarChart2 className="w-5 h-5" />
+                <span className="text-sm font-medium">Compare</span>
+                {compareCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                    {compareCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Post an Ad Button - Prominent CTA */}
+              <button
+                onClick={handlePostAd}
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">Post an Ad</span>
+                <span className="sm:hidden">Post</span>
+              </button>
+
+              {/* Auth Buttons / User Menu */}
+              {isLoggedIn ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="hidden md:inline font-medium">{user?.name || 'User'}</span>
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+
+                  {/* User Dropdown */}
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                      <button
+                        onClick={() => {
+                          setCurrentPage('profile');
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                      >
+                        <User className="w-4 h-4" />
+                        <span>My Profile</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentPage('my-ads');
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                      >
+                        <List className="w-4 h-4" />
+                        <span>My Ads</span>
+                      </button>
+                      <hr className="my-2" />
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 flex items-center space-x-2"
+                      >
+                        <X className="w-4 h-4" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="hidden md:flex items-center space-x-2">
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-50 font-medium transition-all duration-200"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => setShowSignupModal(true)}
+                    className="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                  >
+                    Sign Up
+                  </button>
+                </div>
               )}
-            </button>
 
-            {/* Post Ad Button */}
-            <button
-              onClick={() => setCurrentPage('post-ad')}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Post an Ad</span>
-            </button>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="lg:hidden p-2 rounded-md text-white hover:bg-slate-700 transition-colors"
-            >
-              {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="lg:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-200"
+              >
+                {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {showMobileMenu && (
-          <div className="lg:hidden mt-4 pb-4 border-t border-slate-700">
-            <div className="space-y-2 mt-4">
-              {navigation.map((item) => (
-                <button
-                  key={item.key}
-                  onClick={() => {
-                    setCurrentPage(item.key);
-                    setShowMobileMenu(false);
-                  }}
-                  className={`block w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    currentPage === item.key 
-                      ? 'bg-blue-600 text-white' 
-                      : 'text-white hover:bg-slate-700'
-                  }`}
-                >
-                  {item.name}
-                </button>
-              ))}
+          <div className="lg:hidden border-t border-gray-100 bg-white">
+            <div className="px-4 py-4 space-y-2">
+              {/* Navigation Links */}
+              {navigation.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => {
+                      setCurrentPage(item.key);
+                      setShowMobileMenu(false);
+                    }}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
+                      currentPage === item.key 
+                        ? 'bg-green-50 text-green-700' 
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <IconComponent className="w-5 h-5" />
+                    <span className="font-medium">{item.name}</span>
+                  </button>
+                );
+              })}
+
+              {/* Mobile Auth */}
+              {!isLoggedIn && (
+                <div className="pt-4 border-t border-gray-100 space-y-2">
+                  <button
+                    onClick={() => {
+                      setShowLoginModal(true);
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-medium transition-colors"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowSignupModal(true);
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full border border-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              )}
+
+              {/* Mobile User Menu */}
+              {isLoggedIn && (
+                <div className="pt-4 border-t border-gray-100 space-y-2">
+                  <div className="flex items-center space-x-3 px-4 py-3 bg-gray-50 rounded-lg">
+                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900">{user?.name || 'User'}</div>
+                      <div className="text-sm text-gray-500">{user?.email}</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setCurrentPage('profile');
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+                  >
+                    <User className="w-5 h-5" />
+                    <span>My Profile</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCurrentPage('my-ads');
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+                  >
+                    <List className="w-5 h-5" />
+                    <span>My Ads</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg"
+                  >
+                    <X className="w-5 h-5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
-      </div>
-    </header>
+      </header>
+
+      {/* Authentication Modals */}
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)}
+        onLogin={handleLogin}
+        onSwitchToSignup={() => {
+          setShowLoginModal(false);
+          setShowSignupModal(true);
+        }}
+      />
+      
+      <SignupModal 
+        isOpen={showSignupModal} 
+        onClose={() => setShowSignupModal(false)}
+        onSignup={handleSignup}
+        onSwitchToLogin={() => {
+          setShowSignupModal(false);
+          setShowLoginModal(true);
+        }}
+      />
+    </>
   );
 };
 
