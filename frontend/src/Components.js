@@ -37,7 +37,6 @@ import {
   ChevronDown,
   Sliders,
   Bell,
-  GitCompare,
   ShoppingBag
 } from 'react-feather';
 
