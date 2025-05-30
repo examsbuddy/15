@@ -550,16 +550,151 @@ async def populate_sample_data():
                 "views": 94,
                 "is_featured": True,
                 "is_active": True
+            },
+            {
+                "brand": "Google",
+                "model": "Pixel 8 Pro",
+                "condition": "Like New",
+                "price": 275000,
+                "storage": "128GB",
+                "ram": "12GB",
+                "city": "Islamabad",
+                "description": "Google Pixel 8 Pro with incredible AI features and camera quality. Pure Android experience with timely updates.",
+                "seller_name": "Kamran Ali",
+                "seller_phone": "03334455667",
+                "seller_email": "kamran@example.com",
+                "features": ["AI Camera", "Magic Eraser", "Call Screen", "Titan M Security"],
+                "created_at": datetime.utcnow() - timedelta(days=10),
+                "views": 67,
+                "is_featured": False,
+                "is_active": True
+            },
+            {
+                "brand": "Huawei",
+                "model": "P60 Pro",
+                "condition": "Very Good",
+                "price": 155000,
+                "storage": "256GB",
+                "ram": "8GB",
+                "city": "Lahore",
+                "description": "Huawei P60 Pro with amazing camera system. Great build quality and performance. No Google services included.",
+                "seller_name": "Ayesha Shah",
+                "seller_phone": "03125678901",
+                "seller_email": "ayesha@example.com",
+                "features": ["Variable Aperture", "Leica Camera", "120Hz Display", "Satellite Communication"],
+                "created_at": datetime.utcnow() - timedelta(days=11),
+                "views": 43,
+                "is_featured": False,
+                "is_active": True
+            }
+        ]
+
+        # Sample accessories
+        sample_accessories = [
+            {
+                "category": "accessories",
+                "type": "case",
+                "brand": "Apple",
+                "model": "iPhone 15 Pro Leather Case",
+                "condition": "New",
+                "price": 8500,
+                "city": "Karachi",
+                "description": "Official Apple leather case for iPhone 15 Pro. Premium quality leather with perfect fit and protection.",
+                "seller_name": "Tech Store",
+                "seller_phone": "03001234567",
+                "seller_email": "techstore@example.com",
+                "features": ["Genuine Leather", "Perfect Fit", "Drop Protection", "MagSafe Compatible"],
+                "created_at": datetime.utcnow(),
+                "views": 45,
+                "is_featured": True,
+                "is_active": True
+            },
+            {
+                "category": "accessories",
+                "type": "charger",
+                "brand": "Samsung",
+                "model": "45W Super Fast Charger",
+                "condition": "New",
+                "price": 3500,
+                "city": "Lahore",
+                "description": "Original Samsung 45W super fast charger. Compatible with all Samsung fast charging phones.",
+                "seller_name": "Mobile Mart",
+                "seller_phone": "03121234567", 
+                "seller_email": "mobilemart@example.com",
+                "features": ["45W Fast Charging", "USB-C", "Original Samsung", "Compact Design"],
+                "created_at": datetime.utcnow() - timedelta(days=1),
+                "views": 32,
+                "is_featured": False,
+                "is_active": True
+            },
+            {
+                "category": "accessories",
+                "type": "screen_protector",
+                "brand": "Generic",
+                "model": "Tempered Glass Screen Protector",
+                "condition": "New",
+                "price": 500,
+                "city": "Islamabad",
+                "description": "High quality tempered glass screen protector. 9H hardness, crystal clear, easy installation.",
+                "seller_name": "Accessories Hub",
+                "seller_phone": "03331234567",
+                "seller_email": "accessories@example.com",
+                "features": ["9H Hardness", "Crystal Clear", "Bubble Free", "Easy Install"],
+                "created_at": datetime.utcnow() - timedelta(days=2),
+                "views": 78,
+                "is_featured": False,
+                "is_active": True
+            },
+            {
+                "category": "accessories",
+                "type": "wireless_charger",
+                "brand": "Anker",
+                "model": "PowerWave 15W Wireless Charger",
+                "condition": "Like New",
+                "price": 4500,
+                "city": "Rawalpindi",
+                "description": "Anker PowerWave 15W wireless charger. Fast wireless charging for all Qi-enabled devices.",
+                "seller_name": "Gadget Store",
+                "seller_phone": "03451234567",
+                "seller_email": "gadgets@example.com",
+                "features": ["15W Fast Charging", "Qi Compatible", "LED Indicator", "Temperature Control"],
+                "created_at": datetime.utcnow() - timedelta(days=3),
+                "views": 23,
+                "is_featured": False,
+                "is_active": True
+            },
+            {
+                "category": "accessories",
+                "type": "power_bank",
+                "brand": "Xiaomi",
+                "model": "Mi Power Bank 20000mAh",
+                "condition": "Good",
+                "price": 2800,
+                "city": "Faisalabad",
+                "description": "Xiaomi Mi Power Bank 20000mAh. Reliable portable charging solution with fast charging support.",
+                "seller_name": "Electronics Point",
+                "seller_phone": "03411234567",
+                "seller_email": "electronics@example.com",
+                "features": ["20000mAh Capacity", "Dual USB Output", "Fast Charging", "LED Indicator"],
+                "created_at": datetime.utcnow() - timedelta(days=4),
+                "views": 56,
+                "is_featured": True,
+                "is_active": True
             }
         ]
 
         # Clear existing sample data
         await db.phone_listings.delete_many({})
+        await db.accessories.delete_many({})
         
         # Insert sample listings
         await db.phone_listings.insert_many(sample_listings)
+        await db.accessories.insert_many(sample_accessories)
         
-        return {"success": True, "message": f"Successfully populated {len(sample_listings)} sample phone listings"}
+        return {
+            "success": True, 
+            "message": f"Successfully populated {len(sample_listings)} phone listings and {len(sample_accessories)} accessories"
+        }
         
     except Exception as e:
         logger.error(f"Error populating sample data: {str(e)}")
