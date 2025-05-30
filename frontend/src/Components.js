@@ -664,13 +664,13 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
   const ramOptions = ['4GB', '6GB', '8GB', '12GB', '16GB'];
 
   return (
-    <section className="bg-gradient-to-br from-slate-800 via-blue-900 to-slate-800 text-white py-12 md:py-20">
+    <section className="bg-gradient-to-br from-green-600 via-green-700 to-green-800 text-white py-12 md:py-20">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-8 md:mb-12">
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
             Find Used Mobile Phones in Pakistan
           </h1>
-          <p className="text-lg md:text-xl text-blue-100 mb-8">
+          <p className="text-lg md:text-xl text-green-100 mb-8">
             With thousands of phones, we have just the right one for you
           </p>
 
@@ -678,14 +678,14 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             <button
               onClick={onCompareClick}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+              className="bg-white hover:bg-gray-100 text-green-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 shadow-lg"
             >
               <BarChart2 className="w-5 h-5" />
               <span>Compare Phones</span>
             </button>
             <button
               onClick={onPriceAlertsClick}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+              className="bg-green-800 hover:bg-green-900 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2 shadow-lg"
             >
               <Bell className="w-5 h-5" />
               <span>Price Alerts</span>
@@ -702,7 +702,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
                   placeholder="Phone Make or Model"
                   value={searchFilters.query}
                   onChange={(e) => setSearchFilters({...searchFilters, query: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
 
@@ -711,7 +711,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
                 <select
                   value={searchFilters.city}
                   onChange={(e) => setSearchFilters({...searchFilters, city: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none"
                 >
                   <option value="">All Cities</option>
                   {cities.map(city => (
@@ -726,7 +726,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
                 <select
                   value={searchFilters.priceRange}
                   onChange={(e) => setSearchFilters({...searchFilters, priceRange: e.target.value})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none"
                 >
                   <option value="">Price Range</option>
                   {priceRanges.map(range => (
@@ -737,7 +737,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
               </div>
 
               {/* Search Button */}
-              <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+              <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 shadow-lg">
                 <Search className="w-5 h-5" />
                 <span>Search</span>
               </button>
@@ -746,7 +746,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick }) => {
             {/* Advanced Filters Toggle */}
             <button
               onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              className="text-blue-600 hover:text-blue-700 font-medium flex items-center space-x-1 mx-auto"
+              className="text-green-600 hover:text-green-700 font-medium flex items-center space-x-1 mx-auto"
             >
               <Sliders className="w-4 h-4" />
               <span>{showAdvancedFilters ? 'Hide' : 'Show'} Advanced Filters</span>
