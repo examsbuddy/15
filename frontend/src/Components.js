@@ -1562,7 +1562,7 @@ export const MobileMenu = ({ isOpen, setIsOpen, setActiveTab, setIsPostAdOpen })
               initial={{ x: -300 }}
               animate={{ x: 0 }}
               exit={{ x: -300 }}
-              className="fixed left-0 top-0 h-full w-80 bg-white z-50 lg:hidden overflow-y-auto"
+              className="fixed left-0 top-0 h-full w-80 bg-white z-50 sm:hidden overflow-y-auto"
             >
               <div className="p-4">
                 <div className="flex items-center justify-between mb-8">
