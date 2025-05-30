@@ -710,7 +710,7 @@ export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
     if (!isLoggedIn) {
       setIsLoginOpen(true);
     } else {
-      setActiveTab('sell');
+      setIsPostAdOpen(true);
       console.log('Opening Post Ad form');
     }
   };
