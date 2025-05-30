@@ -707,12 +707,14 @@ export const Header = ({
   onLogin, 
   onLogout,
   compareCount,
-  onCompareClick 
+  onCompareClick,
+  showSignInModal,
+  setShowSignInModal,
+  showSignUpModal,
+  setShowSignUpModal
 }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showSignInModal, setShowSignInModal] = useState(false);
-  const [showSignUpModal, setShowSignUpModal] = useState(false);
   const [signUpType, setSignUpType] = useState('normal'); // 'normal' or 'shop_owner'
   const [showDropdown, setShowDropdown] = useState(null);
 
