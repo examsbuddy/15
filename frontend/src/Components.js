@@ -1489,7 +1489,7 @@ export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen, isLogg
                 </button>
               )}
               <button
-                onClick={() => setIsPostAdOpen(true)}
+                onClick={handlePostAd}
                 className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
               >
                 Post an Ad
