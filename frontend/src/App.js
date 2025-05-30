@@ -60,9 +60,14 @@ function App() {
     setCurrentPage('home');
   };
 
-  const handleSearch = (filters) => {
-    setSearchFilters(filters);
-    setCurrentPage('search-results');
+  const handleSearch = (type, filters = {}) => {
+    if (type === 'dedicated-search') {
+      setSearchFilters(filters);
+      setCurrentPage('dedicated-search');
+    } else {
+      setSearchFilters(type);
+      setCurrentPage('search-results');
+    }
   };
 
   const handleBackToHome = () => {
