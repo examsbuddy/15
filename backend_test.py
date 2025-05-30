@@ -1,0 +1,172 @@
+
+import requests
+import sys
+import json
+from datetime import datetime
+
+class PhoneFlipAPITester:
+    def __init__(self, base_url):
+        self.base_url = base_url
+        self.tests_run = 0
+        self.tests_passed = 0
+        self.test_listing_id = None
+
+    def run_test(self, name, method, endpoint, expected_status, data=None, params=None):
+        """Run a single API test"""
+        url = f"{self.base_url}/{endpoint}"
+        headers = {'Content-Type': 'application/json'}
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing {name}...")
+        
+        try:
+            if method == 'GET':
+                response = requests.get(url, headers=headers, params=params)
+            elif method == 'POST':
+                response = requests.post(url, json=data, headers=headers)
+            
+            # Print response status and data for debugging
+            print(f"Response Status: {response.status_code}")
+            print(f"Response Data: {response.text[:200]}..." if len(response.text) > 200 else f"Response Data: {response.text}")
+            
+            success = response.status_code == expected_status
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                try:
+                    return success, response.json()
+                except json.JSONDecodeError:
+                    return success, {}
+            else:
+                print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
+                return False, {}
+
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False, {}
+
+    def test_api_root(self):
+        """Test API root endpoint"""
+        return self.run_test(
+            "API Root",
+            "GET",
+            "api",
+            200
+        )
+
+    def test_get_listings(self):
+        """Test getting all listings"""
+        return self.run_test(
+            "Get All Listings",
+            "GET",
+            "api/listings",
+            200
+        )
+
+    def test_get_featured_listings(self):
+        """Test getting featured listings"""
+        return self.run_test(
+            "Get Featured Listings",
+            "GET",
+            "api/listings/featured",
+            200
+        )
+
+    def test_get_stats(self):
+        """Test getting platform statistics"""
+        return self.run_test(
+            "Get Platform Stats",
+            "GET",
+            "api/stats",
+            200
+        )
+
+    def test_create_listing(self):
+        """Test creating a new listing"""
+        test_data = {
+            "brand": "Samsung",
+            "model": "Galaxy S23",
+            "condition": "Good",
+            "price": 120000,
+            "storage": "256GB",
+            "ram": "8GB",
+            "city": "Karachi",
+            "description": "This is a test listing created by automated testing.",
+            "seller_name": "Test User",
+            "seller_phone": "03001234567",
+            "seller_email": "test@example.com",
+            "features": ["5G", "AMOLED Display", "Fast Charging"]
+        }
+        
+        success, response = self.run_test(
+            "Create New Listing",
+            "POST",
+            "api/listings",
+            200,
+            data=test_data
+        )
+        
+        if success and response.get("success") and "listing_id" in response:
+            self.test_listing_id = response["listing_id"]
+            print(f"Created test listing with ID: {self.test_listing_id}")
+        
+        return success, response
+
+    def test_get_listing_by_id(self):
+        """Test getting a specific listing by ID"""
+        if not self.test_listing_id:
+            print("❌ No test listing ID available, skipping test")
+            return False, {}
+        
+        return self.run_test(
+            "Get Listing by ID",
+            "GET",
+            f"api/listings/{self.test_listing_id}",
+            200
+        )
+
+    def test_filtered_listings(self):
+        """Test getting listings with filters"""
+        params = {
+            "brand": "Samsung",
+            "city": "Karachi",
+            "min_price": 100000,
+            "max_price": 150000
+        }
+        
+        return self.run_test(
+            "Get Filtered Listings",
+            "GET",
+            "api/listings",
+            200,
+            params=params
+        )
+
+def main():
+    # Get backend URL from environment or use default
+    with open('/app/frontend/.env', 'r') as f:
+        for line in f:
+            if line.startswith('REACT_APP_BACKEND_URL='):
+                backend_url = line.strip().split('=')[1]
+                break
+    
+    print(f"Using backend URL: {backend_url}")
+    
+    # Setup tester
+    tester = PhoneFlipAPITester(backend_url)
+    
+    # Run tests
+    tester.test_api_root()
+    tester.test_get_listings()
+    tester.test_get_featured_listings()
+    tester.test_get_stats()
+    tester.test_create_listing()
+    tester.test_get_listing_by_id()
+    tester.test_filtered_listings()
+    
+    # Print results
+    print(f"\n📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
+    return 0 if tester.tests_passed == tester.tests_run else 1
+
+if __name__ == "__main__":
+    sys.exit(main())
