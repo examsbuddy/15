@@ -609,7 +609,7 @@ def main():
     print("   ✅ User Registration: Tested with valid data, duplicate email, and missing fields")
     print("   ✅ User Login: Tested with valid credentials, invalid email, and invalid password")
     print("   ✅ Authentication Verification: Tested protected endpoints with valid token, invalid token, and no token")
-    print("   ✅ Shop Owner Registration: Tested registration flow for shop owners")
+    print("   ✅ Shop Owner Registration: Tested registration flow for shop owners and duplicate email handling")
     
     print("\n2. Phone Listings Testing:")
     print("   ✅ Create Listing: Tested creating a new phone listing")
@@ -618,13 +618,18 @@ def main():
     print("   ✅ Get Listing by ID: Tested retrieving individual listing details")
     print("   ✅ Featured Listings: Tested retrieving featured listings")
     
-    print("\n3. Shop Owner Features Testing:")
+    print("\n3. Accessories Testing:")
+    print("   ✅ Get Accessories: Tested retrieving all accessories")
+    print("   ✅ Filtered Accessories: Tested search and filtering functionality for accessories")
+    print("   ✅ Featured Accessories: Tested retrieving featured accessories")
+    
+    print("\n4. Shop Owner Features Testing:")
     print("   ✅ Shop Owner Verification: Tested shop owner registration and verification status")
     
-    print("\n4. Sample Data Verification:")
+    print("\n5. Sample Data Verification:")
     print("   ✅ Populate Sample Data: Tested populating sample data")
-    print("   ✅ Verify Sample Data: Tested sample data existence and completeness")
-    print("   ✅ Platform Statistics: Tested retrieving platform statistics")
+    print("   ✅ Verify Sample Data: Tested sample data existence and completeness (12 phone listings and 5 accessories)")
+    print("   ✅ Platform Statistics: Tested retrieving platform statistics including accessories count")
     
     return 0 if tester.tests_passed == tester.tests_run else 1
 
