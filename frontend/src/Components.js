@@ -124,21 +124,21 @@ export const DesktopHeader = ({ activeTab, setActiveTab }) => {
 // Mobile Header Component
 export const MobileHeader = ({ isMenuOpen, setIsMenuOpen }) => {
   return (
-    <header className="md:hidden bg-blue-900 text-white sticky top-0 z-50">
-      <div className="px-4 py-3">
+    <header className="block md:hidden bg-blue-900 text-white sticky top-0 z-50 safe-area-top">
+      <div className="px-4 py-4">
         <div className="flex items-center justify-between">
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-white"
+            className="text-white p-2 -ml-2"
           >
             <Menu className="w-6 h-6" />
           </button>
           
-          <div className="text-xl font-bold text-white">
+          <div className="text-lg font-bold text-white">
             PhoneFlip<span className="text-green-400">.PK</span>
           </div>
           
-          <button className="text-white">
+          <button className="text-white p-2 -mr-2">
             <Bell className="w-6 h-6" />
           </button>
         </div>
