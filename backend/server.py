@@ -202,21 +202,144 @@ class PhoneListing(BaseModel):
         populate_by_name = True
 
 # Existing routes
-@api_router.get("/")
-async def root():
-    return {"message": "PhoneFlip.PK API is running"}
+# Authentication Routes
+@api_router.post("/auth/register", response_model=LoginResponse)
+async def register_normal_user(user_data: UserRegistration):
+    """Register a normal user"""
+    try:
+        # Check if user already exists
+        existing_user = await db.users.find_one({"email": user_data.email})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Hash password
+        hashed_password = hash_password(user_data.password)
+        
+        # Create user document
+        user_doc = {
+            "name": user_data.name,
+            "email": user_data.email,
+            "password": hashed_password,
+            "phone": user_data.phone,
+            "role": user_data.role,
+            "created_at": datetime.utcnow(),
+            "is_active": True,
+            "verification_status": VerificationStatus.APPROVED if user_data.role == UserRole.NORMAL_USER else VerificationStatus.PENDING
+        }
+        
+        # Insert user
+        result = await db.users.insert_one(user_doc)
+        user_id = str(result.inserted_id)
+        
+        # Create access token
+        access_token = create_access_token(data={"sub": user_id})
+        
+        # Get user for response
+        user_doc["_id"] = user_id
+        user = User(**serialize_doc(user_doc))
+        
+        return LoginResponse(access_token=access_token, user=user)
+    except Exception as e:
+        logger.error(f"Error registering user: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to register user")
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
+@api_router.post("/auth/register-shop-owner", response_model=dict)
+async def register_shop_owner(shop_data: ShopOwnerRegistration):
+    """Register a shop owner with business details and KYC"""
+    try:
+        # Check if user already exists
+        existing_user = await db.users.find_one({"email": shop_data.email})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Hash password
+        hashed_password = hash_password(shop_data.password)
+        
+        # Create user document
+        user_doc = {
+            "name": shop_data.name,
+            "email": shop_data.email,
+            "password": hashed_password,
+            "phone": shop_data.phone,
+            "role": UserRole.SHOP_OWNER,
+            "created_at": datetime.utcnow(),
+            "is_active": True,
+            "verification_status": VerificationStatus.UNDER_REVIEW,
+            "business_details": shop_data.business_details.dict(),
+            "kyc_documents": shop_data.kyc_documents.dict()
+        }
+        
+        # Insert user
+        result = await db.users.insert_one(user_doc)
+        
+        return {
+            "success": True,
+            "message": "Shop owner registration submitted successfully! Your account is under review and you will be notified once approved.",
+            "user_id": str(result.inserted_id)
+        }
+    except Exception as e:
+        logger.error(f"Error registering shop owner: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to register shop owner")
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+@api_router.post("/auth/login", response_model=LoginResponse)
+async def login(user_credentials: UserLogin):
+    """Login user"""
+    try:
+        # Find user by email
+        user = await db.users.find_one({"email": user_credentials.email})
+        if not user or not verify_password(user_credentials.password, user["password"]):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        if not user["is_active"]:
+            raise HTTPException(status_code=401, detail="Account is disabled")
+        
+        # Create access token
+        access_token = create_access_token(data={"sub": str(user["_id"])})
+        
+        # Remove password from response
+        user.pop("password", None)
+        user = serialize_doc(user)
+        user_obj = User(**user)
+        
+        return LoginResponse(access_token=access_token, user=user_obj)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error during login: {str(e)}")
+        raise HTTPException(status_code=500, detail="Login failed")
+
+@api_router.get("/auth/me", response_model=User)
+async def get_current_user_info(current_user: dict = Depends(get_current_user)):
+    """Get current user information"""
+    return User(**current_user)
+
+@api_router.put("/auth/verify-shop-owner/{user_id}")
+async def verify_shop_owner(user_id: str, status: VerificationStatus, current_user: dict = Depends(get_current_user)):
+    """Verify or reject shop owner (Admin only)"""
+    try:
+        # Check if current user is admin
+        if current_user["role"] != UserRole.ADMIN:
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Validate ObjectId
+        if not ObjectId.is_valid(user_id):
+            raise HTTPException(status_code=400, detail="Invalid user ID")
+        
+        # Update verification status
+        result = await db.users.update_one(
+            {"_id": ObjectId(user_id), "role": UserRole.SHOP_OWNER},
+            {"$set": {"verification_status": status, "updated_at": datetime.utcnow()}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Shop owner not found")
+        
+        return {"success": True, "message": f"Shop owner verification status updated to {status}"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error verifying shop owner: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update verification status")
 
 # Phone Listing Routes
 @api_router.post("/listings", response_model=dict)
