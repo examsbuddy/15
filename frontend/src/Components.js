@@ -3808,19 +3808,62 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
     setFilteredListings(filtered);
   };
 
+  // Helper functions for multi-select filters
+  const toggleMultiSelectFilter = (filterType, value) => {
+    setActiveFilters(prev => {
+      const currentValues = prev[filterType];
+      const newValues = currentValues.includes(value)
+        ? currentValues.filter(v => v !== value)
+        : [...currentValues, value];
+      
+      return { ...prev, [filterType]: newValues };
+    });
+  };
+
   const clearFilters = () => {
     setActiveFilters({
-      brand: '',
+      brand: [],
       model: '',
-      city: '',
-      condition: '',
+      city: [],
+      condition: [],
+      color: [],
       priceRange: '',
-      storage: '',
-      ram: '',
-      battery: '',
-      network: '',
+      storage: [],
+      ram: [],
+      battery: [],
+      battery_health: [],
+      network: [],
+      seller_type: [],
       search: ''
     });
+    setCurrentPage(1);
+  };
+
+  const removeFilterTag = (filterType, value) => {
+    if (Array.isArray(activeFilters[filterType])) {
+      toggleMultiSelectFilter(filterType, value);
+    } else {
+      setActiveFilters(prev => ({ ...prev, [filterType]: '' }));
+    }
+  };
+
+  // Get active filter tags for display
+  const getActiveFilterTags = () => {
+    const tags = [];
+    
+    // Multi-select filters
+    ['brand', 'city', 'condition', 'color', 'storage', 'ram', 'battery', 'battery_health', 'network', 'seller_type'].forEach(filterType => {
+      activeFilters[filterType].forEach(value => {
+        tags.push({ type: filterType, value, label: `${filterType}: ${value}` });
+      });
+    });
+    
+    // Single-select filters
+    if (activeFilters.model) tags.push({ type: 'model', value: activeFilters.model, label: `Model: ${activeFilters.model}` });
+    if (activeFilters.priceRange) tags.push({ type: 'priceRange', value: activeFilters.priceRange, label: activeFilters.priceRange });
+    if (activeFilters.search) tags.push({ type: 'search', value: activeFilters.search, label: `Search: ${activeFilters.search}` });
+    
+    return tags;
   };
 
   const getActiveFilterCount = () => {
