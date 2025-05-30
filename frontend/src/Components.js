@@ -409,12 +409,31 @@ export const DetailedListingPage = ({ listingId, setCurrentPage, onBack }) => {
               </div>
 
               <div className="space-y-4">
+                {/* Contact Options */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={handleCallSeller}
+                    className="bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Phone className="w-5 h-5" />
+                    <span>Call</span>
+                  </button>
+                  
+                  <button
+                    onClick={handleContactSeller}
+                    className="bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    <span>WhatsApp</span>
+                  </button>
+                </div>
+                
                 <button
-                  onClick={handleShare}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                  onClick={handleEmailSeller}
+                  className="w-full bg-gray-600 text-white py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors flex items-center justify-center space-x-2"
                 >
-                  <Phone className="w-5 h-5" />
-                  <span>Contact Seller</span>
+                  <Mail className="w-5 h-5" />
+                  <span>Email Seller</span>
                 </button>
                 
                 <button
@@ -422,7 +441,7 @@ export const DetailedListingPage = ({ listingId, setCurrentPage, onBack }) => {
                   className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
                 >
                   <Share2 className="w-5 h-5" />
-                  <span>Share</span>
+                  <span>Share Listing</span>
                 </button>
               </div>
             </div>
