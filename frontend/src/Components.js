@@ -3828,6 +3828,26 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
     }
   };
 
+  // Helper function for time formatting
+  const getTimeAgo = (dateString) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInMs = now - date;
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+
+    if (diffInDays > 0) {
+      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    } else if (diffInHours > 0) {
+      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    } else if (diffInMinutes > 0) {
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+    } else {
+      return 'Just now';
+    }
+  };
+
   // Helper functions for multi-select filters
   const toggleMultiSelectFilter = (filterType, value) => {
     setActiveFilters(prev => {
