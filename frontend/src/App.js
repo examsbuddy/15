@@ -118,6 +118,9 @@ function App() {
       <div className="block md:hidden">
         <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
+
+      {/* Post Ad Modal */}
+      <PostAdModal isOpen={isPostAdOpen} setIsOpen={setIsPostAdOpen} />
     </div>
   );
 }
