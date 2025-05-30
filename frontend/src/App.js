@@ -131,17 +131,17 @@ function App() {
   return (
     <div className="App min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Desktop Header - hidden on mobile/tablet */}
-      <div className="hidden lg:block">
+      <div className="hidden md:block">
         <DesktopHeader activeTab={activeTab} setActiveTab={setActiveTab} setIsPostAdOpen={setIsPostAdOpen} />
       </div>
       
       {/* Mobile Header - visible on mobile/tablet */}
-      <div className="block lg:hidden">
+      <div className="block md:hidden">
         <MobileHeader />
       </div>
       
       {/* Main Content */}
-      <main className="min-h-screen pb-20 lg:pb-0">
+      <main className="min-h-screen pb-20 md:pb-0">
         {renderContent()}
       </main>
       
@@ -149,7 +149,7 @@ function App() {
       <Footer />
       
       {/* Bottom Navigation - Mobile/Tablet Only */}
-      <div className="block lg:hidden">
+      <div className="block md:hidden">
         <BottomNavigation 
           activeTab={activeTab} 
           setActiveTab={setActiveTab} 
