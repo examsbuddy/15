@@ -152,7 +152,370 @@ export const SignInModal = ({ isOpen, onClose, onLogin, onSwitchToSignUp }) => {
   );
 };
 
-// Enhanced Sign Up Modal with Normal User and Shop Owner options
+// Detailed Listing Page Component
+export const DetailedListingPage = ({ listingId, setCurrentPage, onBack }) => {
+  const [listing, setListing] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+
+  useEffect(() => {
+    fetchListingDetails();
+  }, [listingId]);
+
+  const fetchListingDetails = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/listings/${listingId}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setListing(data);
+      } else {
+        setError(data.detail || 'Failed to load listing details');
+      }
+    } catch (error) {
+      console.error('Error fetching listing details:', error);
+      setError('Failed to load listing details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: `${listing.brand} ${listing.model}`,
+        text: `Check out this ${listing.brand} ${listing.model} for ₨${listing.price.toLocaleString()}`,
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <span className="ml-3 text-lg text-gray-600">Loading listing details...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+            <X className="w-16 h-16 text-red-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Listing</h3>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button
+              onClick={onBack}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!listing) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+            <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Listing Not Found</h3>
+            <p className="text-gray-600 mb-4">The listing you're looking for doesn't exist or has been removed.</p>
+            <button
+              onClick={onBack}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-6">
+          <button
+            onClick={onBack}
+            className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors mb-4"
+          >
+            <ArrowRight className="w-5 h-5 rotate-180" />
+            <span>Back to Search</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Photos Section */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              {/* Main Photo */}
+              <div className="relative aspect-square bg-gray-100">
+                {listing.photos && listing.photos.length > 0 ? (
+                  <>
+                    <img 
+                      src={listing.photos[currentPhotoIndex]} 
+                      alt={`${listing.brand} ${listing.model}`}
+                      className="w-full h-full object-cover"
+                    />
+                    {listing.photos.length > 1 && (
+                      <>
+                        <button
+                          onClick={() => setCurrentPhotoIndex(prev => prev > 0 ? prev - 1 : listing.photos.length - 1)}
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-opacity"
+                        >
+                          <ArrowRight className="w-5 h-5 rotate-180" />
+                        </button>
+                        <button
+                          onClick={() => setCurrentPhotoIndex(prev => prev < listing.photos.length - 1 ? prev + 1 : 0)}
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-opacity"
+                        >
+                          <ArrowRight className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <Smartphone className="w-16 h-16 text-gray-400" />
+                  </div>
+                )}
+              </div>
+
+              {/* Photo Thumbnails */}
+              {listing.photos && listing.photos.length > 1 && (
+                <div className="p-4">
+                  <div className="grid grid-cols-6 gap-2">
+                    {listing.photos.map((photo, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentPhotoIndex(index)}
+                        className={`aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
+                          currentPhotoIndex === index ? 'border-blue-500' : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <img 
+                          src={photo} 
+                          alt={`Thumbnail ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Description */}
+            <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Description</h3>
+              <p className="text-gray-700 leading-relaxed">{listing.description}</p>
+            </div>
+
+            {/* Features */}
+            {listing.features && listing.features.length > 0 && (
+              <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Features</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {listing.features.map((feature, index) => (
+                    <div key={index} className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg">
+                      <CheckCircle className="w-4 h-4 text-blue-600" />
+                      <span className="text-blue-800 text-sm font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Details Sidebar */}
+          <div className="space-y-6">
+            {/* Price & Basic Info */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="text-center mb-6">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                  {listing.brand} {listing.model}
+                </h1>
+                <div className="text-3xl font-bold text-blue-600 mb-2">
+                  ₨{listing.price.toLocaleString()}
+                </div>
+                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                  listing.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
+                  listing.condition === 'Very Good' ? 'bg-blue-100 text-blue-800' :
+                  listing.condition === 'Good' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {listing.condition}
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                <button
+                  onClick={handleShare}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                >
+                  <Phone className="w-5 h-5" />
+                  <span>Contact Seller</span>
+                </button>
+                
+                <button
+                  onClick={handleShare}
+                  className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
+                >
+                  <Share2 className="w-5 h-5" />
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Specifications */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600">Storage</span>
+                  <span className="font-medium">{listing.storage}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600">RAM</span>
+                  <span className="font-medium">{listing.ram}</span>
+                </div>
+                {listing.battery && (
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Battery</span>
+                    <span className="font-medium">{listing.battery}</span>
+                  </div>
+                )}
+                {listing.screen_size && (
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Screen Size</span>
+                    <span className="font-medium">{listing.screen_size}</span>
+                  </div>
+                )}
+                {listing.camera && (
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Camera</span>
+                    <span className="font-medium">{listing.camera}</span>
+                  </div>
+                )}
+                {listing.processor && (
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Processor</span>
+                    <span className="font-medium">{listing.processor}</span>
+                  </div>
+                )}
+                {listing.operating_system && (
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">OS</span>
+                    <span className="font-medium">{listing.operating_system}</span>
+                  </div>
+                )}
+                {listing.network && (
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Network</span>
+                    <span className="font-medium">{listing.network}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Seller Info */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Seller Information</h3>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <User className="w-5 h-5 text-gray-400" />
+                  <span className="font-medium">{listing.seller_name}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <MapPin className="w-5 h-5 text-gray-400" />
+                  <span className="text-gray-600">{listing.city}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Phone className="w-5 h-5 text-gray-400" />
+                  <span className="text-gray-600">{listing.seller_phone}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Mail className="w-5 h-5 text-gray-400" />
+                  <span className="text-gray-600">{listing.seller_email}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Info */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h3>
+              <div className="space-y-3">
+                {listing.purchase_year && (
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Purchase Year</span>
+                    <span className="font-medium">{listing.purchase_year}</span>
+                  </div>
+                )}
+                {listing.warranty_months && (
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Warranty</span>
+                    <span className="font-medium">{listing.warranty_months} months</span>
+                  </div>
+                )}
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600">Box Included</span>
+                  <span className="font-medium">{listing.box_included ? 'Yes' : 'No'}</span>
+                </div>
+                {listing.accessories_included && listing.accessories_included.length > 0 && (
+                  <div className="py-2">
+                    <span className="text-gray-600 block mb-2">Accessories Included:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {listing.accessories_included.map((accessory, index) => (
+                        <span key={index} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">
+                          {accessory}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600">Views</span>
+                  <span className="font-medium">{listing.views}</span>
+                </div>
+                <div className="flex justify-between py-2">
+                  <span className="text-gray-600">Listed On</span>
+                  <span className="font-medium">{formatDate(listing.created_at)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpType, onSwitchToSignIn }) => {
   const [normalUserData, setNormalUserData] = useState({
     name: '',
