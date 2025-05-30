@@ -737,7 +737,7 @@ export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
             >
               PhoneFlip<span className="text-green-400">.PK</span>
             </button>
-            <nav className="hidden lg:flex space-x-6">
+            <nav className="hidden sm:flex space-x-6">
               {menuItems.map((item) => (
                 <div key={item.id} className="relative">
                   <button
