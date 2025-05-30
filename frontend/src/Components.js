@@ -3108,11 +3108,11 @@ export const SearchResultsPage = ({ searchFilters, onBack }) => {
 
   useEffect(() => {
     fetchListings();
-  }, []);
+  }, [activeFilters]); // Refetch when filters change
 
   useEffect(() => {
     applyFilters();
-  }, [listings, activeFilters, sortBy]);
+  }, [listings, sortBy]); // Apply sorting when listings or sortBy changes
 
   const fetchListings = async () => {
     try {
