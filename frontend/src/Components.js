@@ -3122,11 +3122,47 @@ export const SearchResultsPage = ({ searchFilters, onBack }) => {
       const isAccessories = searchFilters?.category === 'accessories';
       const endpoint = isAccessories ? '/api/accessories' : '/api/listings';
       
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}${endpoint}`);
+      // Build query parameters for advanced filtering
+      const params = new URLSearchParams();
+      
+      if (activeFilters.brand) params.append('brand', activeFilters.brand);
+      if (activeFilters.model) params.append('model', activeFilters.model);
+      if (activeFilters.city) params.append('city', activeFilters.city);
+      if (activeFilters.condition) params.append('condition', activeFilters.condition);
+      if (activeFilters.storage) params.append('storage', activeFilters.storage);
+      if (activeFilters.ram) params.append('ram', activeFilters.ram);
+      if (activeFilters.battery) params.append('battery', activeFilters.battery);
+      if (activeFilters.network) params.append('network', activeFilters.network);
+      if (activeFilters.search) params.append('search', activeFilters.search);
+      
+      // Handle price range
+      if (activeFilters.priceRange) {
+        const priceMapping = {
+          'Under ₨50,000': { max_price: 50000 },
+          '₨50,000 - ₨100,000': { min_price: 50000, max_price: 100000 },
+          '₨100,000 - ₨200,000': { min_price: 100000, max_price: 200000 },
+          '₨200,000 - ₨300,000': { min_price: 200000, max_price: 300000 },
+          '₨300,000 - ₨500,000': { min_price: 300000, max_price: 500000 },
+          'Above ₨500,000': { min_price: 500000 }
+        };
+        
+        const priceFilter = priceMapping[activeFilters.priceRange];
+        if (priceFilter) {
+          if (priceFilter.min_price) params.append('min_price', priceFilter.min_price);
+          if (priceFilter.max_price) params.append('max_price', priceFilter.max_price);
+        }
+      }
+      
+      const queryString = params.toString();
+      const url = `${process.env.REACT_APP_BACKEND_URL}${endpoint}${queryString ? `?${queryString}` : ''}`;
+      
+      const response = await fetch(url);
       const data = await response.json();
       
       if (response.ok) {
         setListings(data);
+        setFilteredListings(data); // Set filtered listings directly from backend
+        
         // Apply initial search filters if any
         if (searchFilters) {
           setActiveFilters({
