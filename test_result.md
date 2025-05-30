@@ -237,17 +237,53 @@ backend:
         agent: "testing"
         comment: "Populating sample data works correctly. The API returns a 200 status code and a success message. 10 sample phone listings are created in the database."
 
-  - task: "Platform Statistics (GET /api/stats)"
+  - task: "Enhanced Error Handling Testing"
     implemented: true
     working: true
     file: "/app/backend/server.py"
     stuck_count: 0
-    priority: "low"
+    priority: "high"
     needs_retesting: false
     status_history:
       - working: true
         agent: "testing"
-        comment: "Retrieving platform statistics works correctly. The API returns a 200 status code and statistics including total listings, brand counts, and city counts."
+        comment: "Tested duplicate email registration (returns 400 as expected), invalid JWT tokens (returns 401 as expected), and shop owner registration with duplicate email (returns 400 as expected). All error handling is working correctly."
+
+  - task: "Enhanced Sample Data Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Tested sample data population (POST /api/sample-data) which successfully creates 12 phone listings and 5 accessories. Verified accessories endpoints (GET /api/accessories, GET /api/accessories/featured) are working correctly."
+
+  - task: "Complete User Flow Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Tested normal user registration flow, shop owner registration flow, creating a phone listing, and search/filtering for both phones and accessories. All user flows are working correctly."
+
+  - task: "Functionality Verification"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Most API endpoints return proper status codes, but there are two issues: 1) No token access returns 403 instead of 401, 2) Stats endpoint doesn't include accessories_count field and is missing other expected fields (total_users, cities_count, brands_count)."
 
 frontend:
   - task: "Deep Blue Header Design"
