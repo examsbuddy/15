@@ -26,6 +26,7 @@ function App() {
   const [showPriceAlertsModal, setShowPriceAlertsModal] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [compareList, setCompareList] = useState([]);
+  const [searchFilters, setSearchFilters] = useState(null);
 
   useEffect(() => {
     // Check if user is logged in on component mount
@@ -49,6 +50,16 @@ function App() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setCurrentPage('home');
+  };
+
+  const handleSearch = (filters) => {
+    setSearchFilters(filters);
+    setCurrentPage('search-results');
+  };
+
+  const handleBackToHome = () => {
+    setCurrentPage('home');
+    setSearchFilters(null);
   };
 
   const addToCompare = (phone) => {
