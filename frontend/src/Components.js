@@ -4,6 +4,21 @@
   );
 };
 
+// Mobile Header Component - Simplified to only show logo
+export const MobileHeader = () => {
+  return (
+    <header className="block md:hidden bg-blue-900 text-white sticky top-0 z-50 safe-area-top">
+      <div className="px-4 py-4">
+        <div className="flex items-center justify-center">
+          <div className="text-xl font-bold">
+            PhoneFlip<span className="text-green-400">.PK</span>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
 // Reviews Page Component
 export const ReviewsPage = () => {
   const phoneReviews = [
