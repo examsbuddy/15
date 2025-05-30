@@ -426,10 +426,15 @@ test_plan:
     - "User Registration (POST /api/auth/register)"
     - "Authentication Verification (Protected Endpoints)"
     - "Shop Owner Registration (POST /api/auth/register-shop-owner)"
+    - "Enhanced Error Handling Testing"
+    - "Enhanced Sample Data Testing"
+    - "Complete User Flow Testing"
+    - "Functionality Verification"
   stuck_tasks: 
     - "User Registration (POST /api/auth/register)"
     - "Authentication Verification (Protected Endpoints)"
     - "Shop Owner Registration (POST /api/auth/register-shop-owner)"
+    - "Functionality Verification"
   test_all: false
   test_priority: "high_first"
 
