@@ -386,7 +386,7 @@ export const PostAdModal = ({ isOpen, setIsOpen }) => {
 // Mobile Header Component - Simplified to only show logo
 export const MobileHeader = () => {
   return (
-    <header className="block lg:hidden bg-blue-900 text-white sticky top-0 z-50 safe-area-top">
+    <header className="block md:hidden bg-blue-900 text-white sticky top-0 z-50 safe-area-top">
       <div className="px-4 py-4">
         <div className="flex items-center justify-center">
           <div className="text-xl font-bold">
