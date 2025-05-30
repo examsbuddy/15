@@ -135,12 +135,12 @@ class PhoneFlipAPITester:
             200
         )
 
-    def test_get_featured_listings(self):
-        """Test getting featured listings"""
+    def test_get_stats(self):
+        """Test getting platform statistics"""
         return self.run_test(
-            "Get Featured Listings",
+            "Get Platform Stats",
             "GET",
-            "api/listings/featured",
+            "api/stats",
             200
         )
 
