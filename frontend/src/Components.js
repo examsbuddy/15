@@ -415,7 +415,7 @@ export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
 
   return (
     <>
-      <header className="hidden md:block bg-blue-900 text-white sticky top-0 z-50">
+      <header className="hidden lg:block bg-blue-900 text-white sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between py-4">
             <div 
