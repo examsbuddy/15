@@ -24,7 +24,7 @@ import {
   Play,
   Eye,
   Heart,
-  BarChart3,
+  BarChart,
   Users,
   Award,
   Zap,
@@ -35,9 +35,9 @@ import {
   Twitter,
   Youtube,
   ChevronDown,
-  SlidersHorizontal,
+  Sliders,
   Bell,
-  Compare,
+  GitCompare,
   ShoppingBag
 } from 'react-feather';
 
