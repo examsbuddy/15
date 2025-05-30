@@ -249,6 +249,9 @@ async def register_normal_user(user_data: UserRegistration):
         user = User(**serialize_doc(user_doc))
         
         return LoginResponse(access_token=access_token, user=user)
+    except HTTPException:
+        # Re-raise HTTP exceptions (like 400 for duplicate email)
+        raise
     except Exception as e:
         logger.error(f"Error registering user: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to register user")
