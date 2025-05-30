@@ -240,118 +240,118 @@ class PhoneFlipAPITester:
             params={"brand": "Apple", "min_price": 50000, "max_price": 150000}
         )
 
-def test_invalid_login(self):
-    """Test login with invalid credentials"""
-    # Test with invalid email
-    test_data_invalid_email = {
-        "email": "nonexistent@example.com",
-        "password": self.test_user_password
-    }
-    
-    success_invalid_email, _ = self.run_test(
-        "Login with Invalid Email",
-        "POST",
-        "api/auth/login",
-        401,
-        data=test_data_invalid_email
-    )
-    
-    # Test with invalid password
-    test_data_invalid_password = {
-        "email": self.test_user_email,
-        "password": "WrongPassword123!"
-    }
-    
-    success_invalid_password, _ = self.run_test(
-        "Login with Invalid Password",
-        "POST",
-        "api/auth/login",
-        401,
-        data=test_data_invalid_password
-    )
-    
-    return success_invalid_email and success_invalid_password
+    def test_invalid_login(self):
+        """Test login with invalid credentials"""
+        # Test with invalid email
+        test_data_invalid_email = {
+            "email": "nonexistent@example.com",
+            "password": self.test_user_password
+        }
+        
+        success_invalid_email, _ = self.run_test(
+            "Login with Invalid Email",
+            "POST",
+            "api/auth/login",
+            401,
+            data=test_data_invalid_email
+        )
+        
+        # Test with invalid password
+        test_data_invalid_password = {
+            "email": self.test_user_email,
+            "password": "WrongPassword123!"
+        }
+        
+        success_invalid_password, _ = self.run_test(
+            "Login with Invalid Password",
+            "POST",
+            "api/auth/login",
+            401,
+            data=test_data_invalid_password
+        )
+        
+        return success_invalid_email and success_invalid_password
 
-def test_duplicate_registration(self):
-    """Test registering with an email that already exists"""
-    test_data = {
-        "name": "Duplicate User",
-        "email": self.test_user_email,  # Use the same email as the already registered user
-        "password": self.test_user_password,
-        "phone": "03001234567",
-        "role": "normal_user"
-    }
-    
-    return self.run_test(
-        "Register with Duplicate Email",
-        "POST",
-        "api/auth/register",
-        400,  # Expect 400 Bad Request
-        data=test_data
-    )
+    def test_duplicate_registration(self):
+        """Test registering with an email that already exists"""
+        test_data = {
+            "name": "Duplicate User",
+            "email": self.test_user_email,  # Use the same email as the already registered user
+            "password": self.test_user_password,
+            "phone": "03001234567",
+            "role": "normal_user"
+        }
+        
+        return self.run_test(
+            "Register with Duplicate Email",
+            "POST",
+            "api/auth/register",
+            400,  # Expect 400 Bad Request
+            data=test_data
+        )
 
-def test_invalid_token_access(self):
-    """Test accessing protected endpoint with invalid token"""
-    # Create an invalid token
-    invalid_token = self.auth_token + "invalid" if self.auth_token else "invalid_token"
-    
-    # Save the current token
-    current_token = self.auth_token
-    
-    # Set the invalid token
-    self.auth_token = invalid_token
-    
-    # Try to access protected endpoint
-    success, _ = self.run_test(
-        "Access Protected Endpoint with Invalid Token",
-        "GET",
-        "api/auth/me",
-        401,  # Expect 401 Unauthorized
-        auth=True
-    )
-    
-    # Restore the original token
-    self.auth_token = current_token
-    
-    return success
+    def test_invalid_token_access(self):
+        """Test accessing protected endpoint with invalid token"""
+        # Create an invalid token
+        invalid_token = self.auth_token + "invalid" if self.auth_token else "invalid_token"
+        
+        # Save the current token
+        current_token = self.auth_token
+        
+        # Set the invalid token
+        self.auth_token = invalid_token
+        
+        # Try to access protected endpoint
+        success, _ = self.run_test(
+            "Access Protected Endpoint with Invalid Token",
+            "GET",
+            "api/auth/me",
+            401,  # Expect 401 Unauthorized
+            auth=True
+        )
+        
+        # Restore the original token
+        self.auth_token = current_token
+        
+        return success
 
-def test_no_token_access(self):
-    """Test accessing protected endpoint without token"""
-    # Save the current token
-    current_token = self.auth_token
-    
-    # Set token to None
-    self.auth_token = None
-    
-    # Try to access protected endpoint
-    success, _ = self.run_test(
-        "Access Protected Endpoint without Token",
-        "GET",
-        "api/auth/me",
-        401,  # Expect 401 Unauthorized
-        auth=False
-    )
-    
-    # Restore the original token
-    self.auth_token = current_token
-    
-    return success
+    def test_no_token_access(self):
+        """Test accessing protected endpoint without token"""
+        # Save the current token
+        current_token = self.auth_token
+        
+        # Set token to None
+        self.auth_token = None
+        
+        # Try to access protected endpoint
+        success, _ = self.run_test(
+            "Access Protected Endpoint without Token",
+            "GET",
+            "api/auth/me",
+            401,  # Expect 401 Unauthorized
+            auth=False
+        )
+        
+        # Restore the original token
+        self.auth_token = current_token
+        
+        return success
 
-def test_missing_fields_registration(self):
-    """Test registration with missing required fields"""
-    # Missing password and phone
-    test_data_incomplete = {
-        "name": "Incomplete User",
-        "email": f"incomplete_{uuid.uuid4().hex[:8]}@example.com"
-    }
-    
-    return self.run_test(
-        "Register with Missing Fields",
-        "POST",
-        "api/auth/register",
-        422,  # Expect 422 Unprocessable Entity (FastAPI validation error)
-        data=test_data_incomplete
-    )
+    def test_missing_fields_registration(self):
+        """Test registration with missing required fields"""
+        # Missing password and phone
+        test_data_incomplete = {
+            "name": "Incomplete User",
+            "email": f"incomplete_{uuid.uuid4().hex[:8]}@example.com"
+        }
+        
+        return self.run_test(
+            "Register with Missing Fields",
+            "POST",
+            "api/auth/register",
+            422,  # Expect 422 Unprocessable Entity (FastAPI validation error)
+            data=test_data_incomplete
+        )
 
 def main():
     # Get backend URL from environment or use default
