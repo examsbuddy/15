@@ -183,34 +183,7 @@ export const DetailedListingPage = ({ listingId, setCurrentPage, onBack }) => {
     }
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: `${listing.brand} ${listing.model}`,
-        text: `Check out this ${listing.brand} ${listing.model} for ₨${listing.price.toLocaleString()}`,
-        url: window.location.href
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
-    }
-  };
 
-  const handleContactSeller = () => {
-    const message = `Hi! I'm interested in your ${listing.brand} ${listing.model} listed for ₨${listing.price.toLocaleString()}. Is it still available?`;
-    const whatsappUrl = `https://wa.me/${listing.seller_phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-  };
-
-  const handleCallSeller = () => {
-    window.location.href = `tel:${listing.seller_phone}`;
-  };
-
-  const handleEmailSeller = () => {
-    const subject = `Inquiry about ${listing.brand} ${listing.model}`;
-    const body = `Hi ${listing.seller_name},\n\nI'm interested in your ${listing.brand} ${listing.model} listed for ₨${listing.price.toLocaleString()}. Could you please provide more details?\n\nThanks!`;
-    window.location.href = `mailto:${listing.seller_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
 
   const handleContactSeller = () => {
     const message = `Hi! I'm interested in your ${listing.brand} ${listing.model} listed for ₨${listing.price.toLocaleString()}. Is it still available?`;
