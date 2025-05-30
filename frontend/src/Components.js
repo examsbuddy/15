@@ -1422,9 +1422,14 @@ export const MobileHeader = () => {
 };
 
 // Desktop Header Component
-export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen, isLoggedIn, setIsLoginOpen }) => {
+  const handlePostAd = () => {
+    if (!isLoggedIn) {
+      setIsLoginOpen(true);
+    } else {
+      setIsPostAdOpen(true);
+    }
+  };
 
   const navItems = [
     { id: 'used-phones', label: 'Used Phones' },
