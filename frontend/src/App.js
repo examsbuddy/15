@@ -175,6 +175,16 @@ function App() {
           <SearchResultsPage 
             searchFilters={searchFilters}
             onBack={handleBackToHome}
+            onViewListing={handleViewListing}
+          />
+        )}
+        
+        {/* Detailed Listing Page */}
+        {currentPage === 'listing-details' && currentListingId && (
+          <DetailedListingPage 
+            listingId={currentListingId}
+            setCurrentPage={setCurrentPage}
+            onBack={() => setCurrentPage('search-results')}
           />
         )}
         
