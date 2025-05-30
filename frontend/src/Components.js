@@ -877,28 +877,87 @@ export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
 };
 
 // Mobile Header Component
-export const MobileHeader = ({ isMenuOpen, setIsMenuOpen }) => {
+export const MobileHeader = ({ isMenuOpen, setIsMenuOpen, setIsPostAdOpen }) => {
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handlePostAd = () => {
+    if (!isLoggedIn) {
+      setIsLoginOpen(true);
+    } else {
+      setIsPostAdOpen(true);
+    }
+  };
+
   return (
-    <header className="block md:hidden bg-blue-900 text-white sticky top-0 z-50 safe-area-top">
-      <div className="px-4 py-4">
-        <div className="flex items-center justify-between">
-          <button 
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-white p-2 -ml-2"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-          
-          <div className="text-lg font-bold text-white">
-            PhoneFlip<span className="text-green-400">.PK</span>
+    <>
+      <header className="block md:hidden bg-blue-900 text-white sticky top-0 z-50 safe-area-top">
+        <div className="px-4 py-4">
+          <div className="flex items-center justify-between">
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-white p-2 -ml-2 touch-target"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            
+            <button
+              onClick={() => setActiveTab && setActiveTab('home')}
+              className="text-lg font-bold text-white"
+            >
+              PhoneFlip<span className="text-green-400">.PK</span>
+            </button>
+            
+            <div className="flex items-center space-x-2">
+              {/* Notification Bell */}
+              <div className="relative">
+                <button 
+                  onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                  className="text-white p-2 -mr-1 relative touch-target"
+                >
+                  <Bell className="w-6 h-6" />
+                  {notifications.filter(n => n.unread).length > 0 && (
+                    <span className="absolute -top-0 -right-0 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                      {notifications.filter(n => n.unread).length}
+                    </span>
+                  )}
+                </button>
+                <NotificationPanel 
+                  isOpen={isNotificationOpen} 
+                  setIsOpen={setIsNotificationOpen} 
+                />
+              </div>
+
+              {/* User Profile or Login */}
+              {isLoggedIn ? (
+                <button className="text-white p-2 touch-target">
+                  <User className="w-6 h-6" />
+                </button>
+              ) : (
+                <button 
+                  onClick={() => setIsLoginOpen(true)}
+                  className="text-white text-sm font-medium px-3 py-1 border border-white/30 rounded-full"
+                >
+                  Login
+                </button>
+              )}
+            </div>
           </div>
-          
-          <button className="text-white p-2 -mr-2">
-            <Bell className="w-6 h-6" />
-          </button>
         </div>
-      </div>
-    </header>
+
+        {/* Mobile Post Ad Button - Floating */}
+        <button
+          onClick={handlePostAd}
+          className="fixed bottom-20 right-4 bg-red-600 hover:bg-red-700 text-white p-4 rounded-full shadow-lg z-40 md:hidden"
+        >
+          <Plus className="w-6 h-6" />
+        </button>
+      </header>
+
+      {/* Login Modal */}
+      <LoginModal isOpen={isLoginOpen} setIsOpen={setIsLoginOpen} setIsLoggedIn={setIsLoggedIn} />
+    </>
   );
 };
 
