@@ -280,22 +280,22 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="md:hidden"
+          className="block md:hidden mx-4"
         >
-          <div className="bg-white rounded-lg p-4 mx-4 shadow-xl">
+          <div className="bg-white rounded-xl p-4 shadow-xl">
             <div className="space-y-3">
               <input
                 type="text"
                 placeholder="Search phones..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
               />
               <div className="grid grid-cols-2 gap-3">
                 <select
                   value={selectedCity}
                   onChange={(e) => setSelectedCity(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm"
+                  className="px-3 py-3 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">City</option>
                   {cities.slice(0, 4).map(city => (
@@ -305,7 +305,7 @@ export const HeroSection = () => {
                 <select
                   value={selectedPriceRange}
                   onChange={(e) => setSelectedPriceRange(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-gray-900 text-sm"
+                  className="px-3 py-3 border border-gray-300 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Price</option>
                   {priceRanges.slice(0, 3).map(range => (
@@ -313,7 +313,7 @@ export const HeroSection = () => {
                   ))}
                 </select>
               </div>
-              <button className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center">
+              <button className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-medium flex items-center justify-center text-lg">
                 <Search className="w-5 h-5 mr-2" />
                 Search
               </button>
