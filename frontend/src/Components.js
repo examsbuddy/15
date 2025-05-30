@@ -914,7 +914,73 @@ export const QuickCategories = () => {
 
 // Featured Phones Component
 export const FeaturedPhones = () => {
-  const featuredPhones = [
+  const [featuredPhones, setFeaturedPhones] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFeaturedPhones();
+  }, []);
+
+  const fetchFeaturedPhones = async () => {
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      const response = await fetch(`${backendUrl}/api/listings/featured?limit=4`);
+      if (response.ok) {
+        const listings = await response.json();
+        // Transform backend data to component format
+        const transformedPhones = listings.map(listing => ({
+          id: listing.id,
+          title: `${listing.brand} ${listing.model}`,
+          price: `PKR ${listing.price.toLocaleString()}`,
+          condition: listing.condition,
+          location: listing.city,
+          image: getPhoneImage(listing.brand),
+          specs: `${listing.storage || 'N/A'}, ${listing.ram || 'N/A'}`,
+          timeAgo: getTimeAgo(listing.created_at)
+        }));
+        setFeaturedPhones(transformedPhones);
+      } else {
+        console.error('Failed to fetch featured phones');
+        // Fallback to static data if API fails
+        setFeaturedPhones(getStaticPhones());
+      }
+    } catch (error) {
+      console.error('Error fetching featured phones:', error);
+      // Fallback to static data if API fails
+      setFeaturedPhones(getStaticPhones());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getPhoneImage = (brand) => {
+    const imageMap = {
+      'iPhone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300',
+      'Samsung': 'https://images.unsplash.com/photo-1584651432430-7e1ac8303a0a?w=300',
+      'Xiaomi': 'https://images.unsplash.com/photo-1575719362347-a70b129740e0?w=300',
+      'OnePlus': 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300',
+      'Oppo': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300',
+      'Vivo': 'https://images.unsplash.com/photo-1584651432430-7e1ac8303a0a?w=300',
+      'Huawei': 'https://images.unsplash.com/photo-1575719362347-a70b129740e0?w=300',
+      'Google': 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300'
+    };
+    return imageMap[brand] || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300';
+  };
+
+  const getTimeAgo = (dateString) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInMs = now - date;
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInHours / 24);
+
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    if (diffInDays === 1) return '1 day ago';
+    return `${diffInDays} days ago`;
+  };
+
+  const getStaticPhones = () => [
     {
       id: 1,
       title: 'iPhone 15 Pro Max',
@@ -956,6 +1022,30 @@ export const FeaturedPhones = () => {
       timeAgo: '2 days ago'
     }
   ];
+
+  if (loading) {
+    return (
+      <div className="py-12 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">Featured Phones</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1,2,3,4].map((i) => (
+              <div key={i} className="bg-white rounded-lg shadow-md animate-pulse">
+                <div className="h-48 bg-gray-300 rounded-t-lg"></div>
+                <div className="p-4 space-y-2">
+                  <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-12 bg-gray-50">
@@ -1009,6 +1099,13 @@ export const FeaturedPhones = () => {
             </motion.div>
           ))}
         </div>
+        
+        {featuredPhones.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No featured phones available at the moment.</p>
+            <p className="text-gray-400 text-sm mt-2">Be the first to post a listing!</p>
+          </div>
+        )}
       </div>
     </div>
   );
