@@ -491,6 +491,14 @@ class PhoneFlipAPITester:
             }
         }
         
+        return self.run_test(
+            "Register Shop Owner with Duplicate Email",
+            "POST",
+            "api/auth/register-shop-owner",
+            400,  # Expect 400 Bad Request
+            data=test_data
+        )
+        
     def test_shop_owner_verification(self):
         """Test shop owner verification status management (requires admin access)"""
         print("ℹ️ Shop owner verification requires admin access - Skipping actual verification")
