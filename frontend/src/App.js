@@ -13,7 +13,10 @@ import {
   ReviewsPage,
   VideosPage,
   ForumsPage,
-  BlogPage
+  BlogPage,
+  ProfileDashboard,
+  MyAdsPage,
+  LoginModal
 } from './Components';
 
 function App() {
