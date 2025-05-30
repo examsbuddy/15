@@ -551,6 +551,7 @@ def main():
     
     print("\n--- 1.4 Shop Owner Registration Test ---")
     tester.test_register_shop_owner()
+    tester.test_duplicate_shop_owner_registration()
     
     # Run phone listings tests
     print("\n=== 2. Phone Listings Testing ===")
@@ -569,20 +570,31 @@ def main():
     print("\n--- 2.5 Get Featured Listings Test ---")
     tester.test_get_featured_listings()
     
+    # Run accessories tests
+    print("\n=== 3. Accessories Testing ===")
+    print("\n--- 3.1 Get Accessories Test ---")
+    tester.test_get_accessories()
+    
+    print("\n--- 3.2 Get Filtered Accessories Test ---")
+    tester.test_filtered_accessories()
+    
+    print("\n--- 3.3 Get Featured Accessories Test ---")
+    tester.test_get_featured_accessories()
+    
     # Run shop owner features tests
-    print("\n=== 3. Shop Owner Features Testing ===")
-    print("\n--- 3.1 Shop Owner Verification Status Test ---")
+    print("\n=== 4. Shop Owner Features Testing ===")
+    print("\n--- 4.1 Shop Owner Verification Status Test ---")
     tester.test_shop_owner_verification()
     
     # Run sample data verification tests
-    print("\n=== 4. Sample Data Verification ===")
-    print("\n--- 4.1 Populate Sample Data Test ---")
+    print("\n=== 5. Sample Data Verification ===")
+    print("\n--- 5.1 Populate Sample Data Test ---")
     tester.test_populate_sample_data()
     
-    print("\n--- 4.2 Verify Sample Data Test ---")
+    print("\n--- 5.2 Verify Sample Data Test ---")
     tester.test_verify_sample_data()
     
-    print("\n--- 4.3 Platform Statistics Test ---")
+    print("\n--- 5.3 Platform Statistics Test ---")
     tester.test_get_stats()
     
     # Print results
