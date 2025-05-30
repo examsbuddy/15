@@ -120,6 +120,36 @@ async def create_listing(listing: PhoneListingCreate):
         logger.error(f"Error creating listing: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create listing")
 
+@api_router.get("/listings/featured", response_model=List[PhoneListing])
+async def get_featured_listings(limit: int = 4):
+    """Get featured phone listings"""
+    try:
+        # Get featured listings first, then recent ones if not enough featured
+        featured_cursor = db.phone_listings.find({
+            "is_active": True, 
+            "is_featured": True
+        }).sort("created_at", -1).limit(limit)
+        featured_listings = await featured_cursor.to_list(length=limit)
+        
+        # If we don't have enough featured listings, get recent ones
+        if len(featured_listings) < limit:
+            remaining = limit - len(featured_listings)
+            recent_cursor = db.phone_listings.find({
+                "is_active": True,
+                "is_featured": False
+            }).sort("created_at", -1).limit(remaining)
+            recent_listings = await recent_cursor.to_list(length=remaining)
+            featured_listings.extend(recent_listings)
+        
+        # Serialize ObjectIds
+        for listing in featured_listings:
+            listing = serialize_doc(listing)
+        
+        return [PhoneListing(**listing) for listing in featured_listings]
+    except Exception as e:
+        logger.error(f"Error fetching featured listings: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch featured listings")
+
 @api_router.get("/listings", response_model=List[PhoneListing])
 async def get_listings(skip: int = 0, limit: int = 50, city: Optional[str] = None, brand: Optional[str] = None, min_price: Optional[int] = None, max_price: Optional[int] = None):
     """Get phone listings with optional filters"""
@@ -179,36 +209,6 @@ async def get_listing(listing_id: str):
     except Exception as e:
         logger.error(f"Error fetching listing {listing_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch listing")
-
-@api_router.get("/listings/featured", response_model=List[PhoneListing])
-async def get_featured_listings(limit: int = 4):
-    """Get featured phone listings"""
-    try:
-        # Get featured listings first, then recent ones if not enough featured
-        featured_cursor = db.phone_listings.find({
-            "is_active": True, 
-            "is_featured": True
-        }).sort("created_at", -1).limit(limit)
-        featured_listings = await featured_cursor.to_list(length=limit)
-        
-        # If we don't have enough featured listings, get recent ones
-        if len(featured_listings) < limit:
-            remaining = limit - len(featured_listings)
-            recent_cursor = db.phone_listings.find({
-                "is_active": True,
-                "is_featured": False
-            }).sort("created_at", -1).limit(remaining)
-            recent_listings = await recent_cursor.to_list(length=remaining)
-            featured_listings.extend(recent_listings)
-        
-        # Serialize ObjectIds
-        for listing in featured_listings:
-            listing = serialize_doc(listing)
-        
-        return [PhoneListing(**listing) for listing in featured_listings]
-    except Exception as e:
-        logger.error(f"Error fetching featured listings: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to fetch featured listings")
 
 @api_router.get("/stats")
 async def get_stats():
