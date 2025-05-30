@@ -579,7 +579,7 @@ export const BottomNavigation = ({ activeTab, setActiveTab, setIsPostAdOpen }) =
 
   return (
     <>
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-bottom">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-bottom">
         <div className="flex justify-around py-2">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -616,14 +616,14 @@ export const BottomNavigation = ({ activeTab, setActiveTab, setIsPostAdOpen }) =
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-40 md:hidden"
+              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
               onClick={() => setIsMoreOpen(false)}
             />
             <motion.div
               initial={{ y: 300 }}
               animate={{ y: 0 }}
               exit={{ y: 300 }}
-              className="fixed bottom-16 left-4 right-4 bg-white rounded-t-2xl z-50 md:hidden max-h-96 overflow-y-auto"
+              className="fixed bottom-16 left-4 right-4 bg-white rounded-t-2xl z-50 lg:hidden max-h-96 overflow-y-auto"
             >
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
