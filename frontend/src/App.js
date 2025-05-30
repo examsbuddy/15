@@ -46,7 +46,13 @@ function App() {
             <div className="max-w-7xl mx-auto px-4">
               <div className="text-center py-20">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Sell Your Phone</h2>
-                <p className="text-gray-600">Sell phone form coming soon...</p>
+                <p className="text-gray-600 mb-6">Post your ad and reach thousands of buyers</p>
+                <button
+                  onClick={() => setIsPostAdOpen(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium"
+                >
+                  Post an Ad
+                </button>
               </div>
             </div>
           </div>
