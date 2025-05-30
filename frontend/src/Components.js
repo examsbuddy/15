@@ -128,7 +128,7 @@ export const Header = ({
               onClick={onCompareClick}
               className="relative hidden md:flex items-center space-x-1 text-white hover:text-blue-300 transition-colors"
             >
-              <Compare className="w-5 h-5" />
+              <GitCompare className="w-5 h-5" />
               <span className="text-sm">Compare</span>
               {compareCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
