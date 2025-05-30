@@ -15,6 +15,8 @@ import {
   Footer,
   PriceDropAlertsModal,
   CompareModal,
+  SignInModal,
+  SignUpModal,
   PostAdPage,
   SearchResultsPage,
   ShopOwnerDashboard
