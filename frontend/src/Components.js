@@ -892,7 +892,7 @@ export const MobileHeader = ({ isMenuOpen, setIsMenuOpen, setIsPostAdOpen, setAc
 
   return (
     <>
-      <header className="block lg:hidden bg-blue-900 text-white sticky top-0 z-50 safe-area-top">
+      <header className="block sm:hidden bg-blue-900 text-white sticky top-0 z-50 safe-area-top">
         <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             <button 
