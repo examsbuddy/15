@@ -3261,12 +3261,15 @@ export const SearchResultsPage = ({ searchFilters, onBack }) => {
   const clearFilters = () => {
     setActiveFilters({
       brand: '',
+      model: '',
       city: '',
       condition: '',
       priceRange: '',
       storage: '',
       ram: '',
-      query: ''
+      battery: '',
+      network: '',
+      search: ''
     });
   };
 
