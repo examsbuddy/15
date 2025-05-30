@@ -42,8 +42,8 @@ import {
   FileText
 } from 'react-feather';
 
-// Authentication Modals
-export const LoginModal = ({ isOpen, onClose, onLogin, onSwitchToSignup }) => {
+// Enhanced Sign In Modal
+export const SignInModal = ({ isOpen, onClose, onLogin, onSwitchToSignUp }) => {
   const [loginData, setLoginData] = useState({
     email: '',
     password: ''
@@ -109,7 +109,7 @@ export const LoginModal = ({ isOpen, onClose, onLogin, onSwitchToSignup }) => {
               required
               value={loginData.email}
               onChange={(e) => setLoginData({...loginData, email: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Enter your email"
             />
           </div>
@@ -121,7 +121,7 @@ export const LoginModal = ({ isOpen, onClose, onLogin, onSwitchToSignup }) => {
               required
               value={loginData.password}
               onChange={(e) => setLoginData({...loginData, password: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Enter your password"
             />
           </div>
@@ -129,7 +129,7 @@ export const LoginModal = ({ isOpen, onClose, onLogin, onSwitchToSignup }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition-colors"
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition-colors"
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
@@ -139,8 +139,8 @@ export const LoginModal = ({ isOpen, onClose, onLogin, onSwitchToSignup }) => {
           <p className="text-gray-600">
             Don't have an account?{' '}
             <button 
-              onClick={onSwitchToSignup}
-              className="text-green-600 hover:text-green-700 font-medium"
+              onClick={onSwitchToSignUp}
+              className="text-blue-600 hover:text-blue-700 font-medium"
             >
               Sign up
             </button>
@@ -151,8 +151,9 @@ export const LoginModal = ({ isOpen, onClose, onLogin, onSwitchToSignup }) => {
   );
 };
 
-export const SignupModal = ({ isOpen, onClose, onSignup, onSwitchToLogin }) => {
-  const [signupData, setSignupData] = useState({
+// Enhanced Sign Up Modal with Normal User and Shop Owner options
+export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpType, onSwitchToSignIn }) => {
+  const [normalUserData, setNormalUserData] = useState({
     name: '',
     email: '',
     password: '',
@@ -160,17 +161,37 @@ export const SignupModal = ({ isOpen, onClose, onSignup, onSwitchToLogin }) => {
     phone: '',
     city: ''
   });
+
+  const [shopOwnerData, setShopOwnerData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: '',
+    city: '',
+    businessName: '',
+    businessAddress: '',
+    businessType: '',
+    yearsInBusiness: '',
+    cnicNumber: '',
+    businessLicense: null,
+    cnicFront: null,
+    cnicBack: null
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [currentStep, setCurrentStep] = useState(1);
 
   const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
+  const businessTypes = ['Mobile Phone Shop', 'Electronics Store', 'Repair Center', 'Distributor', 'Other'];
 
-  const handleSubmit = async (e) => {
+  const handleNormalUserSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    if (signupData.password !== signupData.confirmPassword) {
+    if (normalUserData.password !== normalUserData.confirmPassword) {
       setError('Passwords do not match');
       setIsLoading(false);
       return;
@@ -183,11 +204,11 @@ export const SignupModal = ({ isOpen, onClose, onSignup, onSwitchToLogin }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: signupData.name,
-          email: signupData.email,
-          password: signupData.password,
-          phone: signupData.phone,
-          city: signupData.city
+          name: normalUserData.name,
+          email: normalUserData.email,
+          password: normalUserData.password,
+          phone: normalUserData.phone,
+          city: normalUserData.city
         }),
       });
 
@@ -198,7 +219,7 @@ export const SignupModal = ({ isOpen, onClose, onSignup, onSwitchToLogin }) => {
         localStorage.setItem('user', JSON.stringify(data.user));
         onSignup(data.user);
         onClose();
-        setSignupData({ name: '', email: '', password: '', confirmPassword: '', phone: '', city: '' });
+        resetForms();
       } else {
         setError(data.detail || 'Registration failed');
       }
@@ -209,119 +230,467 @@ export const SignupModal = ({ isOpen, onClose, onSignup, onSwitchToLogin }) => {
     }
   };
 
+  const handleShopOwnerSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    if (shopOwnerData.password !== shopOwnerData.confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      Object.keys(shopOwnerData).forEach(key => {
+        if (key !== 'confirmPassword' && shopOwnerData[key] !== null) {
+          formData.append(key, shopOwnerData[key]);
+        }
+      });
+
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/register-shop-owner`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        onSignup(data.user);
+        onClose();
+        resetForms();
+      } else {
+        setError(data.detail || 'Registration failed');
+      }
+    } catch (error) {
+      setError('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetForms = () => {
+    setNormalUserData({
+      name: '', email: '', password: '', confirmPassword: '', phone: '', city: ''
+    });
+    setShopOwnerData({
+      name: '', email: '', password: '', confirmPassword: '', phone: '', city: '',
+      businessName: '', businessAddress: '', businessType: '', yearsInBusiness: '',
+      cnicNumber: '', businessLicense: null, cnicFront: null, cnicBack: null
+    });
+    setCurrentStep(1);
+    setError('');
+  };
+
+  const handleFileChange = (fieldName, file) => {
+    setShopOwnerData({ ...shopOwnerData, [fieldName]: file });
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-gray-900">Join PhoneFlip.PK</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            <X className="w-6 h-6" />
-          </button>
+      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-2xl">
+          <div className="flex items-center justify-between">
+            <h3 className="text-2xl font-bold text-gray-900">Join PhoneFlip.PK</h3>
+            <button onClick={() => { onClose(); resetForms(); }} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Sign Up Type Selector */}
+          <div className="flex mt-4 space-x-1 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => { setSignUpType('normal'); setCurrentStep(1); setError(''); }}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                signUpType === 'normal' 
+                  ? 'bg-white text-blue-600 shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <User className="w-4 h-4 inline mr-2" />
+              Normal User
+            </button>
+            <button
+              onClick={() => { setSignUpType('shop_owner'); setCurrentStep(1); setError(''); }}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                signUpType === 'shop_owner' 
+                  ? 'bg-white text-blue-600 shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <ShoppingBag className="w-4 h-4 inline mr-2" />
+              Shop Owner
+            </button>
+          </div>
         </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-            <p className="text-red-600 text-sm">{error}</p>
+        <div className="p-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
+          {signUpType === 'normal' ? (
+            /* Normal User Registration */
+            <form onSubmit={handleNormalUserSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={normalUserData.name}
+                    onChange={(e) => setNormalUserData({...normalUserData, name: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter your full name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    required
+                    value={normalUserData.email}
+                    onChange={(e) => setNormalUserData({...normalUserData, email: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter your email"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                  <input
+                    type="tel"
+                    required
+                    value={normalUserData.phone}
+                    onChange={(e) => setNormalUserData({...normalUserData, phone: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="03XX XXXXXXX"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                  <select
+                    required
+                    value={normalUserData.city}
+                    onChange={(e) => setNormalUserData({...normalUserData, city: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select your city</option>
+                    {cities.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                  <input
+                    type="password"
+                    required
+                    value={normalUserData.password}
+                    onChange={(e) => setNormalUserData({...normalUserData, password: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Create a password"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                  <input
+                    type="password"
+                    required
+                    value={normalUserData.confirmPassword}
+                    onChange={(e) => setNormalUserData({...normalUserData, confirmPassword: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Confirm your password"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition-colors"
+              >
+                {isLoading ? 'Creating account...' : 'Create Account'}
+              </button>
+            </form>
+          ) : (
+            /* Shop Owner Registration */
+            <div>
+              {/* Progress Bar */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
+                  <span>Step {currentStep} of 3</span>
+                  <span>{Math.round((currentStep / 3) * 100)}% Complete</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(currentStep / 3) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              <form onSubmit={handleShopOwnerSubmit} className="space-y-6">
+                {currentStep === 1 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Personal Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                        <input
+                          type="text"
+                          required
+                          value={shopOwnerData.name}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, name: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter your full name"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input
+                          type="email"
+                          required
+                          value={shopOwnerData.email}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, email: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter your email"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <input
+                          type="tel"
+                          required
+                          value={shopOwnerData.phone}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, phone: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="03XX XXXXXXX"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                        <select
+                          required
+                          value={shopOwnerData.city}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, city: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="">Select your city</option>
+                          {cities.map(city => (
+                            <option key={city} value={city}>{city}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">CNIC Number</label>
+                        <input
+                          type="text"
+                          required
+                          value={shopOwnerData.cnicNumber}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, cnicNumber: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="XXXXX-XXXXXXX-X"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input
+                          type="password"
+                          required
+                          value={shopOwnerData.password}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, password: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Create a password"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                        <input
+                          type="password"
+                          required
+                          value={shopOwnerData.confirmPassword}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, confirmPassword: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Confirm your password"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 2 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Business Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
+                        <input
+                          type="text"
+                          required
+                          value={shopOwnerData.businessName}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, businessName: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter business name"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
+                        <select
+                          required
+                          value={shopOwnerData.businessType}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, businessType: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="">Select business type</option>
+                          {businessTypes.map(type => (
+                            <option key={type} value={type}>{type}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Years in Business</label>
+                        <input
+                          type="number"
+                          required
+                          min="0"
+                          value={shopOwnerData.yearsInBusiness}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, yearsInBusiness: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Years in business"
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Business Address</label>
+                        <textarea
+                          required
+                          value={shopOwnerData.businessAddress}
+                          onChange={(e) => setShopOwnerData({...shopOwnerData, businessAddress: e.target.value})}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter complete business address"
+                          rows="3"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 3 && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Document Upload (KYC)</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Business License</label>
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(e) => handleFileChange('businessLicense', e.target.files[0])}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Upload your business license (PDF or Image)</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">CNIC Front Side</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleFileChange('cnicFront', e.target.files[0])}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Upload front side of your CNIC</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">CNIC Back Side</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleFileChange('cnicBack', e.target.files[0])}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Upload back side of your CNIC</p>
+                      </div>
+
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-start space-x-3">
+                          <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+                          <div>
+                            <h5 className="font-medium text-blue-900">Verification Process</h5>
+                            <p className="text-sm text-blue-700 mt-1">
+                              Your documents will be reviewed within 24-48 hours. You'll receive an email notification once your shop owner account is verified.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-between">
+                  {currentStep > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(currentStep - 1)}
+                      className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      Previous
+                    </button>
+                  )}
+                  
+                  {currentStep < 3 ? (
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(currentStep + 1)}
+                      className="ml-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                    >
+                      Next
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="ml-auto bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      {isLoading ? 'Creating account...' : 'Create Shop Owner Account'}
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+          )}
+
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              Already have an account?{' '}
+              <button 
+                onClick={onSwitchToSignIn}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Sign in
+              </button>
+            </p>
           </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-            <input
-              type="text"
-              required
-              value={signupData.name}
-              onChange={(e) => setSignupData({...signupData, name: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="Enter your full name"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input
-              type="email"
-              required
-              value={signupData.email}
-              onChange={(e) => setSignupData({...signupData, email: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="Enter your email"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-            <input
-              type="tel"
-              required
-              value={signupData.phone}
-              onChange={(e) => setSignupData({...signupData, phone: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="03XX XXXXXXX"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-            <select
-              required
-              value={signupData.city}
-              onChange={(e) => setSignupData({...signupData, city: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            >
-              <option value="">Select your city</option>
-              {cities.map(city => (
-                <option key={city} value={city}>{city}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <input
-              type="password"
-              required
-              value={signupData.password}
-              onChange={(e) => setSignupData({...signupData, password: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="Create a password"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-            <input
-              type="password"
-              required
-              value={signupData.confirmPassword}
-              onChange={(e) => setSignupData({...signupData, confirmPassword: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="Confirm your password"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition-colors"
-          >
-            {isLoading ? 'Creating account...' : 'Create Account'}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Already have an account?{' '}
-            <button 
-              onClick={onSwitchToLogin}
-              className="text-green-600 hover:text-green-700 font-medium"
-            >
-              Sign in
-            </button>
-          </p>
         </div>
       </div>
     </div>
