@@ -2303,6 +2303,207 @@ export const PostAdPage = ({ onSubmitSuccess, user }) => {
               </div>
             </div>
 
+            {/* Photos Section */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Photos *</h3>
+              <p className="text-sm text-gray-600 mb-4">Add at least one photo of your phone. High-quality photos get more responses!</p>
+              
+              {photoError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                  <p className="text-red-600 text-sm">{photoError}</p>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {/* Photo Upload Button */}
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                  <input
+                    type="file"
+                    id="photo-upload"
+                    multiple
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                  <label 
+                    htmlFor="photo-upload" 
+                    className="cursor-pointer flex flex-col items-center"
+                  >
+                    <Plus className="w-12 h-12 text-gray-400 mb-2" />
+                    <span className="text-gray-600 font-medium">Click to upload photos</span>
+                    <span className="text-gray-400 text-sm mt-1">JPEG, PNG, WebP (Max 5MB each, up to 5 photos)</span>
+                  </label>
+                </div>
+
+                {/* Uploaded Photos Preview */}
+                {formData.photos.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {formData.photos.map((photo, index) => (
+                      <div key={index} className="relative group">
+                        <img 
+                          src={photo} 
+                          alt={`Photo ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removePhoto(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Enhanced Specifications */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Detailed Specifications</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Battery</label>
+                  <select
+                    value={formData.battery}
+                    onChange={(e) => handleInputChange('battery', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Battery</option>
+                    {batteryOptions.map(battery => (
+                      <option key={battery} value={battery}>{battery}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Screen Size</label>
+                  <select
+                    value={formData.screen_size}
+                    onChange={(e) => handleInputChange('screen_size', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Screen Size</option>
+                    {screenSizeOptions.map(size => (
+                      <option key={size} value={size}>{size}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Camera</label>
+                  <input
+                    type="text"
+                    value={formData.camera}
+                    onChange={(e) => handleInputChange('camera', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g. 48MP Triple Camera"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Processor</label>
+                  <input
+                    type="text"
+                    value={formData.processor}
+                    onChange={(e) => handleInputChange('processor', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g. Snapdragon 8 Gen 3"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Operating System</label>
+                  <input
+                    type="text"
+                    value={formData.operating_system}
+                    onChange={(e) => handleInputChange('operating_system', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g. Android 14, iOS 17"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Network</label>
+                  <select
+                    value={formData.network}
+                    onChange={(e) => handleInputChange('network', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Network</option>
+                    {networkOptions.map(network => (
+                      <option key={network} value={network}>{network}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Purchase Information */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Purchase Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Purchase Year</label>
+                  <select
+                    value={formData.purchase_year}
+                    onChange={(e) => handleInputChange('purchase_year', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Year</option>
+                    {[2024, 2023, 2022, 2021, 2020, 2019, 2018].map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Warranty (Months)</label>
+                  <input
+                    type="number"
+                    value={formData.warranty_months}
+                    onChange={(e) => handleInputChange('warranty_months', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="0"
+                    min="0"
+                    max="24"
+                  />
+                </div>
+
+                <div className="flex items-center pt-8">
+                  <input
+                    type="checkbox"
+                    id="box-included"
+                    checked={formData.box_included}
+                    onChange={(e) => handleInputChange('box_included', e.target.checked)}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="box-included" className="ml-2 text-sm text-gray-700">
+                    Original Box Included
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Accessories Included */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Accessories Included</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {commonAccessories.map(accessory => (
+                  <label key={accessory} className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.accessories_included.includes(accessory)}
+                      onChange={() => handleAccessoryToggle(accessory)}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">{accessory}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             {/* Location & Contact */}
             <div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Location & Contact</h3>
