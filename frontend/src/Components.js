@@ -3,7 +3,8 @@ import {
   Search, Menu, Bell, MessageCircle, User, Home, Plus, 
   Filter, ChevronRight, Star, MapPin, Heart, Share2, 
   Phone, Camera, Battery, Smartphone, Cpu, HardDrive,
-  Clock, Shield, CheckCircle, ArrowRight, Eye, X
+  Clock, Shield, CheckCircle, ArrowRight, Eye, X, ChevronDown,
+  Mail, Lock, UserPlus, Settings, LogOut, Bookmark, History
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
