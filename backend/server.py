@@ -101,8 +101,15 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             raise HTTPException(status_code=401, detail="User not found")
         
         return serialize_doc(user)
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
     except jwt.JWTError:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+    except Exception as e:
+        logger.error(f"Error validating token: {str(e)}")
+        raise HTTPException(status_code=401, detail="Authentication failed")
 
 # User Models
 class UserRegistration(BaseModel):
