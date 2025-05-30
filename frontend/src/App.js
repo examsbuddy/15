@@ -9,7 +9,6 @@ import {
   FeaturedPhones,
   SellingSection,
   Footer,
-  MobileMenu,
   PostAdModal,
   ReviewsPage,
   VideosPage,
@@ -19,7 +18,6 @@ import {
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPostAdOpen, setIsPostAdOpen] = useState(false);
 
   const renderContent = () => {
@@ -33,30 +31,57 @@ function App() {
             <SellingSection />
           </>
         );
+      case 'my-ads':
+        return (
+          <div className="pt-20 pb-24 md:pb-8">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">My Ads</h2>
+                <p className="text-gray-600">Your posted advertisements will appear here</p>
+              </div>
+            </div>
+          </div>
+        );
+      case 'used-phones':
+        return (
+          <div className="pt-20 pb-24 md:pb-8">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Used Phones</h2>
+                <p className="text-gray-600">Browse thousands of used mobile phones</p>
+              </div>
+            </div>
+          </div>
+        );
+      case 'new-phones':
+        return (
+          <div className="pt-20 pb-24 md:pb-8">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">New Phones</h2>
+                <p className="text-gray-600">Discover the latest mobile phones</p>
+              </div>
+            </div>
+          </div>
+        );
+      case 'accessories':
+        return (
+          <div className="pt-20 pb-24 md:pb-8">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Accessories</h2>
+                <p className="text-gray-600">Find phone cases, chargers, and more</p>
+              </div>
+            </div>
+          </div>
+        );
       case 'search':
         return (
           <div className="pt-20 pb-24 md:pb-8">
             <div className="max-w-7xl mx-auto px-4">
               <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Advanced Search</h2>
-                <p className="text-gray-600">Search functionality coming soon...</p>
-              </div>
-            </div>
-          </div>
-        );
-      case 'sell':
-        return (
-          <div className="pt-20 pb-24 md:pb-8">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Sell Your Phone</h2>
-                <p className="text-gray-600 mb-6">Post your ad and reach thousands of buyers</p>
-                <button
-                  onClick={() => setIsPostAdOpen(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium"
-                >
-                  Post an Ad
-                </button>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Search</h2>
+                <p className="text-gray-600">Advanced search functionality</p>
               </div>
             </div>
           </div>
@@ -67,7 +92,7 @@ function App() {
             <div className="max-w-7xl mx-auto px-4">
               <div className="text-center py-20">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Messages</h2>
-                <p className="text-gray-600">Chat functionality coming soon...</p>
+                <p className="text-gray-600">Your chat conversations with buyers and sellers</p>
               </div>
             </div>
           </div>
@@ -78,7 +103,7 @@ function App() {
             <div className="max-w-7xl mx-auto px-4">
               <div className="text-center py-20">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Profile</h2>
-                <p className="text-gray-600">Profile section coming soon...</p>
+                <p className="text-gray-600">Manage your account settings and preferences</p>
               </div>
             </div>
           </div>
@@ -112,21 +137,8 @@ function App() {
       
       {/* Mobile Header - visible on mobile/tablet */}
       <div className="block md:hidden">
-        <MobileHeader 
-          isMenuOpen={isMenuOpen} 
-          setIsMenuOpen={setIsMenuOpen} 
-          setIsPostAdOpen={setIsPostAdOpen}
-          setActiveTab={setActiveTab}
-        />
+        <MobileHeader />
       </div>
-      
-      {/* Mobile Side Menu */}
-      <MobileMenu 
-        isOpen={isMenuOpen} 
-        setIsOpen={setIsMenuOpen} 
-        setActiveTab={setActiveTab}
-        setIsPostAdOpen={setIsPostAdOpen}
-      />
       
       {/* Main Content */}
       <main className="min-h-screen pb-20 md:pb-0">
