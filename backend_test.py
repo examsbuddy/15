@@ -117,12 +117,12 @@ class PhoneFlipAPITester:
             auth=True
         )
     
-    def test_api_root(self):
-        """Test API root endpoint"""
+    def test_get_listings(self):
+        """Test getting all listings"""
         return self.run_test(
-            "API Root",
+            "Get All Listings",
             "GET",
-            "api",
+            "api/listings",
             200
         )
 
