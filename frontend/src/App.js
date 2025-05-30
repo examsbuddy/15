@@ -165,8 +165,9 @@ function App() {
         {/* Post an Ad Page */}
         {currentPage === 'post-ad' && (
           <PostAdPage 
-            onSubmitSuccess={() => setCurrentPage('home')}
             user={user}
+            setCurrentPage={setCurrentPage}
+            onViewListing={handleViewListing}
           />
         )}
         
