@@ -24,7 +24,7 @@ import {
   Play,
   Eye,
   Heart,
-  GitCompare,
+  BarChart2,
   Users,
   Award,
   Zap,
