@@ -1386,7 +1386,7 @@ export const Header = ({
   );
 };
 
-// Hero Section Component 
+// Hero Section Component with Auto-suggest
 export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) => {
   const [searchFilters, setSearchFilters] = useState({
     query: '',
@@ -1398,6 +1398,122 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
     ram: ''
   });
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Auto-suggest data
+  const autoSuggestData = {
+    brands: ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'],
+    models: [
+      'iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14',
+      'Galaxy S24 Ultra', 'Galaxy S24 Plus', 'Galaxy S24', 'Galaxy A54', 'Galaxy Note',
+      'Xiaomi 13 Pro', 'Redmi Note 13 Pro', 'Mi 11', 'Poco X6',
+      'OnePlus 12', 'OnePlus 11', 'Nord CE', 'Oppo Reno 11 Pro',
+      'Vivo V30 Pro', 'Pixel 8 Pro'
+    ],
+    cities: ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta']
+  };
+
+  // Fuzzy matching function
+  const fuzzyMatch = (query, items) => {
+    const lowerQuery = query.toLowerCase();
+    
+    // Handle common misspellings
+    const correctedQuery = lowerQuery
+      .replace(/iphne|ifone|iphon/g, 'iphone')
+      .replace(/samung|samsng/g, 'samsung')
+      .replace(/xiomi|xaomi/g, 'xiaomi')
+      .replace(/huwei|hauwei/g, 'huawei');
+    
+    return items.filter(item => {
+      const lowerItem = item.toLowerCase();
+      // Exact match
+      if (lowerItem.includes(correctedQuery)) return true;
+      
+      // Character similarity (allow 1-2 character differences)
+      const distance = levenshteinDistance(correctedQuery, lowerItem);
+      return distance <= 2 && correctedQuery.length > 2;
+    });
+  };
+
+  // Simple Levenshtein distance implementation
+  const levenshteinDistance = (str1, str2) => {
+    const matrix = [];
+    for (let i = 0; i <= str2.length; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= str1.length; j++) {
+      matrix[0][j] = j;
+    }
+    for (let i = 1; i <= str2.length; i++) {
+      for (let j = 1; j <= str1.length; j++) {
+        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    return matrix[str2.length][str1.length];
+  };
+
+  // Generate suggestions based on query
+  const generateSuggestions = (query) => {
+    if (!query || query.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    const allSuggestions = [];
+    
+    // Brand suggestions
+    const brandMatches = fuzzyMatch(query, autoSuggestData.brands);
+    brandMatches.forEach(brand => {
+      allSuggestions.push({ type: 'brand', value: brand, display: brand });
+    });
+
+    // Model suggestions
+    const modelMatches = fuzzyMatch(query, autoSuggestData.models);
+    modelMatches.forEach(model => {
+      allSuggestions.push({ type: 'model', value: model, display: model });
+    });
+
+    // City suggestions
+    const cityMatches = fuzzyMatch(query, autoSuggestData.cities);
+    cityMatches.forEach(city => {
+      allSuggestions.push({ type: 'city', value: city, display: `in ${city}` });
+    });
+
+    // Limit to top 6 suggestions
+    setSuggestions(allSuggestions.slice(0, 6));
+  };
+
+  const handleInputChange = (value) => {
+    setSearchFilters({ ...searchFilters, query: value });
+    generateSuggestions(value);
+    setShowSuggestions(true);
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    if (suggestion.type === 'city') {
+      setSearchFilters({ ...searchFilters, query: '', city: suggestion.value });
+    } else {
+      setSearchFilters({ ...searchFilters, query: suggestion.value });
+    }
+    setShowSuggestions(false);
+    // Trigger search immediately
+    if (onSearch) {
+      onSearch({ 
+        ...searchFilters, 
+        query: suggestion.type === 'city' ? '' : suggestion.value,
+        city: suggestion.type === 'city' ? suggestion.value : searchFilters.city
+      });
+    }
+  };
 
   const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'OnePlus', 'Huawei', 'Realme'];
   const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
