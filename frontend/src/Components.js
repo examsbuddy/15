@@ -2013,6 +2013,68 @@ export const PostAdPage = ({ onSubmitSuccess, user }) => {
     }
   };
 
+  const handleAccessoryToggle = (accessory) => {
+    const currentAccessories = formData.accessories_included;
+    if (currentAccessories.includes(accessory)) {
+      setFormData({
+        ...formData,
+        accessories_included: currentAccessories.filter(a => a !== accessory)
+      });
+    } else {
+      setFormData({
+        ...formData,
+        accessories_included: [...currentAccessories, accessory]
+      });
+    }
+  };
+
+  const handlePhotoUpload = (event) => {
+    const files = Array.from(event.target.files);
+    setPhotoError('');
+
+    if (files.length === 0) return;
+
+    // Validate file types and sizes
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    for (const file of files) {
+      if (!validTypes.includes(file.type)) {
+        setPhotoError('Please upload only JPEG, PNG, or WebP images');
+        return;
+      }
+      if (file.size > maxSize) {
+        setPhotoError('Each image must be less than 5MB');
+        return;
+      }
+    }
+
+    // Check total photos limit
+    if (formData.photos.length + files.length > 5) {
+      setPhotoError('Maximum 5 photos allowed');
+      return;
+    }
+
+    // Convert to base64
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFormData(prev => ({
+          ...prev,
+          photos: [...prev.photos, e.target.result]
+        }));
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removePhoto = (index) => {
+    setFormData({
+      ...formData,
+      photos: formData.photos.filter((_, i) => i !== index)
+    });
+  };
+
   const validateForm = () => {
     const required = ['brand', 'model', 'condition', 'price', 'storage', 'ram', 'city', 'description'];
     for (const field of required) {
@@ -2022,7 +2084,13 @@ export const PostAdPage = ({ onSubmitSuccess, user }) => {
       }
     }
     
-    if (isNaN(formData.price) || parseFloat(formData.price) <= 0) {
+    // Validate photos are mandatory
+    if (formData.photos.length === 0) {
+      setPhotoError('At least one photo is required');
+      return false;
+    }
+
+    if (isNaN(parseInt(formData.price)) || parseInt(formData.price) <= 0) {
       setError('Please enter a valid price');
       return false;
     }
