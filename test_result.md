@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the redesigned PhoneFlip.PK header and authentication system thoroughly. I've just implemented a completely new deep blue header design with enhanced Sign In/Sign Up functionality."
+user_problem_statement: "I need to perform comprehensive QA testing of the PhoneFlip.PK backend API. Please test the following critical user flows: Authentication Testing, Phone Listings Testing, Shop Owner Features, and Sample Data Verification."
 
 backend:
   - task: "User Registration (POST /api/auth/register)"
@@ -116,6 +116,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "Registration with valid data works correctly, but duplicate email registration returns a 500 error instead of the expected 400 error. The error handling in the registration endpoint needs to be fixed to properly catch and handle duplicate email errors."
+      - working: false
+        agent: "testing"
+        comment: "Confirmed the issue with duplicate email registration. The API returns a 500 error instead of the expected 400 error. The try-except block in the registration endpoint is catching the duplicate email error but then raising a generic 500 error instead of returning the specific 400 error."
 
   - task: "User Login (POST /api/auth/login)"
     implemented: true
@@ -128,6 +131,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Login functionality works correctly. Successfully tested login with valid credentials, invalid email, and invalid password. All tests passed with expected status codes."
+      - working: true
+        agent: "testing"
+        comment: "Confirmed that login functionality works correctly. Successfully tested login with valid credentials, invalid email, and invalid password. All tests returned the expected status codes (200 for valid login, 401 for invalid credentials)."
 
   - task: "Authentication Verification (Protected Endpoints)"
     implemented: true
@@ -140,8 +146,50 @@ backend:
       - working: false
         agent: "testing"
         comment: "Protected endpoint access with valid token works correctly, but there are issues with error handling for invalid tokens (returns 500 instead of 401) and missing tokens (returns 403 instead of 401). The error handling in the authentication middleware needs to be improved."
+      - working: false
+        agent: "testing"
+        comment: "Confirmed the issues with authentication verification. Protected endpoint access with valid token works correctly, but invalid token access returns a 500 error instead of 401, and no token access returns a 403 error instead of 401. The error handling in the get_current_user dependency function needs to be improved to catch all JWT errors and return appropriate status codes."
 
   - task: "Shop Owner Registration (POST /api/auth/register-shop-owner)"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Shop owner registration works correctly. Successfully tested registration with valid business details and KYC documents."
+      - working: false
+        agent: "testing"
+        comment: "Initial shop owner registration works correctly, but subsequent attempts fail with a 500 error. This is likely related to the duplicate email issue in the regular registration endpoint. The error handling in the shop owner registration endpoint needs to be improved to properly handle duplicate email errors."
+
+  - task: "Phone Listings (POST /api/listings)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Creating a new phone listing works correctly. Successfully tested creating a listing with all required fields. The API returns a 200 status code and the listing ID."
+
+  - task: "Get All Listings (GET /api/listings)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Retrieving all listings works correctly. The API returns a 200 status code and an array of listings with all required fields."
+
+  - task: "Filtered Listings (GET /api/listings with query params)"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -151,7 +199,55 @@ backend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "Shop owner registration works correctly. Successfully tested registration with valid business details and KYC documents."
+        comment: "Filtering listings by brand, price range, and city works correctly. The API returns a 200 status code and the filtered listings."
+
+  - task: "Get Listing by ID (GET /api/listings/{listing_id})"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Retrieving a listing by ID works correctly. The API returns a 200 status code and the listing details. The view count is also incremented as expected."
+
+  - task: "Featured Listings (GET /api/listings/featured)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Retrieving featured listings works correctly. The API returns a 200 status code and an array of featured listings."
+
+  - task: "Sample Data (POST /api/sample-data)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Populating sample data works correctly. The API returns a 200 status code and a success message. 10 sample phone listings are created in the database."
+
+  - task: "Platform Statistics (GET /api/stats)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Retrieving platform statistics works correctly. The API returns a 200 status code and statistics including total listings, brand counts, and city counts."
 
 frontend:
   - task: "Deep Blue Header Design"
