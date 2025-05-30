@@ -339,10 +339,15 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Advanced Filters section is present on the search results page. The section appears to be functional with a toggle to expand additional filters."
-      - working: "NA"
-        agent: "main"
-        comment: "Navigation items (Used Phones, New Phones, Accessories, Reviews, Videos, Blog) implemented with dropdown functionality."
-      - working: true
+
+  - task: "Navigation Items & Dropdowns"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
         agent: "testing"
         comment: "Navigation items are displayed correctly in the header. The dropdown functionality works when hovering over 'Used Phones', showing brand options like iPhone, Samsung, Xiaomi, etc."
       - working: true
