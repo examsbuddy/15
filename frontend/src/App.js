@@ -27,8 +27,8 @@ function App() {
 
   useEffect(() => {
     // Check if user is logged in on component mount
-    const token = localStorage.getItem('phoneflip_token');
-    const userData = localStorage.getItem('phoneflip_user');
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
     
     if (token && userData) {
       setUser(JSON.parse(userData));
@@ -36,18 +36,16 @@ function App() {
     }
   }, []);
 
-  const handleLogin = (userData, token) => {
+  const handleLogin = (userData) => {
     setUser(userData);
     setIsLoggedIn(true);
-    localStorage.setItem('phoneflip_token', token);
-    localStorage.setItem('phoneflip_user', JSON.stringify(userData));
   };
 
   const handleLogout = () => {
     setUser(null);
     setIsLoggedIn(false);
-    localStorage.removeItem('phoneflip_token');
-    localStorage.removeItem('phoneflip_user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setCurrentPage('home');
   };
 
