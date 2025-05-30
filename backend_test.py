@@ -2,6 +2,7 @@
 import requests
 import sys
 import json
+import uuid
 from datetime import datetime
 
 class PhoneFlipAPITester:
@@ -10,11 +11,19 @@ class PhoneFlipAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.test_listing_id = None
+        self.auth_token = None
+        self.user_data = None
+        self.test_user_email = f"test_user_{uuid.uuid4().hex[:8]}@example.com"
+        self.test_user_password = "Test@123456"
+        self.test_shop_owner_email = f"shop_owner_{uuid.uuid4().hex[:8]}@example.com"
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, params=None):
+    def run_test(self, name, method, endpoint, expected_status, data=None, params=None, auth=False):
         """Run a single API test"""
         url = f"{self.base_url}/{endpoint}"
         headers = {'Content-Type': 'application/json'}
+        
+        if auth and self.auth_token:
+            headers['Authorization'] = f"Bearer {self.auth_token}"
         
         self.tests_run += 1
         print(f"\n🔍 Testing {name}...")
@@ -24,6 +33,8 @@ class PhoneFlipAPITester:
                 response = requests.get(url, headers=headers, params=params)
             elif method == 'POST':
                 response = requests.post(url, json=data, headers=headers)
+            elif method == 'PUT':
+                response = requests.put(url, json=data, headers=headers)
             
             # Print response status and data for debugging
             print(f"Response Status: {response.status_code}")
