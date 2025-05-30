@@ -9,7 +9,8 @@ import {
   FeaturedPhones,
   SellingSection,
   Footer,
-  MobileMenu
+  MobileMenu,
+  PostAdModal
 } from './Components';
 
 function App() {
