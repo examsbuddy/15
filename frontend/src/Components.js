@@ -1161,13 +1161,711 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
   );
 };
 
-// Post Ad Modal Component
+// Enhanced Single-Page Post Ad Modal with Confirmation Screen
+export const PostAdModal = ({ isOpen, setIsOpen }) => {
   const [currentView, setCurrentView] = useState('form'); // 'form' or 'confirmation'
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedAdId, setSubmittedAdId] = useState(null);
   const [formData, setFormData] = useState({
     // Phone Details
     brand: '',
+    model: '',
+    condition: 'Excellent',
+    price: '',
+    storage: '',
+    ram: '',
+    color: '',
+    warranty: '',
+    
+    // Location & Description
+    city: 'Karachi',
+    area: '',
+    description: '',
+    
+    // Seller Information
+    seller_name: '',
+    seller_phone: '',
+    seller_email: '',
+    
+    // Additional Features
+    features: [],
+    
+    // Preferences
+    negotiable: true,
+    exchange: false,
+    urgent_sale: false
+  });
+
+  const phoneFeatures = [
+    'Face Unlock', 'Fingerprint Scanner', 'Fast Charging', 'Wireless Charging',
+    'Dual SIM', 'Water Resistant', 'Original Box', 'Original Charger',
+    'Screen Protector Applied', 'Cover Included', 'Headphones Included',
+    'Original Receipt', 'Under Warranty', 'Never Repaired'
+  ];
+
+  const phoneBrands = [
+    'iPhone', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'OnePlus', 
+    'Huawei', 'Realme', 'Google Pixel', 'Nothing', 'Infinix', 'Tecno'
+  ];
+
+  const cities = [
+    'Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 
+    'Multan', 'Peshawar', 'Quetta', 'Sialkot', 'Gujranwala'
+  ];
+
+  const storageOptions = ['64GB', '128GB', '256GB', '512GB', '1TB'];
+  const ramOptions = ['3GB', '4GB', '6GB', '8GB', '12GB', '16GB'];
+  const conditionOptions = ['Excellent', 'Good', 'Fair', 'Poor'];
+
+  const resetForm = () => {
+    setCurrentView('form');
+    setFormData({
+      brand: '', model: '', condition: 'Excellent', price: '', storage: '', ram: '', color: '', warranty: '',
+      city: 'Karachi', area: '', description: '', seller_name: '', seller_phone: '', seller_email: '',
+      features: [], negotiable: true, exchange: false, urgent_sale: false
+    });
+    setIsSubmitting(false);
+    setSubmittedAdId(null);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setTimeout(resetForm, 300);
+  };
+
+  const handleFeatureToggle = (feature) => {
+    setFormData(prev => ({
+      ...prev,
+      features: prev.features.includes(feature)
+        ? prev.features.filter(f => f !== feature)
+        : [...prev.features, feature]
+    }));
+  };
+
+  const validateForm = () => {
+    const requiredFields = ['brand', 'model', 'condition', 'price', 'city', 'seller_name', 'seller_phone'];
+    const missingFields = requiredFields.filter(field => !formData[field]);
+    
+    if (missingFields.length > 0) {
+      alert(`Please fill in the following required fields: ${missingFields.join(', ')}`);
+      return false;
+    }
+    
+    if (formData.price <= 0) {
+      alert('Please enter a valid price');
+      return false;
+    }
+    
+    return true;
+  };
+
+  const submitListing = async () => {
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+      
+      const submissionData = {
+        ...formData,
+        price: parseInt(formData.price),
+        is_featured: false,
+        is_active: true,
+        views: 0,
+        created_at: new Date().toISOString()
+      };
+
+      const response = await fetch(`${backendUrl}/api/listings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissionData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setSubmittedAdId(result.id);
+        setCurrentView('confirmation');
+      } else {
+        const error = await response.json();
+        alert('Failed to post ad: ' + (error.detail || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      alert('Failed to post ad. Please check your connection.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEdit = () => {
+    setCurrentView('form');
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        
+        {/* Form View */}
+        {currentView === 'form' && (
+          <>
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-lg">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">Post Your Phone Ad</h2>
+                <button 
+                  onClick={handleClose}
+                  className="text-gray-400 hover:text-gray-600 p-2"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-gray-600 mt-1">Fill in all details to create your listing</p>
+            </div>
+
+            {/* Form Content */}
+            <div className="px-6 py-6">
+              <form className="space-y-8">
+                
+                {/* Phone Information Section */}
+                <div className="bg-blue-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Smartphone className="w-5 h-5 mr-2 text-blue-600" />
+                    Phone Information
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Brand */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Brand *
+                      </label>
+                      <select
+                        value={formData.brand}
+                        onChange={(e) => setFormData({...formData, brand: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        required
+                      >
+                        <option value="">Select Brand</option>
+                        {phoneBrands.map(brand => (
+                          <option key={brand} value={brand}>{brand}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Model */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Model *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.model}
+                        onChange={(e) => setFormData({...formData, model: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., iPhone 15 Pro Max"
+                        required
+                      />
+                    </div>
+
+                    {/* Condition */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Condition *
+                      </label>
+                      <select
+                        value={formData.condition}
+                        onChange={(e) => setFormData({...formData, condition: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        required
+                      >
+                        {conditionOptions.map(condition => (
+                          <option key={condition} value={condition}>{condition}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Price */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Price (PKR) *
+                      </label>
+                      <input
+                        type="number"
+                        value={formData.price}
+                        onChange={(e) => setFormData({...formData, price: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="150000"
+                        required
+                      />
+                    </div>
+
+                    {/* Storage */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Storage
+                      </label>
+                      <select
+                        value={formData.storage}
+                        onChange={(e) => setFormData({...formData, storage: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select Storage</option>
+                        {storageOptions.map(storage => (
+                          <option key={storage} value={storage}>{storage}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* RAM */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        RAM
+                      </label>
+                      <select
+                        value={formData.ram}
+                        onChange={(e) => setFormData({...formData, ram: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select RAM</option>
+                        {ramOptions.map(ram => (
+                          <option key={ram} value={ram}>{ram}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Color */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Color
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.color}
+                        onChange={(e) => setFormData({...formData, color: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., Space Black"
+                      />
+                    </div>
+
+                    {/* Warranty */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Warranty Status
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.warranty}
+                        onChange={(e) => setFormData({...formData, warranty: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., 6 months remaining"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location & Description Section */}
+                <div className="bg-green-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <MapPin className="w-5 h-5 mr-2 text-green-600" />
+                    Location & Description
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    {/* City */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        City *
+                      </label>
+                      <select
+                        value={formData.city}
+                        onChange={(e) => setFormData({...formData, city: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        required
+                      >
+                        {cities.map(city => (
+                          <option key={city} value={city}>{city}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Area */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Area/Locality
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.area}
+                        onChange={(e) => setFormData({...formData, area: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., Gulshan-e-Iqbal"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Description
+                    </label>
+                    <textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      rows="4"
+                      placeholder="Describe your phone's condition, usage, any issues, etc."
+                    />
+                  </div>
+                </div>
+
+                {/* Features Section */}
+                <div className="bg-purple-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Star className="w-5 h-5 mr-2 text-purple-600" />
+                    Features & Accessories
+                  </h3>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {phoneFeatures.map((feature) => (
+                      <label key={feature} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.features.includes(feature)}
+                          onChange={() => handleFeatureToggle(feature)}
+                          className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-sm text-gray-700">{feature}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Contact Information Section */}
+                <div className="bg-orange-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <User className="w-5 h-5 mr-2 text-orange-600" />
+                    Contact Information
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Seller Name */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Your Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.seller_name}
+                        onChange={(e) => setFormData({...formData, seller_name: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="Full Name"
+                        required
+                      />
+                    </div>
+
+                    {/* Phone */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        value={formData.seller_phone}
+                        onChange={(e) => setFormData({...formData, seller_phone: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="03xx-xxxxxxx"
+                        required
+                      />
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        value={formData.seller_email}
+                        onChange={(e) => setFormData({...formData, seller_email: e.target.value})}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="your@email.com"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preferences Section */}
+                <div className="bg-gray-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <Settings className="w-5 h-5 mr-2 text-gray-600" />
+                    Sale Preferences
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.negotiable}
+                        onChange={(e) => setFormData({...formData, negotiable: e.target.checked})}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">Price is negotiable</span>
+                    </label>
+
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.exchange}
+                        onChange={(e) => setFormData({...formData, exchange: e.target.checked})}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">Open to exchange</span>
+                    </label>
+
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.urgent_sale}
+                        onChange={(e) => setFormData({...formData, urgent_sale: e.target.checked})}
+                        className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                      />
+                      <span className="text-sm text-gray-700">Urgent sale</span>
+                    </label>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            {/* Footer */}
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-lg">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-600">
+                  Fields marked with * are required
+                </p>
+                <div className="flex space-x-3">
+                  <button
+                    type="button"
+                    onClick={handleClose}
+                    className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={submitListing}
+                    disabled={isSubmitting}
+                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full"></div>
+                        Posting...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Post My Ad
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Confirmation View */}
+        {currentView === 'confirmation' && (
+          <>
+            {/* Success Header */}
+            <div className="bg-green-500 text-white px-6 py-6 rounded-t-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                    <Check className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold">Ad Posted Successfully!</h2>
+                    <p className="text-green-100">Your phone listing is now live on PhoneFlip.PK</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={handleClose}
+                  className="text-white hover:text-green-100 p-2"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Ad Preview */}
+            <div className="px-6 py-6">
+              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                {/* Ad Header */}
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h3 className="text-2xl font-bold text-gray-900">
+                        {formData.brand} {formData.model}
+                      </h3>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        formData.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
+                        formData.condition === 'Good' ? 'bg-blue-100 text-blue-800' :
+                        formData.condition === 'Fair' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {formData.condition}
+                      </span>
+                      {formData.urgent_sale && (
+                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                          Urgent Sale
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
+                      <span className="flex items-center">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        {formData.city}{formData.area && `, ${formData.area}`}
+                      </span>
+                      <span className="flex items-center">
+                        <Clock className="w-3 h-3 mr-1" />
+                        Just now
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="text-right">
+                    <div className="text-3xl font-bold text-blue-600 mb-1">
+                      PKR {parseInt(formData.price).toLocaleString()}
+                    </div>
+                    {formData.negotiable && (
+                      <span className="text-sm text-gray-600">Negotiable</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Specifications */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  {formData.storage && (
+                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                      <div className="text-sm text-gray-600">Storage</div>
+                      <div className="font-semibold text-gray-900">{formData.storage}</div>
+                    </div>
+                  )}
+                  {formData.ram && (
+                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                      <div className="text-sm text-gray-600">RAM</div>
+                      <div className="font-semibold text-gray-900">{formData.ram}</div>
+                    </div>
+                  )}
+                  {formData.color && (
+                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                      <div className="text-sm text-gray-600">Color</div>
+                      <div className="font-semibold text-gray-900">{formData.color}</div>
+                    </div>
+                  )}
+                  {formData.warranty && (
+                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                      <div className="text-sm text-gray-600">Warranty</div>
+                      <div className="font-semibold text-gray-900">{formData.warranty}</div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Description */}
+                {formData.description && (
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
+                    <p className="text-gray-700 leading-relaxed">{formData.description}</p>
+                  </div>
+                )}
+
+                {/* Features */}
+                {formData.features.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-900 mb-3">Features & Accessories</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {formData.features.map((feature) => (
+                        <div key={feature} className="flex items-center text-sm text-gray-700">
+                          <Check className="w-3 h-3 text-green-500 mr-2" />
+                          {feature}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Seller Information */}
+                <div className="border-t border-gray-200 pt-6">
+                  <h4 className="font-semibold text-gray-900 mb-3">Contact Information</h4>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex items-center text-gray-700">
+                      <User className="w-4 h-4 mr-2" />
+                      {formData.seller_name}
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <Phone className="w-4 h-4 mr-2" />
+                      {formData.seller_phone}
+                    </div>
+                    {formData.seller_email && (
+                      <div className="flex items-center text-gray-700">
+                        <Mail className="w-4 h-4 mr-2" />
+                        {formData.seller_email}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {(formData.exchange || formData.negotiable) && (
+                    <div className="flex items-center gap-4 mt-3">
+                      {formData.negotiable && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          Negotiable
+                        </span>
+                      )}
+                      {formData.exchange && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          Exchange OK
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="bg-gray-50 px-6 py-4 rounded-b-lg">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  Ad ID: {submittedAdId || 'Generated'} • Posted on {new Date().toLocaleDateString()}
+                </div>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={handleEdit}
+                    className="px-6 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors flex items-center"
+                  >
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Edit Ad
+                  </button>
+                  <button
+                    onClick={handleClose}
+                    className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center"
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Live Ad
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
     model: '',
     condition: 'Excellent',
     price: '',
