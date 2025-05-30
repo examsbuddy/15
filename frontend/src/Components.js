@@ -118,6 +118,7 @@ export const LoginModal = ({ isOpen, setIsOpen, setIsLoggedIn }) => {
     e.preventDefault();
     // Handle login/signup logic here
     console.log('Form submitted:', formData);
+    setIsLoggedIn && setIsLoggedIn(true);
     setIsOpen(false);
   };
 
