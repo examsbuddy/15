@@ -931,7 +931,7 @@ export const Header = ({
 
         {/* Mobile Menu */}
         {showMobileMenu && (
-          <div className="lg:hidden border-t border-blue-800 bg-blue-900">
+          <div className="md:hidden border-t border-blue-800 bg-blue-900">
             <div className="px-4 py-4 space-y-2">
               {/* Navigation Links */}
               {navigation.map((item) => {
