@@ -678,7 +678,7 @@ export const DropdownMenu = ({ isOpen, menuId, onClose }) => {
 };
 
 // Desktop Header Component
-export const DesktopHeader = ({ activeTab, setActiveTab }) => {
+export const DesktopHeader = ({ activeTab, setActiveTab, setIsPostAdOpen }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
