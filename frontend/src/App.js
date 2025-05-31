@@ -171,7 +171,7 @@ function App() {
             {/* Compare Section - Keep for functionality */}
             <CompareSection 
               compareList={compareList}
-              onCompareClick={() => setShowCompareModal(true)}
+              onCompareClick={() => setCurrentPage('compare')}
             />
           </div>
         )}
