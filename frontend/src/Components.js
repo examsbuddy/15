@@ -1128,7 +1128,6 @@ export const Header = ({
 }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [signUpType, setSignUpType] = useState('normal'); // 'normal' or 'shop_owner'
   const [showDropdown, setShowDropdown] = useState(null);
 
   const navigation = [
