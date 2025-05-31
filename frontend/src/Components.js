@@ -1116,7 +1116,10 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
                   {currentStep < 3 ? (
                     <button
                       type="button"
-                      onClick={() => setCurrentStep(currentStep + 1)}
+                      onClick={() => {
+                        setError(''); // Clear any previous errors
+                        setCurrentStep(currentStep + 1);
+                      }}
                       className="ml-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
                     >
                       Next
