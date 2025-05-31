@@ -132,7 +132,7 @@ class PhoneFlipAPITester:
         )
     
     def test_register_shop_owner(self):
-        """Test registering a shop owner"""
+        """Test registering a shop owner with all required fields"""
         test_data = {
             "name": "Test Shop Owner",
             "email": self.test_shop_owner_email,
@@ -162,6 +162,85 @@ class PhoneFlipAPITester:
             "POST",
             "api/auth/register-shop-owner",
             200,
+            data=test_data
+        )
+        
+    def test_register_shop_owner_missing_fields(self):
+        """Test registering a shop owner with missing required fields"""
+        # Missing business_details.business_name and kyc_documents.cnic_front
+        test_data = {
+            "name": "Test Shop Owner Missing Fields",
+            "email": f"shop_owner_missing_{uuid.uuid4().hex[:8]}@example.com",
+            "password": self.test_user_password,
+            "phone": "03009876543",
+            "business_details": {
+                # Missing business_name
+                "business_type": "mobile_shop",
+                "business_address": "123 Test Street",
+                "city": "Karachi",
+                "postal_code": "75000",
+                "business_phone": "03009876543",
+                "website": "https://testshop.com",
+                "description": "This is a test shop for automated testing.",
+                "years_in_business": 5
+            },
+            "kyc_documents": {
+                # Missing cnic_front
+                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",
+                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",
+                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="
+            }
+        }
+        
+        # We expect a 422 Unprocessable Entity response for validation errors
+        return self.run_test(
+            "Register Shop Owner with Missing Fields",
+            "POST",
+            "api/auth/register-shop-owner",
+            422,
+            data=test_data
+        )
+        
+    def test_register_shop_owner_duplicate_email(self):
+        """Test registering a shop owner with a duplicate email"""
+        # First, register a shop owner successfully
+        success, _ = self.test_register_shop_owner()
+        
+        if not success:
+            print("❌ Failed to register initial shop owner, skipping duplicate email test")
+            return False, {}
+            
+        # Now try to register another shop owner with the same email
+        test_data = {
+            "name": "Duplicate Shop Owner",
+            "email": self.test_shop_owner_email,  # Same email as the first shop owner
+            "password": self.test_user_password,
+            "phone": "03009876543",
+            "business_details": {
+                "business_name": "Duplicate Shop",
+                "business_type": "mobile_shop",
+                "business_address": "123 Test Street",
+                "city": "Karachi",
+                "postal_code": "75000",
+                "business_phone": "03009876543",
+                "website": "https://testshop.com",
+                "description": "This is a test shop for automated testing.",
+                "years_in_business": 5
+            },
+            "kyc_documents": {
+                "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",
+                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",
+                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",
+                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="
+            }
+        }
+        
+        # We expect a 400 Bad Request response for duplicate email
+        return self.run_test(
+            "Register Shop Owner with Duplicate Email",
+            "POST",
+            "api/auth/register-shop-owner",
+            400,
             data=test_data
         )
 
