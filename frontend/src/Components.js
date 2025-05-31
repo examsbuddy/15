@@ -1717,7 +1717,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
               Mobile Phone
             </span>
           </h1>
-          <p className="text-sm md:text-lg lg:text-xl text-blue-100 mb-8 max-w-3xl mx-auto text-center">
+          <p className="text-sm md:text-lg lg:text-xl text-blue-100 mb-4 md:mb-8 max-w-3xl mx-auto text-center">
             Pakistan's #1 phone marketplace
           </p>
 
