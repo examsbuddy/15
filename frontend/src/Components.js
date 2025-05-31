@@ -2976,14 +2976,14 @@ export const FeaturedPhones = ({ addToCompare, compareList, onViewListing }) => 
                         e.stopPropagation();
                         addToCompare(phone);
                       }}
-                      disabled={compareList?.some(p => p.id === phone.id)}
+                      disabled={compareList?.some(p => p._id === phone._id)}
                       className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                        compareList?.some(p => p.id === phone.id)
+                        compareList?.some(p => p._id === phone._id)
                           ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
                           : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                       }`}
                     >
-                      {compareList?.some(p => p.id === phone.id) ? 'Added' : 'Compare'}
+                      {compareList?.some(p => p._id === phone._id) ? 'Added' : 'Compare'}
                     </button>
                     <button 
                       onClick={(e) => {
