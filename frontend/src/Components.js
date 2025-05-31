@@ -1701,7 +1701,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
 
   return (
     <section 
-      className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 text-white py-8 md:py-24 overflow-hidden"
+      className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 text-white py-6 md:py-24 overflow-hidden"
       style={{
         backgroundImage: `linear-gradient(rgba(30, 58, 138, 0.85), rgba(30, 58, 138, 0.85)), url('https://images.unsplash.com/photo-1562575214-da9fcf59b907')`,
         backgroundSize: 'cover',
