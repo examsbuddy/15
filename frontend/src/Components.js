@@ -20,7 +20,6 @@ import {
   Smartphone,
   Headphones,
   Camera,
-
   Heart,
   Share,
   Eye,
@@ -55,7 +54,8 @@ import {
   Youtube,
   Sliders,
   Battery,
-  Play
+  Play,
+  Filter
 } from 'lucide-react';
 
 // Enhanced Sign In Modal
