@@ -2237,6 +2237,7 @@ export const ListingDetails = ({ listing, onClose }) => {
 export const RecentListingsSection = () => {
   const [recentListings, setRecentListings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedListing, setSelectedListing] = useState(null);
 
   useEffect(() => {
     fetchRecentListings();
