@@ -1912,13 +1912,13 @@ export const RecentListingsSection = () => {
   };
 
   return (
-    <section className="bg-gray-50 py-12 md:py-16">
+    <section className="bg-gray-50 py-6 md:py-12 lg:py-16">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-4 md:mb-8">
+          <h2 className="text-lg md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 md:mb-4">
             Recent Listings
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-gray-600 max-w-2xl mx-auto hidden md:block">
             Check out the latest phones and accessories added to our marketplace
           </p>
         </div>
