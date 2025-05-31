@@ -145,7 +145,7 @@ function App() {
             
             {/* Recent Listings Section - Desktop view */}
             <div className="hidden md:block">
-              <RecentListingsSection />
+              <RecentListingsSection onViewListing={handleViewListing} />
             </div>
             
             {/* Enhanced Selling Section */}
