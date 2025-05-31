@@ -122,6 +122,18 @@ frontend:
         agent: "testing"
         comment: "The new comparison page functionality is not working. Could not navigate to a dedicated comparison page. The compare button does not navigate to a '/compare' page. No GSMArena-style side-by-side layout was found. The comparison functionality appears to be missing or not properly implemented."
 
+  - task: "Brand-specific Search Pages"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Brand-specific search pages functionality is not working. There are compilation errors in the frontend code. The DedicatedSearchPage component is imported in App.js but not properly defined in Components.js. When trying to navigate to brand-specific pages, the application shows a compilation error: 'ERROR in ./src/App.js 180:75-94 export 'DedicatedSearchPage' (imported as 'DedicatedSearchPage') was not found in './Components''. The BrandSearchPage component exists but cannot be tested due to the compilation errors."
+
   - task: "Sell Page"
     implemented: true
     working: true
@@ -274,11 +286,11 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: ["Compare Page"]
-  stuck_tasks: ["Compare Page"]
+  current_focus: ["Brand-specific Search Pages"]
+  stuck_tasks: ["Compare Page", "Brand-specific Search Pages"]
   test_all: false
   test_priority: "high_first"
-  last_tested: "Compare Page"
+  last_tested: "Brand-specific Search Pages"
 
 agent_communication:
   - agent: "testing"
@@ -295,3 +307,5 @@ agent_communication:
     message: "I've tested the new comparison page functionality and found that it's not working as expected. The key issues are: 1) Could not navigate to a dedicated comparison page - the compare button doesn't navigate to '/compare' page. 2) No GSMArena-style side-by-side layout was found. 3) The comparison functionality appears to be missing or not properly implemented. The file path in the test_result.md pointed to '/app/frontend/src/pages/Compare.js', but this file doesn't exist. The comparison functionality is currently implemented in Components.js as a component, not as a dedicated page. The implementation needs to be updated to match the requirements."
   - agent: "testing"
     message: "I've tested the fixed compare button functionality. The 'Start Comparing' link opens a modal that shows the 'No phones to compare' message when there are no phones in the compare list. The modal can be closed properly using the close button. No JavaScript errors were detected during testing. The compare functionality works even when compareCount is 0. All requirements for the compare button functionality have been met."
+  - agent: "testing"
+    message: "I've tested the brand-specific search pages functionality and found that it's not working. There are compilation errors in the frontend code. The DedicatedSearchPage component is imported in App.js but not properly defined in Components.js. When trying to navigate to brand-specific pages, the application shows a compilation error: 'ERROR in ./src/App.js 180:75-94 export 'DedicatedSearchPage' (imported as 'DedicatedSearchPage') was not found in './Components''. The BrandSearchPage component exists but cannot be tested due to the compilation errors. This needs to be fixed before the brand-specific search pages can be properly tested."
