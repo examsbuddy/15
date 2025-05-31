@@ -5,6 +5,7 @@ import {
   MobileBottomNav, 
   HeroSection, 
   CompareSection,
+  RecentListingsSection,
   SellSection, 
   FeaturedShopsSection,
   OurOfferingsSection,
