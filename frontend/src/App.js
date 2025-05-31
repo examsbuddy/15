@@ -204,7 +204,7 @@ function App() {
           <DedicatedSearchPage 
             onBack={handleBackToHome}
             onViewListing={handleViewListing}
-            initialFilters={searchFilters}
+            initialFilters={searchFilters || {}}
           />
         )}
         
