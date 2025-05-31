@@ -209,15 +209,18 @@ backend:
 
   - task: "Search Functionality Endpoint"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "Search functionality endpoint (/api/listings with search parameters) is not working correctly. It returns a 500 Internal Server Error when searching for 'iPhone'."
+      - working: true
+        agent: "testing"
+        comment: "Fixed the search functionality endpoint by correcting the query for searching in the features array. Changed from using $in with a regex to using $elemMatch with a regex. The endpoint now returns the expected results."
 
   - task: "Compare Functionality Endpoints"
     implemented: true
