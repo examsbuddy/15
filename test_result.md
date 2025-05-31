@@ -274,11 +274,11 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
-  stuck_tasks: []
+  current_focus: ["Compare Page"]
+  stuck_tasks: ["Compare Page"]
   test_all: false
   test_priority: "high_first"
-  last_tested: "Compare Button Functionality"
+  last_tested: "Compare Page"
 
 agent_communication:
   - agent: "testing"
