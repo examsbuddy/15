@@ -1790,18 +1790,18 @@ export const RecentSearchesHomepage = ({ onSearch }) => {
   const sectionTitle = recentSearches.length > 0 ? 'Recent Searches' : 'Popular Near You';
 
   return (
-    <div className="max-w-4xl mx-auto mt-4 px-4">
-      <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-3 md:p-4">
-        <h3 className="text-xs md:text-sm font-medium text-gray-600 mb-2 flex items-center">
-          <Clock className="w-3 h-3 md:w-4 md:h-4 mr-1.5 text-gray-400" />
+    <div className="max-w-4xl mx-auto mt-2 px-4">
+      <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-sm p-2.5 md:p-3 border border-white/40">
+        <h3 className="text-xs font-medium text-gray-500 mb-1.5 flex items-center">
+          <Clock className="w-3 h-3 mr-1 text-gray-400" />
           {sectionTitle}
         </h3>
-        <div className="flex flex-wrap gap-1.5 md:gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {displaySearches.map((search, index) => (
             <button
               key={index}
               onClick={() => handleRecentSearch(search)}
-              className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors border border-blue-200 hover:border-blue-300"
+              className="bg-blue-50/80 hover:bg-blue-100 text-blue-600 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors border border-blue-100 hover:border-blue-200"
             >
               {search}
             </button>
