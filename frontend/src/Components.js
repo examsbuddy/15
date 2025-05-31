@@ -4599,15 +4599,6 @@ export const DedicatedSearchPage = ({ onBack, onViewListing, initialFilters = {}
   const [savedSearches, setSavedSearches] = useState([]);
   
   // Enhanced search data
-  const storageOptions = ['32GB', '64GB', '128GB', '256GB', '512GB', '1TB'];
-  const ramOptions = ['2GB', '3GB', '4GB', '6GB', '8GB', '12GB', '16GB'];
-  const sortOptions = [
-    { value: 'relevance', label: 'Most Relevant' },
-    { value: 'price_low', label: 'Price: Low to High' },
-    { value: 'price_high', label: 'Price: High to Low' },
-    { value: 'newest', label: 'Newest First' },
-    { value: 'distance', label: 'Nearest First' }
-  ];
   
   // Search data and options
   const phoneModels = [
