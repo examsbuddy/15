@@ -666,7 +666,7 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
         if (key !== 'confirmPassword' && shopOwnerData[key] !== null && shopOwnerData[key] !== '') {
           // Handle file fields separately
           if (['businessLicense', 'cnicFront', 'cnicBack'].includes(key)) {
-            if (shopOwnerData[key] instanceof File) {
+            if (shopOwnerData[key] && shopOwnerData[key] instanceof File) {
               formData.append(key, shopOwnerData[key]);
             }
           } else {
