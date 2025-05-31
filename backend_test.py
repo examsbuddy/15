@@ -204,14 +204,45 @@ class PhoneFlipAPITester:
     def test_register_shop_owner_duplicate_email(self):
         """Test registering a shop owner with a duplicate email"""
         # First, register a shop owner successfully
-        success, _ = self.test_register_shop_owner()
+        test_data_1 = {
+            "name": "Test Shop Owner",
+            "email": self.test_shop_owner_email,
+            "password": self.test_user_password,
+            "phone": "03009876543",
+            "business_details": {
+                "business_name": "Test Mobile Shop",
+                "business_type": "mobile_shop",
+                "business_address": "123 Test Street",
+                "city": "Karachi",
+                "postal_code": "75000",
+                "business_phone": "03009876543",
+                "website": "https://testshop.com",
+                "description": "This is a test shop for automated testing.",
+                "years_in_business": 5
+            },
+            "kyc_documents": {
+                "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
+                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",    # test base64 data
+                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
+                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="      # test base64 data
+            }
+        }
         
-        if not success:
+        # Register the first shop owner
+        success_1, _ = self.run_test(
+            "Register First Shop Owner",
+            "POST",
+            "api/auth/register-shop-owner",
+            200,
+            data=test_data_1
+        )
+        
+        if not success_1:
             print("❌ Failed to register initial shop owner, skipping duplicate email test")
             return False, {}
             
         # Now try to register another shop owner with the same email
-        test_data = {
+        test_data_2 = {
             "name": "Duplicate Shop Owner",
             "email": self.test_shop_owner_email,  # Same email as the first shop owner
             "password": self.test_user_password,
@@ -241,7 +272,7 @@ class PhoneFlipAPITester:
             "POST",
             "api/auth/register-shop-owner",
             400,
-            data=test_data
+            data=test_data_2
         )
 
 def test_shop_owner_registration():
