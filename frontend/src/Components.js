@@ -2357,6 +2357,14 @@ export const RecentListingsSection = () => {
           </div>
         )}
       </div>
+      
+      {/* Listing Details Modal */}
+      {selectedListing && (
+        <ListingDetails 
+          listing={selectedListing} 
+          onClose={() => setSelectedListing(null)} 
+        />
+      )}
     </section>
   );
 };
