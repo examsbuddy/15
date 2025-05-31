@@ -1943,7 +1943,6 @@ export const RecentListingsSection = () => {
               <div 
                 key={listing._id} 
                 className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer flex-shrink-0 w-[140px] sm:w-[160px] relative overflow-hidden"
-                onClick={() => setSelectedListing(listing)}
               >
                 {/* Image Section - Top */}
                 <div className="w-full h-[120px] sm:h-[140px] relative">
