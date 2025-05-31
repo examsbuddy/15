@@ -2396,7 +2396,7 @@ export const ContentCardsSection = () => {
   );
 };
 
-export const FeaturedPhones = ({ addToCompare, compareList }) => {
+export const FeaturedPhones = ({ addToCompare, compareList, onViewListing }) => {
   const [featuredPhones, setFeaturedPhones] = useState([]);
   const [loading, setLoading] = useState(true);
 
