@@ -32,6 +32,7 @@ function App() {
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [showSignUpModal, setShowSignUpModal] = useState(false);
+  const [signUpType, setSignUpType] = useState('normal');
   const [compareList, setCompareList] = useState([]);
   const [searchFilters, setSearchFilters] = useState(null);
   const [currentListingId, setCurrentListingId] = useState(null);
