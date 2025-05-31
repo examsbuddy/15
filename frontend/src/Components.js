@@ -1312,9 +1312,8 @@ export const Header = ({
                 <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                   <Smartphone className="w-6 h-6 text-white" />
                 </div>
-                <div>
-                  <div className="text-xl font-bold text-white">PhoneFlip</div>
-                  <div className="text-xs text-blue-300 font-semibold -mt-1">.PK</div>
+                <div className="text-xl font-bold text-white tracking-tight">
+                  PhoneFlip<span className="text-transparent bg-gradient-to-r from-green-400 via-green-500 to-green-600 bg-clip-text font-black">.PK</span>
                 </div>
               </button>
             </div>
