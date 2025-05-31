@@ -1925,55 +1925,72 @@ export const RecentListingsSection = () => {
         </div>
 
         {isLoading ? (
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
             {[...Array(8)].map((_, index) => (
-              <div key={index} className="bg-white rounded-xl p-4 shadow-sm animate-pulse flex-shrink-0 w-[calc(50%-0.5rem)] md:w-80">
-                <div className="w-full h-48 bg-gray-200 rounded-lg mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+              <div key={index} className="bg-white rounded-xl shadow-sm animate-pulse flex-shrink-0 w-[280px] sm:w-[320px] h-[120px] flex">
+                <div className="w-24 sm:w-28 h-full bg-gray-200 rounded-l-xl flex-shrink-0"></div>
+                <div className="flex-1 p-3 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  </div>
+                  <div className="h-5 bg-gray-200 rounded w-1/3"></div>
+                </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
             {recentListings.map((listing) => (
-              <div key={listing._id} className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer flex-shrink-0 w-[calc(50%-0.5rem)] md:w-80">
-                <div className="relative mb-4">
+              <div key={listing._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer flex-shrink-0 w-[280px] sm:w-[320px] h-[120px] flex relative overflow-hidden">
+                {/* Image Section - Left Side */}
+                <div className="w-24 sm:w-28 h-full relative flex-shrink-0">
                   <img
                     src={listing.photos && listing.photos.length > 0 ? listing.photos[0] : '/api/placeholder/300/200'}
                     alt={`${listing.brand} ${listing.model}`}
-                    className="w-full h-48 object-cover rounded-lg"
+                    className="w-full h-full object-cover rounded-l-xl"
                   />
-                  <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                    {timeAgo(listing.created_at)}
-                  </div>
+                  {/* Featured Badge */}
                   {listing.is_featured && (
-                    <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
-                      Featured
+                    <div className="absolute top-1 left-1 bg-yellow-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                      ⭐
                     </div>
                   )}
                 </div>
                 
-                <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
-                    {listing.brand} {listing.model}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {listing.storage} • {listing.condition}
-                  </p>
-                  <p className="text-sm text-gray-500 flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    {listing.city}
-                  </p>
-                  <div className="flex items-center justify-between pt-2">
-                    <span className="text-xl font-bold text-[#1e40af]">
+                {/* Details Section - Right Side */}
+                <div className="flex-1 p-3 flex flex-col justify-between relative">
+                  {/* Time Badge */}
+                  <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    {timeAgo(listing.created_at)}
+                  </div>
+                  
+                  {/* Main Content */}
+                  <div className="space-y-1 mt-4">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 line-clamp-1 leading-tight">
+                      {listing.brand} {listing.model}
+                    </h3>
+                    <p className="text-xs text-gray-600">
+                      {listing.storage} • {listing.condition}
+                    </p>
+                    <p className="text-xs text-gray-500 flex items-center">
+                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="truncate">{listing.city}</span>
+                    </p>
+                  </div>
+                  
+                  {/* Price and Seller Type */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-base sm:text-lg font-bold text-[#1e40af] truncate">
                       {formatPrice(listing.price)}
                     </span>
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                      {listing.seller_type}
+                    <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-1 rounded-full ml-2">
+                      {listing.seller_type === 'Individual' ? 'Ind' : 
+                       listing.seller_type === 'Shop Owner' ? 'Shop' : 
+                       listing.seller_type === 'Verified Seller' ? 'Ver' : listing.seller_type}
                     </span>
                   </div>
                 </div>
