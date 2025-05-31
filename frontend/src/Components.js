@@ -2076,24 +2076,15 @@ export const RecentSearchesHomepage = ({ onSearch }) => {
 // Simplified placeholder components
 export const MobileBottomNav = ({ currentPage, setCurrentPage, isLoggedIn, compareCount, onCompareClick }) => {
   const handleNavigation = (key) => {
-    console.log('Navigation clicked:', key);
-    console.log('Current page:', currentPage);
-    console.log('setCurrentPage function:', typeof setCurrentPage);
-    
     if (key === 'compare') {
-      console.log('Compare button clicked, compareCount:', compareCount);
       // Handle compare functionality
       if (compareCount > 0) {
-        console.log('Opening compare modal');
         onCompareClick();
-      } else {
-        console.log('No items to compare');
       }
       return;
     }
     
     // Regular navigation for all other buttons
-    console.log('Setting current page to:', key);
     setCurrentPage(key);
   };
 
