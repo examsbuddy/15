@@ -1627,39 +1627,10 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
                 <span className="hidden md:inline">Search</span>
               </button>
             </div>
-            
-            {/* Quick Action Buttons */}
-            <div className="flex flex-wrap gap-3 mt-6 justify-center">
-              <button 
-                onClick={() => onSearch && onSearch('dedicated-search', { brand: 'Apple' })}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
-              >
-                <span>📱</span>
-                <span>iPhone</span>
-              </button>
-              <button 
-                onClick={() => onSearch && onSearch('dedicated-search', { brand: 'Samsung' })}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
-              >
-                <span>📱</span>
-                <span>Samsung</span>
-              </button>
-              <button 
-                onClick={() => onSearch && onSearch('dedicated-search', { priceRange: 'Under ₨50,000' })}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
-              >
-                <span>💰</span>
-                <span>Under ₨50K</span>
-              </button>
-              <button 
-                onClick={() => onSearch && onSearch('dedicated-search', { condition: 'New' })}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
-              >
-                <span>✨</span>
-                <span>New Phones</span>
-              </button>
-            </div>
           </div>
+          
+          {/* Recent Searches Section */}
+          <RecentSearchesHomepage onSearch={onSearch} />
         </div>
       </div>
     </section>
