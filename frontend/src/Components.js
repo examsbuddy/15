@@ -635,7 +635,18 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
         onClose();
         resetForms();
       } else {
-        setError(data.detail || 'Registration failed');
+        // Handle both string and object error responses
+        let errorMessage = 'Registration failed';
+        if (data.detail) {
+          if (typeof data.detail === 'string') {
+            errorMessage = data.detail;
+          } else if (Array.isArray(data.detail)) {
+            errorMessage = data.detail.map(err => err.msg || err).join(', ');
+          } else {
+            errorMessage = JSON.stringify(data.detail);
+          }
+        }
+        setError(errorMessage);
       }
     } catch (error) {
       setError('Network error. Please try again.');
