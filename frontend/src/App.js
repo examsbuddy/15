@@ -23,8 +23,7 @@ import {
   SearchResultsPage,
   ShopOwnerDashboard,
   DetailedListingPage,
-  DedicatedSearchPage,
-  CompareModal
+  DedicatedSearchPage
 } from './Components';
 
 function App() {
