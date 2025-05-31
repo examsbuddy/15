@@ -1721,8 +1721,8 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
             Pakistan's #1 phone marketplace
           </p>
 
-          {/* Simplified Search Bar - Modern & Compact Design */}
-          <div className="bg-white/98 backdrop-blur-sm rounded-xl shadow-lg p-3 md:p-6 max-w-4xl mx-auto border border-white/30">
+          {/* Simplified Search Bar - Ultra Modern & Sleek Design */}
+          <div className="bg-white/98 backdrop-blur-sm rounded-xl shadow-lg p-3 md:p-6 max-w-4xl mx-auto">
             <div className="flex gap-2 md:gap-4">
               {/* Simplified Search Input */}
               <div className="flex-1 relative">
@@ -1732,7 +1732,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
                   placeholder="Search phones, brands, or models..."
                   onClick={() => onSearch && onSearch('dedicated-search')}
                   readOnly
-                  className="w-full pl-9 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border border-gray-200 rounded-lg md:rounded-xl text-sm md:text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 md:focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition-all duration-200"
+                  className="w-full pl-9 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-gray-50/50 hover:bg-gray-50 transition-all duration-200 cursor-pointer"
                 />
               </div>
 
