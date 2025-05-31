@@ -2098,63 +2098,118 @@ export const FeaturedShopsSection = () => {
   return (
     <section className="bg-gray-50 py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-            Featured Phone Shops
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Browse phones from verified shops with excellent ratings and genuine products
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              Featured Phone Shops
+            </h2>
+            <p className="text-gray-600">
+              Browse phones from verified shops with excellent ratings and genuine products
+            </p>
+          </div>
+          
+          {/* Navigation arrows for desktop */}
+          <div className="hidden md:flex items-center space-x-2">
+            <button 
+              onClick={() => {
+                const container = document.getElementById('shops-scroll');
+                container.scrollBy({ left: -300, behavior: 'smooth' });
+              }}
+              className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <ArrowRight className="w-5 h-5 rotate-180 text-gray-600" />
+            </button>
+            <button 
+              onClick={() => {
+                const container = document.getElementById('shops-scroll');
+                container.scrollBy({ left: 300, behavior: 'smooth' });
+              }}
+              className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <ArrowRight className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredShops.map((shop, index) => (
-            <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{shop.name}</h3>
-                  <p className="text-gray-600 text-sm flex items-center">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    {shop.location}
-                  </p>
+        {/* Horizontal scrolling container */}
+        <div className="relative">
+          <div 
+            id="shops-scroll"
+            className="flex gap-6 overflow-x-auto scrollbar-hide pb-4"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {featuredShops.map((shop, index) => (
+              <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow flex-shrink-0 w-[320px]">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">{shop.name}</h3>
+                    <p className="text-gray-600 text-sm flex items-center">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      {shop.location}
+                    </p>
+                  </div>
+                  <div className="flex items-center bg-green-100 px-2 py-1 rounded-full">
+                    <Star className="w-4 h-4 text-green-600 mr-1" />
+                    <span className="text-green-800 text-sm font-medium">{shop.rating}</span>
+                  </div>
                 </div>
-                <div className="flex items-center bg-green-100 px-2 py-1 rounded-full">
-                  <Star className="w-4 h-4 text-green-600 mr-1" />
-                  <span className="text-green-800 text-sm font-medium">{shop.rating}</span>
-                </div>
-              </div>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Reviews:</span>
-                  <span className="font-medium">{shop.reviews.toLocaleString()}</span>
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Reviews:</span>
+                    <span className="font-medium">{shop.reviews.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Years in Business:</span>
+                    <span className="font-medium">{shop.yearsInBusiness} years</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Phones Available:</span>
+                    <span className="font-medium">{shop.phoneCount}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Years in Business:</span>
-                  <span className="font-medium">{shop.yearsInBusiness} years</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Phones Available:</span>
-                  <span className="font-medium">{shop.phoneCount}</span>
-                </div>
-              </div>
 
-              <div className="mb-6">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Specialties:</h4>
-                <div className="flex flex-wrap gap-2">
-                  {shop.specialties.map((specialty, idx) => (
-                    <span key={idx} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                      {specialty}
-                    </span>
-                  ))}
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Specialties:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {shop.specialties.map((specialty, specialtyIndex) => (
+                      <span key={specialtyIndex} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                        {specialty}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors">
-                View Shop
-              </button>
+                <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                  View Shop
+                </button>
+              </div>
+            ))}
+            
+            {/* See All Shops card - fixed on the right */}
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex-shrink-0 w-[320px] h-[300px] flex items-center justify-center text-white cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-colors">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ArrowRight className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">See All Shops</h3>
+                <p className="text-purple-100 text-sm">Browse verified sellers</p>
+              </div>
             </div>
-          ))}
+          </div>
+          
+          {/* Mobile swipe indicator */}
+          <div className="flex justify-center mt-4 md:hidden">
+            <div className="flex items-center space-x-1 text-gray-400 text-xs">
+              <div className="flex space-x-1">
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+              </div>
+              <span className="ml-2">Swipe to browse</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
