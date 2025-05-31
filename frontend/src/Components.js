@@ -1777,8 +1777,8 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
             </div>
           </div>
           
-          {/* Recent Searches Section */}
-          <RecentSearchesHomepage onSearch={onSearch} />
+          {/* Recent Searches Section - Hidden */}
+          {/* <RecentSearchesHomepage onSearch={onSearch} /> */}
         </div>
       </div>
     </section>
