@@ -61,8 +61,7 @@ test_plan:
     - "Horizontal scrolling for Featured Phones Section"
     - "Horizontal scrolling for Our Offerings Section"
     - "Horizontal scrolling for Featured Shops Section"
-  stuck_tasks: 
-    - "Horizontal scrolling for Featured Shops Section"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
