@@ -306,10 +306,14 @@ function App() {
       {isMobile && (
         <MobileBottomNav 
           currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
+          setCurrentPage={debugSetCurrentPage}
           isLoggedIn={isLoggedIn}
           compareCount={compareList.length}
-          onCompareClick={() => setShowCompareModal(true)}
+          onCompareClick={() => {
+            console.log('App.js: onCompareClick called');
+            setShowCompareModal(true);
+            console.log('App.js: setShowCompareModal(true) completed');
+          }}
         />
       )}
 
