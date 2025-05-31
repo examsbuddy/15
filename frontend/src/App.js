@@ -213,7 +213,7 @@ function App() {
           <DetailedListingPage 
             listingId={currentListingId}
             setCurrentPage={setCurrentPage}
-            onBack={() => setCurrentPage('search-results')}
+            onBack={() => setCurrentPage('home')}
           />
         )}
         
