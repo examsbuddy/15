@@ -3182,10 +3182,20 @@ export const PriceDropAlertsModal = ({ isOpen, onClose }) => {
   );
 };
 
-// Phone Comparison Page (GSMArena Style)
+// Phone Comparison Page (Improved UI)
 export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, onBack, allPhones = [] }) => {
   const [selectedPhones, setSelectedPhones] = useState(compareList || []);
   const [showAddPhone, setShowAddPhone] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Sample phone data if no phones provided
   const samplePhones = [
@@ -3262,14 +3272,54 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
       usb: 'USB-C',
       audio_jack: false,
       sensors: 'Fingerprint, accelerometer, gyro, proximity, compass, barometer, SpO2'
+    },
+    {
+      _id: '3',
+      brand: 'Google',
+      model: 'Pixel 8 Pro',
+      price: 380000,
+      photos: ['/api/placeholder/300/200'],
+      storage: '256GB',
+      ram: '12GB',
+      battery: '5050mAh',
+      camera: '50MP + 48MP + 48MP',
+      screen_size: '6.7"',
+      processor: 'Google Tensor G3',
+      operating_system: 'Android 14',
+      network: '5G',
+      condition: 'Excellent',
+      pta_approved: false,
+      warranty_months: 12,
+      purchase_year: 2023,
+      weight: '213g',
+      dimensions: '162.6 x 76.5 x 8.8 mm',
+      display_type: 'LTPO OLED',
+      refresh_rate: '120Hz',
+      chipset: 'Google Tensor G3',
+      gpu: 'Immortalis-G715s MC10',
+      main_camera: '50MP',
+      selfie_camera: '10.5MP',
+      video_recording: '4K@60fps',
+      wireless_charging: true,
+      fast_charging: '30W',
+      water_resistance: 'IP68',
+      fingerprint: 'Optical in-display',
+      nfc: true,
+      bluetooth: '5.3',
+      usb: 'USB-C',
+      audio_jack: false,
+      sensors: 'Fingerprint, accelerometer, gyro, proximity, compass, barometer, thermometer'
     }
   ];
 
   const phonesToUse = allPhones.length > 0 ? allPhones : samplePhones;
-  const displayPhones = selectedPhones.length > 0 ? selectedPhones : phonesToUse.slice(0, 2);
+  const maxPhones = isMobile ? 2 : 3;
+  const displayPhones = selectedPhones.length > 0 
+    ? selectedPhones.slice(0, maxPhones) 
+    : phonesToUse.slice(0, maxPhones);
 
   const handleAddPhone = (phone) => {
-    if (selectedPhones.length < 3 && !selectedPhones.find(p => p._id === phone._id)) {
+    if (selectedPhones.length < maxPhones && !selectedPhones.find(p => p._id === phone._id)) {
       const updatedList = [...selectedPhones, phone];
       setSelectedPhones(updatedList);
       addToCompare && addToCompare(phone);
@@ -3365,16 +3415,18 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
             <span>Back to Home</span>
           </button>
           
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Phone Comparison</h1>
-              <p className="text-gray-600 mt-2">Compare up to 3 phones side by side</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Phone Comparison</h1>
+              <p className="text-gray-600 mt-2">
+                Compare up to {maxPhones} phones side by side {isMobile ? '(Mobile View)' : '(Desktop View)'}
+              </p>
             </div>
             
-            {selectedPhones.length < 3 && (
+            {selectedPhones.length < maxPhones && (
               <button
                 onClick={() => setShowAddPhone(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                className="mt-4 sm:mt-0 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Phone</span>
@@ -3384,7 +3436,7 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
         </div>
 
         {displayPhones.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+          <div className="bg-white rounded-xl shadow-lg p-8 sm:p-12 text-center">
             <BarChart2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No phones to compare</h3>
             <p className="text-gray-600 mb-6">Add phones to compare their specifications and prices</p>
@@ -3397,48 +3449,66 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            {/* Phone Headers */}
-            <div className="border-b border-gray-200 p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="hidden md:block"></div>
-                {displayPhones.map((phone, index) => (
-                  <div key={phone._id} className="text-center relative">
-                    <button
-                      onClick={() => handleRemovePhone(phone._id)}
-                      className="absolute top-0 right-0 text-red-500 hover:text-red-700 z-10"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                    <img
-                      src={phone.photos?.[0] || '/api/placeholder/200/150'}
-                      alt={`${phone.brand} ${phone.model}`}
-                      className="w-32 h-24 object-cover rounded-lg mx-auto mb-3"
-                    />
-                    <h3 className="font-bold text-lg text-gray-900">{phone.brand} {phone.model}</h3>
-                    <p className="text-2xl font-bold text-blue-600">₨{phone.price?.toLocaleString()}</p>
-                  </div>
-                ))}
+            {/* Phone Headers - Mobile: 2 phones, Desktop: 3 phones */}
+            <div className="border-b border-gray-200 p-4 sm:p-6">
+              <div className="overflow-x-auto">
+                <div className={`grid gap-4 min-w-max ${isMobile ? 'grid-cols-3' : 'grid-cols-4'}`}>
+                  <div className="hidden sm:block"></div>
+                  {displayPhones.map((phone, index) => (
+                    <div key={phone._id} className="text-center relative min-w-40">
+                      <button
+                        onClick={() => handleRemovePhone(phone._id)}
+                        className="absolute top-0 right-0 text-red-500 hover:text-red-700 z-10 bg-white rounded-full p-1 shadow-sm"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                      <img
+                        src={phone.photos?.[0] || '/api/placeholder/150/100'}
+                        alt={`${phone.brand} ${phone.model}`}
+                        className="w-24 h-16 sm:w-32 sm:h-24 object-cover rounded-lg mx-auto mb-3"
+                      />
+                      <h3 className="font-bold text-sm sm:text-lg text-gray-900">
+                        {phone.brand} {phone.model}
+                      </h3>
+                      <p className="text-lg sm:text-2xl font-bold text-blue-600">
+                        ₨{phone.price?.toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Comparison Table */}
+            {/* Improved Comparison Table */}
             <div className="overflow-x-auto">
               {comparisonSpecs.map((section, sectionIndex) => (
                 <div key={sectionIndex}>
-                  <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
-                    <h4 className="font-semibold text-gray-900">{section.category}</h4>
+                  {/* Category Header */}
+                  <div className="bg-gray-100 px-4 sm:px-6 py-3 border-b border-gray-200">
+                    <h4 className="font-semibold text-gray-900 text-sm sm:text-base">{section.category}</h4>
                   </div>
                   
+                  {/* Specs Rows with Alternating Colors */}
                   {section.specs.map((spec, specIndex) => (
-                    <div key={specIndex} className="grid grid-cols-1 md:grid-cols-4 border-b border-gray-100">
-                      <div className="p-4 bg-gray-50 font-medium text-gray-700 md:col-span-1">
+                    <div 
+                      key={specIndex} 
+                      className={`grid gap-2 sm:gap-4 border-b border-gray-100 min-w-max ${
+                        isMobile ? 'grid-cols-3' : 'grid-cols-4'
+                      } ${specIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
+                    >
+                      {/* Feature Name Column */}
+                      <div className="p-3 sm:p-4 font-medium text-gray-700 text-xs sm:text-sm min-w-32 border-r border-gray-200">
                         {spec.label}
                       </div>
+                      
+                      {/* Phone Spec Columns */}
                       {displayPhones.map((phone, phoneIndex) => (
-                        <div key={phoneIndex} className="p-4 text-gray-900">
-                          {typeof spec.key === 'function' 
-                            ? spec.key(phone) 
-                            : phone[spec.key] || 'N/A'}
+                        <div key={phoneIndex} className="p-3 sm:p-4 text-gray-900 text-xs sm:text-sm min-w-32">
+                          <span className="break-words">
+                            {typeof spec.key === 'function' 
+                              ? spec.key(phone) 
+                              : phone[spec.key] || 'N/A'}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -3448,16 +3518,16 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
             </div>
 
             {/* Action Buttons */}
-            <div className="p-6 bg-gray-50 flex flex-col sm:flex-row gap-4">
+            <div className="p-4 sm:p-6 bg-gray-50 flex flex-col sm:flex-row gap-4">
               <button
                 onClick={() => setSelectedPhones([])}
-                className="flex-1 bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+                className="flex-1 bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm sm:text-base"
               >
                 Clear All
               </button>
               <button
                 onClick={onBack}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
               >
                 Continue Shopping
               </button>
@@ -3483,11 +3553,11 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
               
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {phonesToUse.filter(phone => !selectedPhones.find(p => p._id === phone._id)).map((phone) => (
+                  {phonesToUse.filter(phone => !selectedPhones.find(p => p._id === phone._id)).slice(0, 6).map((phone) => (
                     <div
                       key={phone._id}
                       onClick={() => handleAddPhone(phone)}
-                      className="border border-gray-200 rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors"
+                      className="border border-gray-200 rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors hover:shadow-md"
                     >
                       <img
                         src={phone.photos?.[0] || '/api/placeholder/150/100'}
@@ -3496,6 +3566,9 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
                       />
                       <h4 className="font-medium text-gray-900">{phone.brand} {phone.model}</h4>
                       <p className="text-blue-600 font-bold">₨{phone.price?.toLocaleString()}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {phone.pta_approved ? '✅ PTA Approved' : '❌ Non-PTA'}
+                      </p>
                     </div>
                   ))}
                 </div>
