@@ -256,16 +256,16 @@ class PhoneListing(BaseModel):
 # Existing routes
 # High-quality phone images with clean white backgrounds
 PHONE_IMAGES = [
-    "https://images.unsplash.com/photo-1574737331256-16f47895d422",
-    "https://images.unsplash.com/photo-1546621083-17f1e50980e9", 
-    "https://images.unsplash.com/photo-1464380573004-8ca85a08751a",
-    "https://images.pexels.com/photos/7561206/pexels-photo-7561206.jpeg",
-    "https://images.pexels.com/photos/8220804/pexels-photo-8220804.jpeg",
-    "https://images.unsplash.com/photo-1588609460031-22705bc49db0",
-    "https://images.pexels.com/photos/7629856/pexels-photo-7629856.jpeg",
-    "https://images.pexels.com/photos/2698552/pexels-photo-2698552.jpeg",
-    "https://images.unsplash.com/photo-1574737331256-16f47895d422",
-    "https://images.unsplash.com/photo-1546621083-17f1e50980e9"
+    "https://images.unsplash.com/photo-1574737331256-16f47895d422?w=400&h=400&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1546621083-17f1e50980e9?w=400&h=400&fit=crop&auto=format", 
+    "https://images.unsplash.com/photo-1464380573004-8ca85a08751a?w=400&h=400&fit=crop&auto=format",
+    "https://images.pexels.com/photos/7561206/pexels-photo-7561206.jpeg?w=400&h=400&fit=crop&auto=compress",
+    "https://images.pexels.com/photos/8220804/pexels-photo-8220804.jpeg?w=400&h=400&fit=crop&auto=compress",
+    "https://images.unsplash.com/photo-1588609460031-22705bc49db0?w=400&h=400&fit=crop&auto=format",
+    "https://images.pexels.com/photos/7629856/pexels-photo-7629856.jpeg?w=400&h=400&fit=crop&auto=compress",
+    "https://images.pexels.com/photos/2698552/pexels-photo-2698552.jpeg?w=400&h=400&fit=crop&auto=compress",
+    "https://images.unsplash.com/photo-1574737331256-16f47895d422?w=400&h=400&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1546621083-17f1e50980e9?w=400&h=400&fit=crop&auto=format"
 ]
 
 # Phone Specifications Database
