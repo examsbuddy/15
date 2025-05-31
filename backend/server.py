@@ -1277,7 +1277,7 @@ async def get_listings(
                         {"brand": search_regex},
                         {"model": search_regex},
                         {"description": search_regex},
-                        {"features": {"$in": [search_regex]}},
+                        {"features": {"$elemMatch": {"$regex": fuzzy_term, "$options": "i"}}},
                         {"processor": search_regex},
                         {"operating_system": search_regex}
                     ]
