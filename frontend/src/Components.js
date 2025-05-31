@@ -1694,6 +1694,63 @@ export const RecentSearchesHomepage = ({ onSearch }) => {
   );
 };
 
+// Recent Searches for Homepage
+export const RecentSearchesHomepage = ({ onSearch }) => {
+  const [recentSearches, setRecentSearches] = useState([]);
+  const [popularSearches] = useState([
+    'iPhone 13', 'Samsung Galaxy', 'Under ₨80,000', 'Karachi phones', 'Xiaomi latest'
+  ]);
+
+  useEffect(() => {
+    // Pre-load from cache immediately
+    const savedSearches = localStorage.getItem('phoneflip_recent_searches');
+    if (savedSearches) {
+      try {
+        const parsed = JSON.parse(savedSearches);
+        setRecentSearches(parsed.slice(0, 5));
+      } catch {
+        setRecentSearches([]);
+      }
+    }
+  }, []);
+
+  const handleRecentSearch = (searchTerm) => {
+    if (onSearch) {
+      onSearch('dedicated-search', { query: searchTerm });
+    }
+  };
+
+  // Don't render anything if no searches and no popular fallback needed
+  if (recentSearches.length === 0 && popularSearches.length === 0) {
+    return null;
+  }
+
+  const displaySearches = recentSearches.length > 0 ? recentSearches : popularSearches;
+  const sectionTitle = recentSearches.length > 0 ? 'Recent Searches' : 'Popular Near You';
+
+  return (
+    <div className="max-w-4xl mx-auto mt-6 px-4">
+      <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-4">
+        <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
+          <Clock className="w-4 h-4 mr-2 text-gray-500" />
+          {sectionTitle}
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          {displaySearches.map((search, index) => (
+            <button
+              key={index}
+              onClick={() => handleRecentSearch(search)}
+              className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors border border-blue-200 hover:border-blue-300"
+            >
+              {search}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Simplified placeholder components
 export const MobileBottomNav = ({ currentPage, setCurrentPage }) => {
   const menuItems = [
