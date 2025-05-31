@@ -1941,6 +1941,7 @@ export const RecentListingsSection = ({ onViewListing }) => {
             {recentListings.map((listing) => (
               <div 
                 key={listing._id} 
+                onClick={() => onViewListing(listing._id)}
                 className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer flex-shrink-0 w-[140px] sm:w-[160px] relative overflow-hidden"
               >
                 {/* Image Section - Top */}
