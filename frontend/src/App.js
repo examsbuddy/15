@@ -183,6 +183,15 @@ function App() {
           />
         )}
         
+        {/* Brand-specific Search Pages */}
+        {currentPage.startsWith('used-phones-') && (
+          <BrandSearchPage 
+            brand={currentPage.replace('used-phones-', '')}
+            onBack={handleBackToHome}
+            onViewListing={handleViewListing}
+          />
+        )}
+
         {/* Dedicated Search Page */}
         {currentPage === 'dedicated-search' && (
           <DedicatedSearchPage 
