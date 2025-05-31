@@ -1872,10 +1872,9 @@ export const CompareSection = ({ compareList, onCompareClick }) => {
   );
 };
 
-export const RecentListingsSection = () => {
+export const RecentListingsSection = ({ onViewListing }) => {
   const [recentListings, setRecentListings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedListing, setSelectedListing] = useState(null);
 
   useEffect(() => {
     fetchRecentListings();
