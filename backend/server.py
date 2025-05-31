@@ -254,16 +254,18 @@ class PhoneListing(BaseModel):
         populate_by_name = True
 
 # Existing routes
-# Real phone images from vision expert agent
+# High-quality phone images with clean white backgrounds
 PHONE_IMAGES = [
-    "https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg",
-    "https://images.unsplash.com/photo-1523206489230-c012c64b2b48",
-    "https://images.unsplash.com/photo-1556656793-08538906a9f8", 
-    "https://images.pexels.com/photos/1647976/pexels-photo-1647976.jpeg",
-    "https://images.pexels.com/photos/47261/pexels-photo-47261.jpeg",
-    "https://images.pexels.com/photos/50614/pexels-photo-50614.jpeg",
-    "https://images.unsplash.com/photo-1583573636246-18cb2246697f",
-    "https://images.unsplash.com/photo-1598327105666-5b89351aff97"
+    "https://images.unsplash.com/photo-1574737331256-16f47895d422",
+    "https://images.unsplash.com/photo-1546621083-17f1e50980e9", 
+    "https://images.unsplash.com/photo-1464380573004-8ca85a08751a",
+    "https://images.pexels.com/photos/7561206/pexels-photo-7561206.jpeg",
+    "https://images.pexels.com/photos/8220804/pexels-photo-8220804.jpeg",
+    "https://images.unsplash.com/photo-1588609460031-22705bc49db0",
+    "https://images.pexels.com/photos/7629856/pexels-photo-7629856.jpeg",
+    "https://images.pexels.com/photos/2698552/pexels-photo-2698552.jpeg",
+    "https://images.unsplash.com/photo-1574737331256-16f47895d422",
+    "https://images.unsplash.com/photo-1546621083-17f1e50980e9"
 ]
 
 # Phone Specifications Database
