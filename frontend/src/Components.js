@@ -2084,19 +2084,7 @@ export const MobileBottomNav = ({ currentPage, setCurrentPage, isLoggedIn, compa
       return;
     }
     
-    if (key === 'post-ad' && !isLoggedIn) {
-      // Handle post-ad authentication requirement
-      onSignInRequired();
-      return;
-    }
-    
-    if (key === 'profile' && !isLoggedIn) {
-      // Handle profile authentication requirement
-      onSignInRequired();
-      return;
-    }
-    
-    // Regular navigation
+    // Regular navigation for all other buttons
     setCurrentPage(key);
   };
 
