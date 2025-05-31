@@ -695,7 +695,7 @@ async def populate_sample_data():
                 "processor": "Snapdragon 8 Gen 3",
                 "operating_system": "Android 14",
                 "network": "5G",
-                "photos": [sample_image, sample_image, sample_image],
+                "photos": [PHONE_IMAGES[2], PHONE_IMAGES[3], PHONE_IMAGES[4]],
                 "purchase_year": 2024,
                 "warranty_months": 6,
                 "box_included": True,
