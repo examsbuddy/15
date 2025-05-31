@@ -6173,6 +6173,8 @@ export const BrandSearchPage = ({ brand, onBack, onViewListing }) => {
     </div>
   );
 };
+
+export const SearchResults = ({ onBack }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [userLocation, setUserLocation] = useState('');
   const [locationLoading, setLocationLoading] = useState(true);
