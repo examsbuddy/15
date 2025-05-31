@@ -1914,85 +1914,141 @@ export const RecentListingsSection = ({ onViewListing }) => {
   return (
     <section className="bg-gray-50 py-6 md:py-12 lg:py-16">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-4 md:mb-8">
-          <h2 className="text-lg md:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 md:mb-4">
-            Recent Listings
-          </h2>
-          <p className="text-sm md:text-base text-gray-600 max-w-2xl mx-auto hidden md:block">
-            Check out the latest phones and accessories added to our marketplace
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              Recent Listings
+            </h2>
+            <p className="text-gray-600">
+              Latest phones added to our marketplace
+            </p>
+          </div>
+          
+          {/* Navigation arrows for desktop */}
+          <div className="hidden md:flex items-center space-x-2">
+            <button 
+              onClick={() => {
+                const container = document.getElementById('recent-listings-scroll');
+                container.scrollBy({ left: -300, behavior: 'smooth' });
+              }}
+              className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <ArrowRight className="w-5 h-5 rotate-180 text-gray-600" />
+            </button>
+            <button 
+              onClick={() => {
+                const container = document.getElementById('recent-listings-scroll');
+                container.scrollBy({ left: 300, behavior: 'smooth' });
+              }}
+              className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <ArrowRight className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
         </div>
 
-        {isLoading ? (
-          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
-            {[...Array(8)].map((_, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-sm animate-pulse flex-shrink-0 w-[140px] sm:w-[160px]">
-                <div className="w-full h-[120px] sm:h-[140px] bg-gray-200 rounded-t-xl"></div>
-                <div className="p-2 space-y-1">
-                  <div className="h-3 bg-gray-200 rounded w-full"></div>
-                  <div className="h-2 bg-gray-200 rounded w-2/3"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
-            {recentListings.map((listing) => (
+        {/* Horizontal scrolling container */}
+        <div className="relative">
+          <div 
+            id="recent-listings-scroll"
+            className="flex gap-4 overflow-x-auto scrollbar-hide pb-4"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {recentListings.map((listing, index) => (
               <div 
-                key={listing._id} 
+                key={listing._id || index} 
                 onClick={() => onViewListing(listing._id)}
-                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer flex-shrink-0 w-[140px] sm:w-[160px] relative overflow-hidden"
+                className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer flex-shrink-0 w-[280px]"
               >
-                {/* Image Section - Top */}
-                <div className="w-full h-[120px] sm:h-[140px] relative">
+                {/* Image Section */}
+                <div className="h-48 relative">
                   <img
                     src={listing.photos && listing.photos.length > 0 ? listing.photos[0] : '/api/placeholder/300/200'}
                     alt={`${listing.brand} ${listing.model}`}
-                    className="w-full h-full object-cover rounded-t-xl"
+                    className="w-full h-full object-cover"
                   />
-                  {/* Featured Badge */}
-                  {listing.is_featured && (
-                    <div className="absolute top-1 left-1 bg-yellow-500 text-white text-xs px-1 py-0.5 rounded-full">
-                      ⭐
-                    </div>
-                  )}
-                  {/* Time Badge */}
-                  <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1 py-0.5 rounded-full">
-                    New
+                  {/* New Badge */}
+                  <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                    🆕 New
                   </div>
                 </div>
                 
-                {/* Details Section - Bottom */}
-                <div className="p-2 space-y-1">
-                  <h3 className="text-xs font-semibold text-gray-900 line-clamp-1 leading-tight">
-                    {listing.brand} {listing.model}
-                  </h3>
-                  <p className="text-xs text-gray-600 truncate">
-                    {listing.storage}
-                  </p>
-                  <p className="text-xs text-gray-500 flex items-center truncate">
-                    <svg className="w-2.5 h-2.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="truncate">{listing.city}</span>
-                  </p>
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-sm font-bold text-[#1e40af] truncate">
-                      {formatPrice(listing.price)}
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-sm">
+                        {listing.brand} {listing.model}
+                      </h3>
+                      <p className="text-lg font-bold text-green-600">
+                        ₨ {listing.price?.toLocaleString()}
+                      </p>
+                    </div>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      listing.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
+                      listing.condition === 'Very Good' ? 'bg-blue-100 text-blue-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {listing.condition}
                     </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-4">
+                    <div>Storage: {listing.storage}</div>
+                    <div>RAM: {listing.ram}</div>
+                    <div>City: {listing.city}</div>
+                    <div>Views: {listing.views}</div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Add to compare functionality if needed
+                      }}
+                      className="px-3 py-1 rounded text-xs font-medium transition-colors bg-blue-100 text-blue-600 hover:bg-blue-200"
+                    >
+                      Compare
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onViewListing(listing._id);
+                      }}
+                      className="text-blue-600 hover:text-blue-700 text-xs font-medium"
+                    >
+                      View Details →
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
+            
+            {/* See All Phones card - fixed on the right */}
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex-shrink-0 w-[280px] h-[340px] flex items-center justify-center text-white cursor-pointer hover:from-blue-600 hover:to-blue-700 transition-colors">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ArrowRight className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">See All Listings</h3>
+                <p className="text-blue-100 text-sm">Browse all available phones</p>
+              </div>
+            </div>
           </div>
-        )}
-
-        {recentListings.length === 0 && !isLoading && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No recent listings found.</p>
+          
+          {/* Mobile swipe indicator */}
+          <div className="flex justify-center mt-4 md:hidden">
+            <div className="flex items-center space-x-1 text-gray-400 text-xs">
+              <div className="flex space-x-1">
+                <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+              </div>
+              <span className="ml-2">Swipe to browse</span>
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
