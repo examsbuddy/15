@@ -3182,90 +3182,327 @@ export const PriceDropAlertsModal = ({ isOpen, onClose }) => {
   );
 };
 
-export const CompareModal = ({ isOpen, onClose, compareList, clearCompare }) => {
-  if (!isOpen) return null;
+// Phone Comparison Page (GSMArena Style)
+export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, onBack, allPhones = [] }) => {
+  const [selectedPhones, setSelectedPhones] = useState(compareList || []);
+  const [showAddPhone, setShowAddPhone] = useState(false);
+
+  // Sample phone data if no phones provided
+  const samplePhones = [
+    {
+      _id: '1',
+      brand: 'iPhone',
+      model: '15 Pro',
+      price: 450000,
+      photos: ['/api/placeholder/300/200'],
+      storage: '256GB',
+      ram: '8GB',
+      battery: '3274mAh',
+      camera: '48MP + 12MP + 12MP',
+      screen_size: '6.1"',
+      processor: 'A17 Pro',
+      operating_system: 'iOS 17',
+      network: '5G',
+      condition: 'Excellent',
+      pta_approved: true,
+      warranty_months: 12,
+      purchase_year: 2023,
+      weight: '187g',
+      dimensions: '146.6 x 70.6 x 8.25 mm',
+      display_type: 'Super Retina XDR OLED',
+      refresh_rate: '120Hz',
+      chipset: 'Apple A17 Pro',
+      gpu: 'Apple GPU (6-core)',
+      main_camera: '48MP',
+      selfie_camera: '12MP',
+      video_recording: '4K@60fps',
+      wireless_charging: true,
+      fast_charging: '27W',
+      water_resistance: 'IP68',
+      fingerprint: 'Face ID',
+      nfc: true,
+      bluetooth: '5.3',
+      usb: 'USB-C',
+      audio_jack: false,
+      sensors: 'Face ID, accelerometer, gyro, proximity, compass, barometer'
+    },
+    {
+      _id: '2', 
+      brand: 'Samsung',
+      model: 'Galaxy S24 Ultra',
+      price: 420000,
+      photos: ['/api/placeholder/300/200'],
+      storage: '512GB',
+      ram: '12GB',
+      battery: '5000mAh',
+      camera: '200MP + 50MP + 12MP + 10MP',
+      screen_size: '6.8"',
+      processor: 'Snapdragon 8 Gen 3',
+      operating_system: 'Android 14',
+      network: '5G',
+      condition: 'Excellent',
+      pta_approved: true,
+      warranty_months: 24,
+      purchase_year: 2024,
+      weight: '232g',
+      dimensions: '162.3 x 79.0 x 8.6 mm',
+      display_type: 'Dynamic AMOLED 2X',
+      refresh_rate: '120Hz',
+      chipset: 'Snapdragon 8 Gen 3',
+      gpu: 'Adreno 750',
+      main_camera: '200MP',
+      selfie_camera: '12MP',
+      video_recording: '8K@30fps',
+      wireless_charging: true,
+      fast_charging: '45W',
+      water_resistance: 'IP68',
+      fingerprint: 'Ultrasonic in-display',
+      nfc: true,
+      bluetooth: '5.3',
+      usb: 'USB-C',
+      audio_jack: false,
+      sensors: 'Fingerprint, accelerometer, gyro, proximity, compass, barometer, SpO2'
+    }
+  ];
+
+  const phonesToUse = allPhones.length > 0 ? allPhones : samplePhones;
+  const displayPhones = selectedPhones.length > 0 ? selectedPhones : phonesToUse.slice(0, 2);
+
+  const handleAddPhone = (phone) => {
+    if (selectedPhones.length < 3 && !selectedPhones.find(p => p._id === phone._id)) {
+      const updatedList = [...selectedPhones, phone];
+      setSelectedPhones(updatedList);
+      addToCompare && addToCompare(phone);
+    }
+    setShowAddPhone(false);
+  };
+
+  const handleRemovePhone = (phoneId) => {
+    const updatedList = selectedPhones.filter(p => p._id !== phoneId);
+    setSelectedPhones(updatedList);
+    removeFromCompare && removeFromCompare(phoneId);
+  };
+
+  const comparisonSpecs = [
+    { 
+      category: 'Basic Information',
+      specs: [
+        { label: 'Brand & Model', key: (phone) => `${phone.brand} ${phone.model}` },
+        { label: 'Price', key: (phone) => `₨${phone.price?.toLocaleString()}` },
+        { label: 'Condition', key: 'condition' },
+        { label: 'PTA Approved', key: (phone) => phone.pta_approved ? '✅ Yes' : '❌ No' },
+        { label: 'Warranty', key: (phone) => `${phone.warranty_months || 0} months` }
+      ]
+    },
+    {
+      category: 'Design & Display',
+      specs: [
+        { label: 'Dimensions', key: 'dimensions' },
+        { label: 'Weight', key: 'weight' },
+        { label: 'Screen Size', key: 'screen_size' },
+        { label: 'Display Type', key: 'display_type' },
+        { label: 'Refresh Rate', key: 'refresh_rate' },
+        { label: 'Water Resistance', key: 'water_resistance' }
+      ]
+    },
+    {
+      category: 'Performance',
+      specs: [
+        { label: 'Processor', key: 'processor' },
+        { label: 'Chipset', key: 'chipset' },
+        { label: 'GPU', key: 'gpu' },
+        { label: 'RAM', key: 'ram' },
+        { label: 'Storage', key: 'storage' },
+        { label: 'Operating System', key: 'operating_system' }
+      ]
+    },
+    {
+      category: 'Camera',
+      specs: [
+        { label: 'Main Camera', key: 'camera' },
+        { label: 'Primary Sensor', key: 'main_camera' },
+        { label: 'Selfie Camera', key: 'selfie_camera' },
+        { label: 'Video Recording', key: 'video_recording' }
+      ]
+    },
+    {
+      category: 'Battery & Charging',
+      specs: [
+        { label: 'Battery Capacity', key: 'battery' },
+        { label: 'Fast Charging', key: 'fast_charging' },
+        { label: 'Wireless Charging', key: (phone) => phone.wireless_charging ? '✅ Yes' : '❌ No' }
+      ]
+    },
+    {
+      category: 'Connectivity',
+      specs: [
+        { label: 'Network', key: 'network' },
+        { label: 'Bluetooth', key: 'bluetooth' },
+        { label: 'NFC', key: (phone) => phone.nfc ? '✅ Yes' : '❌ No' },
+        { label: 'USB', key: 'usb' },
+        { label: 'Audio Jack', key: (phone) => phone.audio_jack ? '✅ Yes' : '❌ No' }
+      ]
+    },
+    {
+      category: 'Security & Sensors',
+      specs: [
+        { label: 'Fingerprint', key: 'fingerprint' },
+        { label: 'Sensors', key: 'sensors' }
+      ]
+    }
+  ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-2xl">
+    <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-6">
+          <button
+            onClick={onBack}
+            className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors mb-4"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back to Home</span>
+          </button>
+          
           <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-bold text-gray-900">Compare Phones</h3>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-              <X className="w-6 h-6" />
-            </button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Phone Comparison</h1>
+              <p className="text-gray-600 mt-2">Compare up to 3 phones side by side</p>
+            </div>
+            
+            {selectedPhones.length < 3 && (
+              <button
+                onClick={() => setShowAddPhone(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Phone</span>
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="p-6">
-          {compareList.length === 0 ? (
-            <div className="text-center py-12">
-              <BarChart2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h4 className="text-xl font-semibold text-gray-900 mb-2">No phones to compare</h4>
-              <p className="text-gray-600">Add phones to compare their specifications and prices</p>
+        {displayPhones.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+            <BarChart2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No phones to compare</h3>
+            <p className="text-gray-600 mb-6">Add phones to compare their specifications and prices</p>
+            <button
+              onClick={() => setShowAddPhone(true)}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Add Phones to Compare
+            </button>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            {/* Phone Headers */}
+            <div className="border-b border-gray-200 p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="hidden md:block"></div>
+                {displayPhones.map((phone, index) => (
+                  <div key={phone._id} className="text-center relative">
+                    <button
+                      onClick={() => handleRemovePhone(phone._id)}
+                      className="absolute top-0 right-0 text-red-500 hover:text-red-700 z-10"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                    <img
+                      src={phone.photos?.[0] || '/api/placeholder/200/150'}
+                      alt={`${phone.brand} ${phone.model}`}
+                      className="w-32 h-24 object-cover rounded-lg mx-auto mb-3"
+                    />
+                    <h3 className="font-bold text-lg text-gray-900">{phone.brand} {phone.model}</h3>
+                    <p className="text-2xl font-bold text-blue-600">₨{phone.price?.toLocaleString()}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr>
-                    <th className="text-left py-4 px-2 font-medium text-gray-700">Specification</th>
-                    {compareList.map((phone, index) => (
-                      <th key={index} className="text-center py-4 px-2 font-medium text-gray-900">
-                        {phone.brand} {phone.model}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  <tr>
-                    <td className="py-3 px-2 font-medium text-gray-700">Price</td>
-                    {compareList.map((phone, index) => (
-                      <td key={index} className="py-3 px-2 text-center text-green-600 font-bold">
-                        ₨ {phone.price?.toLocaleString()}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-2 font-medium text-gray-700">Condition</td>
-                    {compareList.map((phone, index) => (
-                      <td key={index} className="py-3 px-2 text-center">{phone.condition}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-2 font-medium text-gray-700">Storage</td>
-                    {compareList.map((phone, index) => (
-                      <td key={index} className="py-3 px-2 text-center">{phone.storage}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-2 font-medium text-gray-700">RAM</td>
-                    {compareList.map((phone, index) => (
-                      <td key={index} className="py-3 px-2 text-center">{phone.ram}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-2 font-medium text-gray-700">City</td>
-                    {compareList.map((phone, index) => (
-                      <td key={index} className="py-3 px-2 text-center">{phone.city}</td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
 
-          {compareList.length > 0 && (
-            <div className="mt-6 text-center">
+            {/* Comparison Table */}
+            <div className="overflow-x-auto">
+              {comparisonSpecs.map((section, sectionIndex) => (
+                <div key={sectionIndex}>
+                  <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
+                    <h4 className="font-semibold text-gray-900">{section.category}</h4>
+                  </div>
+                  
+                  {section.specs.map((spec, specIndex) => (
+                    <div key={specIndex} className="grid grid-cols-1 md:grid-cols-4 border-b border-gray-100">
+                      <div className="p-4 bg-gray-50 font-medium text-gray-700 md:col-span-1">
+                        {spec.label}
+                      </div>
+                      {displayPhones.map((phone, phoneIndex) => (
+                        <div key={phoneIndex} className="p-4 text-gray-900">
+                          {typeof spec.key === 'function' 
+                            ? spec.key(phone) 
+                            : phone[spec.key] || 'N/A'}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="p-6 bg-gray-50 flex flex-col sm:flex-row gap-4">
               <button
-                onClick={clearCompare}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                onClick={() => setSelectedPhones([])}
+                className="flex-1 bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium"
               >
                 Clear All
               </button>
+              <button
+                onClick={onBack}
+                className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Continue Shopping
+              </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* Add Phone Modal */}
+        {showAddPhone && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-gray-900">Add Phone to Compare</h3>
+                  <button
+                    onClick={() => setShowAddPhone(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {phonesToUse.filter(phone => !selectedPhones.find(p => p._id === phone._id)).map((phone) => (
+                    <div
+                      key={phone._id}
+                      onClick={() => handleAddPhone(phone)}
+                      className="border border-gray-200 rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors"
+                    >
+                      <img
+                        src={phone.photos?.[0] || '/api/placeholder/150/100'}
+                        alt={`${phone.brand} ${phone.model}`}
+                        className="w-full h-24 object-cover rounded-lg mb-3"
+                      />
+                      <h4 className="font-medium text-gray-900">{phone.brand} {phone.model}</h4>
+                      <p className="text-blue-600 font-bold">₨{phone.price?.toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
