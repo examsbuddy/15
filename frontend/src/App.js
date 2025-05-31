@@ -147,7 +147,7 @@ function App() {
             
             {/* 5. Our Special Offers (Offerings Section) */}
             <OurOfferingsSection 
-              onCompareClick={() => setShowCompareModal(true)}
+              onCompareClick={() => setCurrentPage('compare')}
               onPriceAlertsClick={() => setShowPriceAlertsModal(true)}
             />
             
