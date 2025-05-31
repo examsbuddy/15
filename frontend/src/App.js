@@ -313,7 +313,7 @@ function App() {
           setCurrentPage={setCurrentPage}
           isLoggedIn={isLoggedIn}
           compareCount={compareList.length}
-          onCompareClick={() => setShowCompareModal(true)}
+          onCompareClick={() => setCurrentPage('compare')}
         />
       )}
 
