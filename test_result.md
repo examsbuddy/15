@@ -561,6 +561,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Fixed the 'Uncaught runtime errors' in the shop owner registration form at step 3. The issue was related to file handling in the FormData object. The file fields (businessLicense, cnicFront, cnicBack) were not initialized in the shopOwnerData state, causing errors when checking 'instanceof File'. Fixed by initializing these fields to null and adding a null check before the instanceof check."
+      - working: true
+        agent: "testing"
+        comment: "Verified that the file handling fix is working correctly. The null check before the instanceof File check prevents runtime errors when file fields are null. The form now properly handles empty file fields without causing uncaught runtime errors. While there are backend validation errors (422) when submitting incomplete data, there are no JavaScript runtime errors related to file handling."
 
   - task: "Hero Section with Blue Theme"
     implemented: true
