@@ -125,59 +125,52 @@ function App() {
       <main className="pt-16 pb-20 md:pb-8">
         {currentPage === 'home' && (
           <div className="space-y-0">
-            {/* Hero Section with Enhanced Search */}
+            {/* 1. Hero Section with Centered Logo and Search */}
             <HeroSection 
               onCompareClick={() => setShowCompareModal(true)}
               onPriceAlertsClick={() => setShowPriceAlertsModal(true)}
               onSearch={handleSearch}
             />
             
-            {/* Recent Listings Section - Moved to top for mobile visibility */}
-            <div className="md:hidden">
-              <RecentListingsSection onViewListing={handleViewListing} />
-            </div>
+            {/* 2. Recent Listings Section - Mobile and Desktop */}
+            <RecentListingsSection onViewListing={handleViewListing} />
             
-            {/* Compare Section */}
-            <CompareSection 
-              compareList={compareList}
-              onCompareClick={() => setShowCompareModal(true)}
-            />
-            
-            {/* Recent Listings Section - Desktop view */}
-            <div className="hidden md:block">
-              <RecentListingsSection onViewListing={handleViewListing} />
-            </div>
-            
-            {/* Enhanced Selling Section */}
-            <SellSection 
-              isLoggedIn={isLoggedIn}
-              setCurrentPage={setCurrentPage}
-            />
-            
-            {/* Featured Shops Section */}
+            {/* 3. Featured Phone Shops */}
             <FeaturedShopsSection />
             
-            {/* Our Offerings Section */}
-            <OurOfferingsSection 
-              onCompareClick={() => setShowCompareModal(true)}
-              onPriceAlertsClick={() => setShowPriceAlertsModal(true)}
-            />
-            
-            {/* Featured Phones */}
+            {/* 4. Featured Phones */}
             <FeaturedPhones 
               addToCompare={addToCompare}
               compareList={compareList}
               onViewListing={handleViewListing}
             />
             
-            {/* Accessories Section */}
+            {/* 5. Our Special Offers (Offerings Section) */}
+            <OurOfferingsSection 
+              onCompareClick={() => setShowCompareModal(true)}
+              onPriceAlertsClick={() => setShowPriceAlertsModal(true)}
+            />
+            
+            {/* 6. Phone Accessories */}
             <AccessoriesSection />
             
-            {/* Content Cards Section */}
+            {/* 7. Sell to PhoneFlip Section */}
+            <SellSection 
+              isLoggedIn={isLoggedIn}
+              setCurrentPage={setCurrentPage}
+            />
+            
+            {/* 8. Videos & Blog Posts (Content Cards) */}
             <ContentCardsSection />
             
-            {/* Browse Section */}
+            {/* 9. Browse Phones Section */}
             <BrowseSection />
+            
+            {/* Compare Section - Keep for functionality */}
+            <CompareSection 
+              compareList={compareList}
+              onCompareClick={() => setShowCompareModal(true)}
+            />
           </div>
         )}
         
