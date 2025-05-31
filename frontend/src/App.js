@@ -23,7 +23,8 @@ import {
   SearchResultsPage,
   ShopOwnerDashboard,
   DetailedListingPage,
-  DedicatedSearchPage
+  DedicatedSearchPage,
+  BrandSearchPage
 } from './Components';
 
 function App() {
