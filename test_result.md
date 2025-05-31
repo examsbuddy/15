@@ -558,6 +558,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Verified backend API endpoint for shop owner registration (POST /api/auth/register-shop-owner). The endpoint correctly processes shop owner data including business details and KYC documents. It assigns user_type as 'shop_owner' with verification_status set to 'under_review'. Response includes proper confirmation message and user ID."
+      - working: true
+        agent: "testing"
+        comment: "Fixed the 'Uncaught runtime errors' in the shop owner registration form at step 3. The issue was related to file handling in the FormData object. The file fields (businessLicense, cnicFront, cnicBack) were not initialized in the shopOwnerData state, causing errors when checking 'instanceof File'. Fixed by initializing these fields to null and adding a null check before the instanceof check."
 
   - task: "Hero Section with Blue Theme"
     implemented: true
