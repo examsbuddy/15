@@ -301,11 +301,7 @@ function App() {
           setCurrentPage={setCurrentPage}
           isLoggedIn={isLoggedIn}
           compareCount={compareList.length}
-          onCompareClick={() => {
-            console.log('App.js: onCompareClick called');
-            setShowCompareModal(true);
-            console.log('App.js: setShowCompareModal(true) completed');
-          }}
+          onCompareClick={() => setShowCompareModal(true)}
         />
       )}
 
