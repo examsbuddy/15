@@ -2455,7 +2455,26 @@ export const FeaturedPhones = ({ addToCompare, compareList, onViewListing }) => 
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredPhones.map((phone, index) => (
-            <div key={index} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+            <div 
+              key={phone._id || index} 
+              onClick={() => onViewListing(phone._id)}
+              className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+            >
+              {/* Image Section */}
+              <div className="h-48 relative">
+                <img
+                  src={phone.photos && phone.photos.length > 0 ? phone.photos[0] : '/api/placeholder/300/200'}
+                  alt={`${phone.brand} ${phone.model}`}
+                  className="w-full h-full object-cover"
+                />
+                {/* Featured Badge */}
+                {phone.is_featured && (
+                  <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
+                    ⭐ Featured
+                  </div>
+                )}
+              </div>
+              
               <div className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
@@ -2484,7 +2503,10 @@ export const FeaturedPhones = ({ addToCompare, compareList, onViewListing }) => 
 
                 <div className="flex items-center justify-between">
                   <button
-                    onClick={() => addToCompare(phone)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCompare(phone);
+                    }}
                     disabled={compareList?.includes(phone)}
                     className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                       compareList?.includes(phone)
@@ -2494,7 +2516,13 @@ export const FeaturedPhones = ({ addToCompare, compareList, onViewListing }) => 
                   >
                     {compareList?.includes(phone) ? 'Added' : 'Compare'}
                   </button>
-                  <button className="text-blue-600 hover:text-blue-700 text-xs font-medium">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onViewListing(phone._id);
+                    }}
+                    className="text-blue-600 hover:text-blue-700 text-xs font-medium"
+                  >
                     View Details →
                   </button>
                 </div>
