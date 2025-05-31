@@ -273,6 +273,18 @@ backend:
         agent: "testing"
         comment: "Tested normal user registration flow, shop owner registration flow, creating a phone listing, and search/filtering for both phones and accessories. All user flows are working correctly."
 
+  - task: "Search Functionality API Endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "All search-related API endpoints are working correctly. The listings endpoint with filter parameters (brand, price range, city) returns filtered results as expected. The phone brands, models, and specs endpoints return the correct data. The search functionality is properly connected to the MongoDB database and returns appropriate results based on the search criteria."
+
   - task: "Backend Health Check"
     implemented: true
     working: true
