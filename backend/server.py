@@ -642,9 +642,6 @@ async def verify_shop_owner(user_id: str, status: VerificationStatus, current_us
 async def populate_sample_data():
     """Populate sample data for testing"""
     try:
-        # Sample base64 image (small placeholder)
-        sample_image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
-        
         # Sample phone listings with enhanced fields
         sample_listings = [
             {
@@ -757,7 +754,7 @@ async def populate_sample_data():
                 "processor": "Snapdragon 8+ Gen 1",
                 "operating_system": "ColorOS 14",
                 "network": "5G",
-                "photos": [sample_image, sample_image],
+                "photos": [PHONE_IMAGES[6], PHONE_IMAGES[7]],
                 "purchase_year": 2023,
                 "warranty_months": 3,
                 "box_included": True,
@@ -787,7 +784,7 @@ async def populate_sample_data():
                 "processor": "MediaTek Dimensity 8200",
                 "operating_system": "Funtouch OS 14",
                 "network": "5G",
-                "photos": [sample_image, sample_image],
+                "photos": [PHONE_IMAGES[8], PHONE_IMAGES[9]],
                 "purchase_year": 2024,
                 "warranty_months": 8,
                 "box_included": True,
@@ -817,7 +814,7 @@ async def populate_sample_data():
                 "processor": "Snapdragon 8 Gen 3",
                 "operating_system": "Realme UI 5.0",
                 "network": "5G",
-                "photos": [sample_image],
+                "photos": [PHONE_IMAGES[0]],
                 "purchase_year": 2024,
                 "warranty_months": 4,
                 "box_included": True,
@@ -847,7 +844,7 @@ async def populate_sample_data():
                 "processor": "A15 Bionic",
                 "operating_system": "iOS 17",
                 "network": "5G",
-                "photos": [sample_image, sample_image],
+                "photos": [PHONE_IMAGES[1], PHONE_IMAGES[2]],
                 "purchase_year": 2022,
                 "warranty_months": 0,
                 "box_included": True,
@@ -877,7 +874,7 @@ async def populate_sample_data():
                 "processor": "Exynos 1380",
                 "operating_system": "Android 13",
                 "network": "5G",
-                "photos": [sample_image, sample_image],
+                "photos": [PHONE_IMAGES[3], PHONE_IMAGES[4]],
                 "purchase_year": 2023,
                 "warranty_months": 6,
                 "box_included": True,
@@ -907,7 +904,7 @@ async def populate_sample_data():
                 "processor": "MediaTek Dimensity 7200",
                 "operating_system": "MIUI 14",
                 "network": "4G",
-                "photos": [sample_image],
+                "photos": [PHONE_IMAGES[5]],
                 "purchase_year": 2023,
                 "warranty_months": 2,
                 "box_included": False,
@@ -937,7 +934,7 @@ async def populate_sample_data():
                 "processor": "Snapdragon 8 Gen 3",
                 "operating_system": "OxygenOS 14",
                 "network": "5G",
-                "photos": [sample_image, sample_image, sample_image],
+                "photos": [PHONE_IMAGES[6], PHONE_IMAGES[7], PHONE_IMAGES[8]],
                 "purchase_year": 2024,
                 "warranty_months": 10,
                 "box_included": True,
@@ -967,7 +964,7 @@ async def populate_sample_data():
                 "processor": "Google Tensor G3",
                 "operating_system": "Android 14",
                 "network": "5G",
-                "photos": [sample_image, sample_image],
+                "photos": [PHONE_IMAGES[9], PHONE_IMAGES[0]],
                 "purchase_year": 2023,
                 "warranty_months": 4,
                 "box_included": True,
@@ -997,7 +994,7 @@ async def populate_sample_data():
                 "processor": "Snapdragon 8+ Gen 1",
                 "operating_system": "HarmonyOS 3.1",
                 "network": "5G",
-                "photos": [sample_image, sample_image],
+                "photos": [PHONE_IMAGES[1], PHONE_IMAGES[2]],
                 "purchase_year": 2023,
                 "warranty_months": 1,
                 "box_included": True,
