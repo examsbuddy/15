@@ -1721,28 +1721,28 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
             Pakistan's #1 phone marketplace
           </p>
 
-          {/* Simplified Search Bar */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 max-w-4xl mx-auto border border-white/20">
-            <div className="flex gap-4">
+          {/* Simplified Search Bar - Modern & Compact Design */}
+          <div className="bg-white/98 backdrop-blur-sm rounded-xl shadow-lg p-3 md:p-6 max-w-4xl mx-auto border border-white/30">
+            <div className="flex gap-2 md:gap-4">
               {/* Simplified Search Input */}
               <div className="flex-1 relative">
-                <Smartphone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
+                <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 z-10" />
                 <input
                   type="text"
                   placeholder="Search phones, brands, or models..."
                   onClick={() => onSearch && onSearch('dedicated-search')}
                   readOnly
-                  className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="w-full pl-9 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 border border-gray-200 rounded-lg md:rounded-xl text-sm md:text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 md:focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition-all duration-200"
                 />
               </div>
 
               {/* Search Button */}
               <button 
                 onClick={() => onSearch && onSearch('dedicated-search')}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 md:px-8 py-3 md:py-4 rounded-lg md:rounded-xl font-medium md:font-semibold transition-all duration-200 flex items-center justify-center space-x-2 md:space-x-3 shadow-md hover:shadow-lg"
               >
-                <Search className="w-6 h-6" />
-                <span className="hidden md:inline">Search</span>
+                <Search className="w-4 h-4 md:w-6 md:h-6" />
+                <span className="hidden md:inline text-sm md:text-base">Search</span>
               </button>
             </div>
           </div>
