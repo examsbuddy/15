@@ -116,6 +116,13 @@ function App() {
 
   return (
     <div className="App min-h-screen bg-gray-50">
+      {/* Add debugging info */}
+      {isMobile && (
+        <div className="fixed top-0 left-0 bg-yellow-200 p-2 text-xs z-50">
+          Current Page: {currentPage} | Compare Count: {compareList.length} | Show Compare Modal: {showCompareModal.toString()}
+        </div>
+      )}
+      
       <Header 
         currentPage={currentPage} 
         setCurrentPage={setCurrentPage}
