@@ -33,6 +33,7 @@ function App() {
   const [showPriceAlertsModal, setShowPriceAlertsModal] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [showSignUpModal, setShowSignUpModal] = useState(false);
+  const [showCompareModal, setShowCompareModal] = useState(false);
   const [signUpType, setSignUpType] = useState('normal');
   const [compareList, setCompareList] = useState([]);
   const [searchFilters, setSearchFilters] = useState(null);
