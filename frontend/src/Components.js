@@ -5213,6 +5213,22 @@ export const DedicatedSearchPage = ({ onBack, onViewListing, initialFilters = {}
           </div>
         )}
       </div>
+      
+      {/* Advanced Search Modal */}
+      <AdvancedSearchModal
+        isOpen={showAdvancedSearch}
+        onClose={() => setShowAdvancedSearch(false)}
+        onApplyFilters={(filters) => {
+          setAdvancedFilters(filters);
+          // Apply filters to search
+          let searchTerm = '';
+          if (filters.brand) searchTerm += filters.brand + ' ';
+          if (filters.model) searchTerm += filters.model + ' ';
+          if (filters.city) searchTerm += filters.city + ' ';
+          handleSearch(searchTerm.trim() || 'advanced search', 'advanced');
+        }}
+        currentFilters={advancedFilters}
+      />
     </div>
   );
 };
