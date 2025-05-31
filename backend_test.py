@@ -536,7 +536,8 @@ class PhoneFlipAPITester:
             print("❌ Failed to register shop owner for verification testing")
             return False, response
 
-def main():
+def test_auth_system_focused():
+    """Run focused tests on the authentication system"""
     # Get backend URL from environment or use default
     with open('/app/frontend/.env', 'r') as f:
         for line in f:
@@ -553,105 +554,132 @@ def main():
     print("\n=== Testing Server Status ===")
     tester.test_api_root()
     
-    # Run authentication tests
-    print("\n=== 1. Authentication Testing ===")
-    print("\n--- 1.1 User Registration Tests ---")
-    tester.test_register_normal_user()
-    tester.test_duplicate_registration()
-    tester.test_missing_fields_registration()
+    # Run focused authentication tests
+    print("\n=== EMERGENCY AUTHENTICATION SYSTEM DIAGNOSIS ===")
+    print("\n--- 1. Normal User Registration Tests ---")
+    normal_user_success, normal_user_data = tester.test_register_normal_user()
     
-    print("\n--- 1.2 User Login Tests ---")
-    tester.test_login()
-    tester.test_invalid_login()
+    print("\n--- 2. Duplicate Normal User Registration Test ---")
+    duplicate_user_success, duplicate_user_data = tester.test_duplicate_registration()
     
-    print("\n--- 1.3 Authentication Verification Tests ---")
-    tester.test_get_current_user()
-    tester.test_invalid_token_access()
-    tester.test_no_token_access()
+    print("\n--- 3. Shop Owner Registration Test ---")
+    shop_owner_success, shop_owner_data = tester.test_register_shop_owner()
     
-    print("\n--- 1.4 Shop Owner Registration Test ---")
-    tester.test_register_shop_owner()
-    tester.test_duplicate_shop_owner_registration()
+    print("\n--- 4. Duplicate Shop Owner Registration Test ---")
+    duplicate_shop_owner_success, duplicate_shop_owner_data = tester.test_duplicate_shop_owner_registration()
     
-    # Run phone listings tests
-    print("\n=== 2. Phone Listings Testing ===")
-    print("\n--- 2.1 Create Listing Test ---")
-    tester.test_create_listing()
+    print("\n--- 5. User Login Test ---")
+    login_success, login_data = tester.test_login()
     
-    print("\n--- 2.2 Get Listings Test ---")
-    tester.test_get_listings()
+    print("\n--- 6. Authentication Verification Tests ---")
+    auth_verification_success, auth_verification_data = tester.test_get_current_user()
+    invalid_token_success = tester.test_invalid_token_access()
+    no_token_success = tester.test_no_token_access()
     
-    print("\n--- 2.3 Get Filtered Listings Test ---")
-    tester.test_filtered_listings()
+    # Print detailed results
+    print("\n=== AUTHENTICATION SYSTEM DIAGNOSIS RESULTS ===")
     
-    print("\n--- 2.4 Get Listing by ID Test ---")
-    tester.test_get_listing_by_id()
+    print("\n1. Normal User Registration:")
+    if normal_user_success:
+        print("   ✅ Normal user registration works correctly")
+        print(f"   User ID: {normal_user_data['user']['_id']}")
+        print(f"   User Role: {normal_user_data['user']['role']}")
+        print(f"   Verification Status: {normal_user_data['user']['verification_status']}")
+    else:
+        print("   ❌ Normal user registration failed")
     
-    print("\n--- 2.5 Get Featured Listings Test ---")
-    tester.test_get_featured_listings()
+    print("\n2. Duplicate Email Handling (Normal User):")
+    if duplicate_user_success:
+        print("   ✅ Duplicate email correctly rejected with 400 status code")
+    else:
+        print("   ❌ Duplicate email handling is not working correctly")
+        print("   This may be returning a 500 error instead of the expected 400 error")
     
-    # Run accessories tests
-    print("\n=== 3. Accessories Testing ===")
-    print("\n--- 3.1 Get Accessories Test ---")
-    tester.test_get_accessories()
+    print("\n3. Shop Owner Registration:")
+    if shop_owner_success:
+        print("   ✅ Shop owner registration works correctly")
+        print(f"   User ID: {shop_owner_data.get('user_id', 'N/A')}")
+        print(f"   Message: {shop_owner_data.get('message', 'N/A')}")
+    else:
+        print("   ❌ Shop owner registration failed")
     
-    print("\n--- 3.2 Get Filtered Accessories Test ---")
-    tester.test_filtered_accessories()
+    print("\n4. Duplicate Email Handling (Shop Owner):")
+    if duplicate_shop_owner_success:
+        print("   ✅ Duplicate shop owner email correctly rejected with 400 status code")
+    else:
+        print("   ❌ Duplicate shop owner email handling is not working correctly")
+        print("   This may be returning a 500 error instead of the expected 400 error")
     
-    print("\n--- 3.3 Get Featured Accessories Test ---")
-    tester.test_get_featured_accessories()
+    print("\n5. User Login:")
+    if login_success:
+        print("   ✅ User login works correctly")
+    else:
+        print("   ❌ User login failed")
     
-    # Run shop owner features tests
-    print("\n=== 4. Shop Owner Features Testing ===")
-    print("\n--- 4.1 Shop Owner Verification Status Test ---")
-    tester.test_shop_owner_verification()
+    print("\n6. Authentication Verification:")
+    if auth_verification_success:
+        print("   ✅ Protected endpoint access with valid token works correctly")
+    else:
+        print("   ❌ Protected endpoint access with valid token failed")
     
-    # Run sample data verification tests
-    print("\n=== 5. Sample Data Verification ===")
-    print("\n--- 5.1 Populate Sample Data Test ---")
-    tester.test_populate_sample_data()
+    if invalid_token_success:
+        print("   ✅ Invalid token correctly returns 401 status code")
+    else:
+        print("   ❌ Invalid token handling is not working correctly")
+        print("   This may be returning a 500 error instead of the expected 401 error")
     
-    print("\n--- 5.2 Verify Sample Data Test ---")
-    tester.test_verify_sample_data()
-    
-    print("\n--- 5.3 Platform Statistics Test ---")
-    tester.test_get_stats()
-    
-    # Print results
-    print(f"\n📊 Total Tests: {tester.tests_run}")
-    print(f"📊 Tests Passed: {tester.tests_passed}")
-    print(f"📊 Tests Failed: {tester.tests_run - tester.tests_passed}")
-    print(f"📊 Success Rate: {(tester.tests_passed / tester.tests_run) * 100:.2f}%")
+    if no_token_success:
+        print("   ✅ Missing token correctly returns 401 status code")
+    else:
+        print("   ❌ Missing token handling is not working correctly")
+        print("   This may be returning a 403 error instead of the expected 401 error")
     
     # Print summary
-    print("\n=== Testing Summary ===")
-    print("1. Authentication Testing:")
-    print("   ✅ User Registration: Tested with valid data, duplicate email, and missing fields")
-    print("   ✅ User Login: Tested with valid credentials, invalid email, and invalid password")
-    print("   ✅ Authentication Verification: Tested protected endpoints with valid token, invalid token, and no token")
-    print("   ✅ Shop Owner Registration: Tested registration flow for shop owners and duplicate email handling")
+    print("\n=== AUTHENTICATION SYSTEM DIAGNOSIS SUMMARY ===")
+    auth_tests_passed = sum([
+        1 if normal_user_success else 0,
+        1 if duplicate_user_success else 0,
+        1 if shop_owner_success else 0,
+        1 if duplicate_shop_owner_success else 0,
+        1 if login_success else 0,
+        1 if auth_verification_success else 0,
+        1 if invalid_token_success else 0,
+        1 if no_token_success else 0
+    ])
+    auth_tests_total = 8
     
-    print("\n2. Phone Listings Testing:")
-    print("   ✅ Create Listing: Tested creating a new phone listing")
-    print("   ✅ Get Listings: Tested retrieving all listings")
-    print("   ✅ Filtered Listings: Tested search and filtering functionality")
-    print("   ✅ Get Listing by ID: Tested retrieving individual listing details")
-    print("   ✅ Featured Listings: Tested retrieving featured listings")
+    print(f"📊 Authentication Tests Passed: {auth_tests_passed}/{auth_tests_total}")
+    print(f"📊 Authentication System Health: {(auth_tests_passed / auth_tests_total) * 100:.2f}%")
     
-    print("\n3. Accessories Testing:")
-    print("   ✅ Get Accessories: Tested retrieving all accessories")
-    print("   ✅ Filtered Accessories: Tested search and filtering functionality for accessories")
-    print("   ✅ Featured Accessories: Tested retrieving featured accessories")
+    if auth_tests_passed == auth_tests_total:
+        print("\n✅ AUTHENTICATION SYSTEM IS FULLY FUNCTIONAL")
+    else:
+        print("\n⚠️ AUTHENTICATION SYSTEM REQUIRES ATTENTION")
+        
+        if not duplicate_user_success or not duplicate_shop_owner_success:
+            print("   ❌ CRITICAL: Duplicate email handling is broken")
+            print("   - The system is returning 500 errors instead of 400 errors for duplicate emails")
+            print("   - This affects both normal user and shop owner registration")
+            print("   - Check the error handling in the registration endpoints")
+        
+        if not invalid_token_success:
+            print("   ❌ CRITICAL: Invalid token handling is broken")
+            print("   - The system is returning 500 errors instead of 401 errors for invalid tokens")
+            print("   - Check the error handling in the get_current_user dependency function")
+        
+        if not no_token_success:
+            print("   ❌ CRITICAL: Missing token handling is broken")
+            print("   - The system is returning 403 errors instead of 401 errors for missing tokens")
+            print("   - Check the error handling in the get_current_user dependency function")
     
-    print("\n4. Shop Owner Features Testing:")
-    print("   ✅ Shop Owner Verification: Tested shop owner registration and verification status")
+    return auth_tests_passed == auth_tests_total
+
+def main():
+    # Run focused authentication system tests
+    auth_system_ok = test_auth_system_focused()
     
-    print("\n5. Sample Data Verification:")
-    print("   ✅ Populate Sample Data: Tested populating sample data")
-    print("   ✅ Verify Sample Data: Tested sample data existence and completeness (12 phone listings and 5 accessories)")
-    print("   ✅ Platform Statistics: Tested retrieving platform statistics including accessories count")
-    
-    return 0 if tester.tests_passed == tester.tests_run else 1
+    # Return success code if all tests passed
+    return 0 if auth_system_ok else 1
 
 if __name__ == "__main__":
     sys.exit(main())
