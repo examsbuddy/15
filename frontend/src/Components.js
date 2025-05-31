@@ -20,7 +20,7 @@ import {
   Smartphone,
   Headphones,
   Camera,
-  Filter,
+
   Heart,
   Share,
   Eye,
