@@ -85,13 +85,13 @@ function App() {
   };
 
   const addToCompare = (phone) => {
-    if (compareList.length < 3 && !compareList.find(p => p.id === phone.id)) {
+    if (compareList.length < 3 && !compareList.find(p => p._id === phone._id)) {
       setCompareList([...compareList, phone]);
     }
   };
 
   const removeFromCompare = (phoneId) => {
-    setCompareList(compareList.filter(p => p.id !== phoneId));
+    setCompareList(compareList.filter(p => p._id !== phoneId));
   };
 
   // Mobile view detection
