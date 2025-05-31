@@ -127,7 +127,7 @@ function App() {
           <div className="space-y-0">
             {/* 1. Hero Section with Centered Logo and Search */}
             <HeroSection 
-              onCompareClick={() => setShowCompareModal(true)}
+              onCompareClick={() => setCurrentPage('compare')}
               onPriceAlertsClick={() => setShowPriceAlertsModal(true)}
               onSearch={handleSearch}
             />
