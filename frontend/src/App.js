@@ -210,14 +210,6 @@ function App() {
           />
         )}
 
-        {currentPage === 'profile' && (
-          <ProfilePage 
-            user={user}
-            setCurrentPage={setCurrentPage}
-            onLogout={handleLogout}
-          />
-        )}
-
         {currentPage === 'listing-details' && currentListingId && (
           <DetailedListingPage 
             listingId={currentListingId}
