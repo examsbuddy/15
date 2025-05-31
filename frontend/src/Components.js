@@ -36,6 +36,7 @@ import {
   Check,
   Bell,
   Settings,
+  LogOut,
   DollarSign,
   Clock,
   TrendingUp,
