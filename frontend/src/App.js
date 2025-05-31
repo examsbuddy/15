@@ -204,6 +204,17 @@ function App() {
         )}
         
         {/* Detailed Listing Page */}
+        {/* Comparison Page */}
+        {currentPage === 'compare' && (
+          <ComparisonPage 
+            compareList={compareList}
+            addToCompare={addToCompare}
+            removeFromCompare={removeFromCompare}
+            onBack={handleBackToHome}
+            allPhones={[]} // You can pass actual phone data here if available
+          />
+        )}
+
         {currentPage === 'profile' && (
           <ProfilePage 
             user={user}
