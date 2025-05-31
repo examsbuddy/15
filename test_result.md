@@ -714,14 +714,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phone Specs Auto-Fetch System"
-    - "Enhanced Listing Form"
-    - "Advanced Multi-Select Filtering"
-    - "Filter Tags & UX"
-    - "Enhanced Listing Cards"
-    - "Auto-Suggest Search"
-    - "Seller Type System"
-    - "Mobile Experience"
+    - "Sign Up Modal with User Types"
+    - "Shop Owner Registration Process"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
