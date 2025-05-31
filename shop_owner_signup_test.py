@@ -830,7 +830,7 @@ class ShopOwnerSignupTester:
             report += f"  {case}: {rate:.2f}% ({test_case_success[case]}/{test_case_counts[case]})\n"
         
         report += "\nResponse Status Distribution:\n"
-        for status, count in sorted(status_counts.items()):
+        for status, count in status_counts.items():
             report += f"  {status}: {count} ({(count / len(self.test_results)) * 100:.2f}%)\n"
         
         # Check for error response format consistency
