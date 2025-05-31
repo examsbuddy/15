@@ -105,12 +105,12 @@ frontend:
         comment: "Search page is working correctly. Filters are functional and search results are displayed properly."
 
   - task: "Compare Page"
-    implemented: true
-    working: true
-    file: "/app/frontend/src/pages/Compare.js"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
+    implemented: false
+    working: false
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
@@ -118,6 +118,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Compare page is working correctly. Users can select phones to compare and the comparison table is displayed properly."
+      - working: false
+        agent: "testing"
+        comment: "The new comparison page functionality is not working. Could not navigate to a dedicated comparison page. The compare button does not navigate to a '/compare' page. No GSMArena-style side-by-side layout was found. The comparison functionality appears to be missing or not properly implemented."
 
   - task: "Sell Page"
     implemented: true
