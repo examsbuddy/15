@@ -1701,7 +1701,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
 
   return (
     <section 
-      className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 text-white py-6 md:py-24 overflow-hidden"
+      className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 text-white py-16 md:py-32 lg:py-40 overflow-hidden"
       style={{
         backgroundImage: `linear-gradient(rgba(30, 58, 138, 0.85), rgba(30, 58, 138, 0.85)), url('https://images.unsplash.com/photo-1562575214-da9fcf59b907')`,
         backgroundSize: 'cover',
@@ -1709,41 +1709,74 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
         backgroundRepeat: 'no-repeat'
       }}
     >
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-20 left-20 w-72 h-72 bg-blue-400 rounded-full filter blur-3xl"></div>
+        <div className="absolute bottom-20 right-20 w-72 h-72 bg-green-400 rounded-full filter blur-3xl"></div>
+      </div>
+      
       <div className="relative max-w-7xl mx-auto px-4 z-10">
-        <div className="text-center mb-4 md:mb-12">
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-6 text-center leading-tight">
-            Find Your Perfect
-            <span className="block text-transparent bg-gradient-to-r from-green-400 to-green-600 bg-clip-text">
-              Mobile Phone
-            </span>
-          </h1>
-          <p className="text-sm md:text-lg lg:text-xl text-blue-100 mb-4 md:mb-8 max-w-3xl mx-auto text-center">
-            Pakistan's #1 phone marketplace
-          </p>
+        <div className="text-center mb-8 md:mb-16">
+          {/* Main Headline - Enhanced and Bigger */}
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 md:mb-6 leading-tight">
+              <span className="block text-white">Where Pakistan</span>
+              <span className="block text-transparent bg-gradient-to-r from-green-400 via-green-500 to-green-600 bg-clip-text">
+                Buys, Sells & Talks
+              </span>
+              <span className="block text-white">Phones</span>
+            </h1>
+            
+            {/* Subtitle - More Impactful */}
+            <div className="space-y-2 md:space-y-3">
+              <p className="text-lg md:text-2xl lg:text-3xl text-blue-100 font-medium">
+                🇵🇰 Pakistan's #1 Mobile Phone Marketplace
+              </p>
+              <p className="text-base md:text-xl lg:text-2xl text-blue-200 max-w-4xl mx-auto">
+                Compare prices • Read reviews • Buy with confidence • Sell instantly
+              </p>
+            </div>
+          </div>
 
-          {/* Simplified Search Bar - Ultra Modern & Sleek Design */}
-          <div className="bg-white/98 backdrop-blur-sm rounded-xl shadow-lg p-3 md:p-6 max-w-4xl mx-auto">
-            <div className="flex gap-2 md:gap-4">
-              {/* Simplified Search Input */}
+          {/* Enhanced Search Bar - Bigger and More Modern */}
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl md:rounded-3xl shadow-2xl p-4 md:p-8 max-w-5xl mx-auto border border-white/20">
+            <div className="flex flex-col md:flex-row gap-3 md:gap-6">
+              {/* Main Search Input */}
               <div className="flex-1 relative">
-                <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400 z-10" />
+                <Smartphone className="absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 w-5 h-5 md:w-6 md:h-6 text-gray-400 z-10" />
                 <input
                   type="text"
-                  placeholder="Search phones, brands, or models..."
+                  placeholder="Search phones, brands, or models... (e.g. iPhone 15, Samsung Galaxy)"
                   onClick={() => onSearch && onSearch('dedicated-search')}
                   readOnly
-                  className="w-full pl-9 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/30 bg-white hover:bg-blue-50/30 transition-all duration-200 cursor-pointer"
+                  className="w-full pl-12 md:pl-16 pr-4 md:pr-6 py-4 md:py-6 rounded-xl md:rounded-2xl text-base md:text-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-400/30 bg-white hover:bg-blue-50/30 transition-all duration-200 cursor-pointer font-medium shadow-inner"
                 />
               </div>
 
-              {/* Search Button */}
+              {/* Enhanced Search Button */}
               <button 
                 onClick={() => onSearch && onSearch('dedicated-search')}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 md:px-8 py-3 md:py-4 rounded-lg md:rounded-xl font-medium md:font-semibold transition-all duration-200 flex items-center justify-center space-x-2 md:space-x-3 shadow-md hover:shadow-lg"
+                className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white px-6 md:px-12 py-4 md:py-6 rounded-xl md:rounded-2xl font-bold text-base md:text-lg transition-all duration-200 flex items-center justify-center space-x-3 shadow-xl hover:shadow-2xl transform hover:scale-105"
               >
-                <Search className="w-4 h-4 md:w-6 md:h-6" />
-                <span className="hidden md:inline text-sm md:text-base">Search</span>
+                <Search className="w-5 h-5 md:w-6 md:h-6" />
+                <span>Find Phones</span>
               </button>
+            </div>
+            
+            {/* Quick Stats */}
+            <div className="flex flex-wrap justify-center gap-4 md:gap-8 mt-6 md:mt-8 pt-6 md:pt-8 border-t border-gray-200">
+              <div className="text-center">
+                <div className="text-lg md:text-2xl font-bold text-blue-600">50,000+</div>
+                <div className="text-xs md:text-sm text-gray-600">Active Listings</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg md:text-2xl font-bold text-green-600">100,000+</div>
+                <div className="text-xs md:text-sm text-gray-600">Happy Customers</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg md:text-2xl font-bold text-purple-600">1,000+</div>
+                <div className="text-xs md:text-sm text-gray-600">Verified Sellers</div>
+              </div>
             </div>
           </div>
           
