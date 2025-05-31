@@ -1994,14 +1994,6 @@ export const RecentListingsSection = ({ onViewListing }) => {
           </div>
         )}
       </div>
-      
-      {/* Listing Details Modal */}
-      {selectedListing && (
-        <ListingDetails 
-          listing={selectedListing} 
-          onClose={() => setSelectedListing(null)} 
-        />
-      )}
     </section>
   );
 };
