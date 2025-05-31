@@ -254,6 +254,18 @@ class PhoneListing(BaseModel):
         populate_by_name = True
 
 # Existing routes
+# Real phone images from vision expert agent
+PHONE_IMAGES = [
+    "https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg",
+    "https://images.unsplash.com/photo-1523206489230-c012c64b2b48",
+    "https://images.unsplash.com/photo-1556656793-08538906a9f8", 
+    "https://images.pexels.com/photos/1647976/pexels-photo-1647976.jpeg",
+    "https://images.pexels.com/photos/47261/pexels-photo-47261.jpeg",
+    "https://images.pexels.com/photos/50614/pexels-photo-50614.jpeg",
+    "https://images.unsplash.com/photo-1583573636246-18cb2246697f",
+    "https://images.unsplash.com/photo-1598327105666-5b89351aff97"
+]
+
 # Phone Specifications Database
 PHONE_SPECS_DATABASE = {
     "Apple": {
