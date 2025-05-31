@@ -1711,15 +1711,14 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
     >
       <div className="relative max-w-7xl mx-auto px-4 z-10">
         <div className="text-center mb-8 md:mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 text-center leading-tight">
             Find Your Perfect
             <span className="block text-transparent bg-gradient-to-r from-green-400 to-green-600 bg-clip-text">
               Mobile Phone
             </span>
           </h1>
-          <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-            Pakistan's largest marketplace for new and used mobile phones. 
-            Compare prices, read reviews, and find the best deals in your city.
+          <p className="text-sm md:text-lg lg:text-xl text-blue-100 mb-8 max-w-3xl mx-auto text-center">
+            Pakistan's #1 phone marketplace
           </p>
 
           {/* Simplified Search Bar */}
