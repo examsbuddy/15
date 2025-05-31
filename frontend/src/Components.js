@@ -2077,10 +2077,8 @@ export const RecentSearchesHomepage = ({ onSearch }) => {
 export const MobileBottomNav = ({ currentPage, setCurrentPage, isLoggedIn, compareCount, onCompareClick }) => {
   const handleNavigation = (key) => {
     if (key === 'compare') {
-      // Handle compare functionality
-      if (compareCount > 0) {
-        onCompareClick();
-      }
+      // Always allow compare button to work - modal will handle empty state
+      onCompareClick();
       return;
     }
     
