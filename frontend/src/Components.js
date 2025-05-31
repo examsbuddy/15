@@ -1367,10 +1367,10 @@ export const Header = ({
 
             {/* Right Side Actions */}
             <div className="flex items-center space-x-3">
-              {/* Post an Ad Button - Red Highlighted */}
+              {/* Post an Ad Button - Red Highlighted - Hidden on Mobile */}
               <button
                 onClick={handlePostAd}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="hidden md:flex bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 items-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Post an Ad</span>
