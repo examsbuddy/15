@@ -326,7 +326,9 @@ function App() {
         <SignUpModal 
           isOpen={showSignUpModal}
           onClose={() => setShowSignUpModal(false)}
-          onLogin={handleLogin}
+          onSignup={handleLogin}
+          signUpType={signUpType}
+          setSignUpType={setSignUpType}
           onSwitchToSignIn={() => {
             setShowSignUpModal(false);
             setShowSignInModal(true);
