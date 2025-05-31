@@ -1732,7 +1732,7 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
                   placeholder="Search phones, brands, or models..."
                   onClick={() => onSearch && onSearch('dedicated-search')}
                   readOnly
-                  className="w-full pl-9 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 bg-gray-50/50 hover:bg-gray-50 transition-all duration-200 cursor-pointer"
+                  className="w-full pl-9 md:pl-12 pr-3 md:pr-4 py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/30 bg-white hover:bg-blue-50/30 transition-all duration-200 cursor-pointer"
                 />
               </div>
 
