@@ -665,7 +665,7 @@ async def populate_sample_data():
                 "processor": "A17 Pro Chip",
                 "operating_system": "iOS 17",
                 "network": "5G",
-                "photos": [sample_image, sample_image],
+                "photos": [PHONE_IMAGES[0], PHONE_IMAGES[1]],
                 "purchase_year": 2024,
                 "warranty_months": 12,
                 "box_included": True,
