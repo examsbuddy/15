@@ -10,6 +10,42 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Tested the navigation flow. While I was unable to directly click on phone listings to navigate to the detailed page in the testing environment, I verified that there are no console errors during navigation. The fix to change the 'Back to Search' button to navigate to 'home' instead of 'search-results' appears to be working as intended, as no runtime errors were detected."
+  
+  - task: "Horizontal scrolling for Featured Phones Section"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Tested horizontal scrolling in the Featured Phones section. Navigation arrows are visible on desktop and function correctly. The 'See All Phones' prompt is visible on the right. Phone listings remain clickable and navigate correctly. Mobile swipe indicators are present and horizontal swiping works properly on mobile view."
+  
+  - task: "Horizontal scrolling for Our Offerings Section"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Tested horizontal scrolling in the Our Offerings section. Navigation arrows are visible on desktop and function correctly. The 'See All Deals' link is positioned correctly on the right. Offering buttons (like 'Start Comparing') work properly. Mobile swipe indicators are present and horizontal swiping works properly on mobile view."
+  
+  - task: "Horizontal scrolling for Featured Shops Section"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Tested horizontal scrolling in the Featured Shops section. Navigation arrows are visible on desktop but do not function correctly - clicking the arrows does not change the scroll position. The 'See All Shops' option is visible on the right. Shop cards maintain functionality with clickable buttons. Mobile swipe indicators are present and horizontal swiping works properly on mobile view despite the desktop arrow issue."
 
 metadata:
   created_by: "testing_agent"
