@@ -709,37 +709,17 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
     }
   };
 
-  const validateCurrentStep = () => {
-    setError(''); // Clear any previous errors
-    
-    if (signUpType === 'shop_owner') {
-      if (currentStep === 1) {
-        // Validate step 1 fields
-        if (!shopOwnerData.name || !shopOwnerData.email || !shopOwnerData.password || 
-            !shopOwnerData.confirmPassword || !shopOwnerData.phone || !shopOwnerData.city) {
-          setError('Please fill in all required fields');
-          return false;
-        }
-        if (shopOwnerData.password !== shopOwnerData.confirmPassword) {
-          setError('Passwords do not match');
-          return false;
-        }
-      } else if (currentStep === 2) {
-        // Validate step 2 fields
-        if (!shopOwnerData.businessName || !shopOwnerData.businessAddress || 
-            !shopOwnerData.businessType || !shopOwnerData.yearsInBusiness) {
-          setError('Please fill in all business information');
-          return false;
-        }
-      }
-    }
-    return true;
-  };
-
-  const handleNextStep = () => {
-    if (validateCurrentStep()) {
-      setCurrentStep(currentStep + 1);
-    }
+  const resetForms = () => {
+    setNormalUserData({
+      name: '', email: '', password: '', confirmPassword: '', phone: '', city: ''
+    });
+    setShopOwnerData({
+      name: '', email: '', password: '', confirmPassword: '', phone: '', city: '',
+      businessName: '', businessAddress: '', businessType: '', yearsInBusiness: '',
+      cnicNumber: '', businessLicense: null, cnicFront: null, cnicBack: null
+    });
+    setCurrentStep(1);
+    setError('');
   };
   const resetForms = () => {
     setNormalUserData({
