@@ -590,9 +590,6 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
     cnicNumber: '',
     businessLicense: null,
     cnicFront: null,
-    cnicBack: null,
-    businessLicense: null,
-    cnicFront: null,
     cnicBack: null
   });
 
