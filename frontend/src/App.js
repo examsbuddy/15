@@ -105,6 +105,15 @@ function App() {
   // Mobile view detection
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
+  // Debug state changes
+  useEffect(() => {
+    console.log('App.js: currentPage changed to:', currentPage);
+  }, [currentPage]);
+  
+  useEffect(() => {
+    console.log('App.js: showCompareModal changed to:', showCompareModal);
+  }, [showCompareModal]);
+  
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
