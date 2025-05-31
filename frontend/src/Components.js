@@ -655,55 +655,141 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
     }
   };
 
+  // Robust error handling utility
+  const handleApiError = (error, defaultMessage = 'An unexpected error occurred') => {
+    console.error('API Error:', error);
+    
+    if (typeof error === 'string') {
+      return error;
+    }
+    
+    if (error && typeof error === 'object') {
+      // Handle FastAPI validation errors
+      if (error.detail) {
+        if (typeof error.detail === 'string') {
+          return error.detail;
+        }
+        if (Array.isArray(error.detail)) {
+          return error.detail.map(err => {
+            if (typeof err === 'string') return err;
+            if (err && typeof err === 'object') {
+              return err.msg || err.message || JSON.stringify(err);
+            }
+            return 'Validation error';
+          }).join(', ');
+        }
+        if (typeof error.detail === 'object') {
+          return JSON.stringify(error.detail);
+        }
+      }
+      
+      // Handle other error formats
+      if (error.message) {
+        return error.message;
+      }
+      
+      // Last resort - stringify the object
+      try {
+        return JSON.stringify(error);
+      } catch (e) {
+        return defaultMessage;
+      }
+    }
+    
+    return defaultMessage;
+  };
+
   const handleShopOwnerSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    if (shopOwnerData.password !== shopOwnerData.confirmPassword) {
-      setError('Passwords do not match');
-      setIsLoading(false);
-      return;
-    }
-
     try {
+      // Input validation
+      if (shopOwnerData.password !== shopOwnerData.confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
+
+      // Required field validation
+      const requiredFields = ['name', 'email', 'password', 'phone', 'city', 'businessName', 'businessAddress', 'businessType', 'yearsInBusiness', 'cnicNumber'];
+      const missingFields = requiredFields.filter(field => !shopOwnerData[field] || shopOwnerData[field].toString().trim() === '');
+      
+      if (missingFields.length > 0) {
+        throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      }
+
       const formData = new FormData();
       
-      // Add text fields (skip confirmPassword and null/empty values)
+      // Add text fields with validation
       Object.keys(shopOwnerData).forEach(key => {
         if (key !== 'confirmPassword' && shopOwnerData[key] !== null && shopOwnerData[key] !== '') {
-          // Handle file fields separately
+          // Handle file fields safely
           if (['businessLicense', 'cnicFront', 'cnicBack'].includes(key)) {
             if (shopOwnerData[key] && shopOwnerData[key] instanceof File) {
               formData.append(key, shopOwnerData[key]);
             }
           } else {
             // Handle text fields
-            formData.append(key, shopOwnerData[key]);
+            formData.append(key, shopOwnerData[key].toString().trim());
           }
         }
       });
 
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://dd9d725c-3a7e-4c3a-b904-fbee2ac36da1.preview.emergentagent.com';
-      const response = await fetch(`${backendUrl}/api/auth/register-shop-owner`, {
-        method: 'POST',
-        body: formData,
-      });
+      // Make API request with timeout and error handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-      const data = await response.json();
+      try {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://dd9d725c-3a7e-4c3a-b904-fbee2ac36da1.preview.emergentagent.com';
+        const response = await fetch(`${backendUrl}/api/auth/register-shop-owner`, {
+          method: 'POST',
+          body: formData,
+          signal: controller.signal,
+        });
 
-      if (response.ok) {
-        localStorage.setItem('token', data.access_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        onSignup(data.user);
-        onClose();
-        resetForms();
-      } else {
-        setError(data.detail || 'Registration failed');
+        clearTimeout(timeoutId);
+
+        let data;
+        try {
+          data = await response.json();
+        } catch (jsonError) {
+          console.error('JSON parsing error:', jsonError);
+          throw new Error('Invalid response from server');
+        }
+
+        if (response.ok) {
+          // Success handling
+          if (data.access_token) {
+            localStorage.setItem('token', data.access_token);
+          }
+          if (data.user) {
+            localStorage.setItem('user', JSON.stringify(data.user));
+            onSignup(data.user);
+          }
+          onClose();
+          resetForms();
+        } else {
+          // Error response handling
+          const errorMessage = handleApiError(data, `Registration failed (${response.status})`);
+          throw new Error(errorMessage);
+        }
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        
+        if (fetchError.name === 'AbortError') {
+          throw new Error('Request timeout. Please check your internet connection and try again.');
+        }
+        
+        if (fetchError.message.includes('Failed to fetch')) {
+          throw new Error('Network error. Please check your internet connection and try again.');
+        }
+        
+        throw fetchError;
       }
     } catch (error) {
       console.error('Shop owner registration error:', error);
-      setError('Network error. Please try again.');
+      const errorMessage = handleApiError(error, 'Registration failed. Please try again.');
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
