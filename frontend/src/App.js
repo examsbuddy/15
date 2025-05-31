@@ -138,6 +138,9 @@ function App() {
               onCompareClick={() => setShowCompareModal(true)}
             />
             
+            {/* Recent Listings Section */}
+            <RecentListingsSection />
+            
             {/* Enhanced Selling Section */}
             <SellSection 
               isLoggedIn={isLoggedIn}
