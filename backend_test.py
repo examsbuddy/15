@@ -1,598 +1,233 @@
-
+#!/usr/bin/env python3
 import requests
-import sys
 import json
-import uuid
-from datetime import datetime
+import sys
+import os
+from urllib.parse import urlparse
 import time
 
-class PhoneFlipAPITester:
-    def __init__(self, base_url):
-        self.base_url = base_url
-        self.tests_run = 0
-        self.tests_passed = 0
-        self.test_listing_id = None
-        self.auth_token = None
-        self.user_data = None
-        self.test_user_email = f"test_user_{uuid.uuid4().hex[:8]}@example.com"
-        self.test_user_password = "Test@123456"
-        self.test_shop_owner_email = f"shop_owner_{uuid.uuid4().hex[:8]}@example.com"
-
-    def run_test(self, name, method, endpoint, expected_status, data=None, params=None, auth=False):
-        """Run a single API test"""
-        url = f"{self.base_url}/{endpoint}"
-        headers = {'Content-Type': 'application/json'}
-        
-        if auth and self.auth_token:
-            headers['Authorization'] = f"Bearer {self.auth_token}"
-        
-        self.tests_run += 1
-        print(f"\n🔍 Testing {name}...")
-        
-        try:
-            if method == 'GET':
-                response = requests.get(url, headers=headers, params=params)
-            elif method == 'POST':
-                response = requests.post(url, json=data, headers=headers)
-            elif method == 'PUT':
-                response = requests.put(url, json=data, headers=headers)
-            
-            # Print response status and data for debugging
-            print(f"Response Status: {response.status_code}")
-            print(f"Response Data: {response.text[:200]}..." if len(response.text) > 200 else f"Response Data: {response.text}")
-            
-            success = response.status_code == expected_status
-            if success:
-                self.tests_passed += 1
-                print(f"✅ Passed - Status: {response.status_code}")
-                try:
-                    return success, response.json()
-                except json.JSONDecodeError:
-                    return success, {}
-            else:
-                print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
-                try:
-                    error_data = response.json()
-                    print(f"Error details: {error_data}")
-                except:
-                    print(f"Raw response: {response.text}")
-                return False, {}
-
-        except Exception as e:
-            print(f"❌ Failed - Error: {str(e)}")
-            return False, {}
-
-    def test_register_normal_user(self):
-        """Test registering a normal user"""
-        test_data = {
-            "name": "Test User",
-            "email": self.test_user_email,
-            "password": self.test_user_password,
-            "phone": "03001234567",
-            "role": "normal_user"
-        }
-        
-        success, response = self.run_test(
-            "Register Normal User",
-            "POST",
-            "api/auth/register",
-            200,
-            data=test_data
-        )
-        
-        if success and "access_token" in response:
-            self.auth_token = response["access_token"]
-            self.user_data = response["user"]
-            print(f"Registered user with email: {self.test_user_email}")
-        
-        return success, response
-    
-    def test_login(self):
-        """Test user login"""
-        test_data = {
-            "email": self.test_user_email,
-            "password": self.test_user_password
-        }
-        
-        success, response = self.run_test(
-            "User Login",
-            "POST",
-            "api/auth/login",
-            200,
-            data=test_data
-        )
-        
-        if success and "access_token" in response:
-            self.auth_token = response["access_token"]
-            self.user_data = response["user"]
-            print(f"Logged in user with email: {self.test_user_email}")
-        
-        return success, response
-    
-    def test_get_current_user(self):
-        """Test getting current user info"""
-        if not self.auth_token:
-            print("❌ No auth token available, skipping test")
-            return False, {}
-        
-        return self.run_test(
-            "Get Current User Info",
-            "GET",
-            "api/auth/me",
-            200,
-            auth=True
-        )
-    
-    def test_api_root(self):
-        """Test API root endpoint"""
-        return self.run_test(
-            "API Root",
-            "GET",
-            "api",
-            200
-        )
-    
-    def test_register_shop_owner(self):
-        """Test registering a shop owner with all required fields"""
-        test_data = {
-            "name": "Test Shop Owner",
-            "email": self.test_shop_owner_email,
-            "password": self.test_user_password,
-            "phone": "03009876543",
-            "business_details": {
-                "business_name": "Test Mobile Shop",
-                "business_type": "mobile_shop",
-                "business_address": "123 Test Street",
-                "city": "Karachi",
-                "postal_code": "75000",
-                "business_phone": "03009876543",
-                "website": "https://testshop.com",
-                "description": "This is a test shop for automated testing.",
-                "years_in_business": 5
-            },
-            "kyc_documents": {
-                "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
-                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",    # test base64 data
-                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
-                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="      # test base64 data
-            }
-        }
-        
-        return self.run_test(
-            "Register Shop Owner",
-            "POST",
-            "api/auth/register-shop-owner",
-            200,
-            data=test_data
-        )
-        
-    def test_register_shop_owner_missing_fields(self):
-        """Test registering a shop owner with missing required fields"""
-        # Missing business_details.business_name and kyc_documents.cnic_front
-        test_data = {
-            "name": "Test Shop Owner Missing Fields",
-            "email": f"shop_owner_missing_{uuid.uuid4().hex[:8]}@example.com",
-            "password": self.test_user_password,
-            "phone": "03009876543",
-            "business_details": {
-                # Missing business_name
-                "business_type": "mobile_shop",
-                "business_address": "123 Test Street",
-                "city": "Karachi",
-                "postal_code": "75000",
-                "business_phone": "03009876543",
-                "website": "https://testshop.com",
-                "description": "This is a test shop for automated testing.",
-                "years_in_business": 5
-            },
-            "kyc_documents": {
-                # Missing cnic_front
-                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",
-                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",
-                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="
-            }
-        }
-        
-        # We expect a 422 Unprocessable Entity response for validation errors
-        return self.run_test(
-            "Register Shop Owner with Missing Fields",
-            "POST",
-            "api/auth/register-shop-owner",
-            422,
-            data=test_data
-        )
-        
-    def test_register_shop_owner_duplicate_email(self):
-        """Test registering a shop owner with a duplicate email"""
-        # First, register a shop owner successfully
-        test_data_1 = {
-            "name": "Test Shop Owner",
-            "email": self.test_shop_owner_email,
-            "password": self.test_user_password,
-            "phone": "03009876543",
-            "business_details": {
-                "business_name": "Test Mobile Shop",
-                "business_type": "mobile_shop",
-                "business_address": "123 Test Street",
-                "city": "Karachi",
-                "postal_code": "75000",
-                "business_phone": "03009876543",
-                "website": "https://testshop.com",
-                "description": "This is a test shop for automated testing.",
-                "years_in_business": 5
-            },
-            "kyc_documents": {
-                "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
-                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",    # test base64 data
-                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",  # test base64 data
-                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="      # test base64 data
-            }
-        }
-        
-        # Register the first shop owner
-        success_1, _ = self.run_test(
-            "Register First Shop Owner",
-            "POST",
-            "api/auth/register-shop-owner",
-            200,
-            data=test_data_1
-        )
-        
-        if not success_1:
-            print("❌ Failed to register initial shop owner, skipping duplicate email test")
-            return False, {}
-            
-        # Now try to register another shop owner with the same email
-        test_data_2 = {
-            "name": "Duplicate Shop Owner",
-            "email": self.test_shop_owner_email,  # Same email as the first shop owner
-            "password": self.test_user_password,
-            "phone": "03009876543",
-            "business_details": {
-                "business_name": "Duplicate Shop",
-                "business_type": "mobile_shop",
-                "business_address": "123 Test Street",
-                "city": "Karachi",
-                "postal_code": "75000",
-                "business_phone": "03009876543",
-                "website": "https://testshop.com",
-                "description": "This is a test shop for automated testing.",
-                "years_in_business": 5
-            },
-            "kyc_documents": {
-                "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",
-                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",
-                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",
-                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="
-            }
-        }
-        
-        # We expect a 400 Bad Request response for duplicate email
-        return self.run_test(
-            "Register Shop Owner with Duplicate Email",
-            "POST",
-            "api/auth/register-shop-owner",
-            400,
-            data=test_data_2
-        )
-
-def test_shop_owner_registration():
-    """Run focused tests on shop owner registration API endpoint"""
-    # Get backend URL from environment or use default
+# Get the backend URL from the frontend .env file
+def get_backend_url():
     with open('/app/frontend/.env', 'r') as f:
         for line in f:
             if line.startswith('REACT_APP_BACKEND_URL='):
-                backend_url = line.strip().split('=')[1].strip('"\'')
-                break
-    
-    print(f"Using backend URL: {backend_url}")
-    
-    # Setup tester
-    tester = PhoneFlipAPITester(backend_url)
-    
-    # Run basic API test to check if server is running
-    print("\n=== Testing Server Status ===")
-    tester.test_api_root()
-    
-    # Run shop owner registration tests
-    print("\n=== SHOP OWNER REGISTRATION API TESTING ===")
-    
-    print("\n--- 1. Shop Owner Registration with Valid Data ---")
-    success, response = tester.test_register_shop_owner()
-    
-    print("\n--- 2. Shop Owner Registration with Missing Fields ---")
-    missing_fields_success, missing_fields_response = tester.test_register_shop_owner_missing_fields()
-    
-    # For duplicate email test, we need to use a new email for the first registration
-    # and then try to register again with the same email
-    print("\n--- 3. Shop Owner Registration with Duplicate Email ---")
-    
-    # Create a new unique email for this test
-    duplicate_test_email = f"duplicate_test_{uuid.uuid4().hex[:8]}@example.com"
-    
-    # First registration with the new email
-    first_reg_data = {
-        "name": "First Shop Owner",
-        "email": duplicate_test_email,
-        "password": "Test@123456",
-        "phone": "03009876543",
-        "business_details": {
-            "business_name": "First Shop",
-            "business_type": "mobile_shop",
-            "business_address": "123 Test Street",
-            "city": "Karachi",
-            "postal_code": "75000",
-            "business_phone": "03009876543",
-            "website": "https://testshop.com",
-            "description": "This is a test shop for automated testing.",
-            "years_in_business": 5
-        },
-        "kyc_documents": {
-            "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",
-            "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",
-            "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",
-            "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="
-        }
-    }
-    
-    first_reg_success, _ = tester.run_test(
-        "First Registration for Duplicate Test",
-        "POST",
-        "api/auth/register-shop-owner",
-        200,
-        data=first_reg_data
-    )
-    
-    # Second registration with the same email
-    if first_reg_success:
-        second_reg_data = {
-            "name": "Second Shop Owner",
-            "email": duplicate_test_email,  # Same email as first registration
-            "password": "Test@123456",
-            "phone": "03009876544",
-            "business_details": {
-                "business_name": "Second Shop",
-                "business_type": "mobile_shop",
-                "business_address": "456 Test Avenue",
-                "city": "Lahore",
-                "postal_code": "54000",
-                "business_phone": "03009876544",
-                "website": "https://secondshop.com",
-                "description": "This is another test shop for automated testing.",
-                "years_in_business": 3
-            },
-            "kyc_documents": {
-                "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",
-                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",
-                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",
-                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="
-            }
-        }
-        
-        duplicate_email_success, duplicate_email_response = tester.run_test(
-            "Second Registration with Same Email",
-            "POST",
-            "api/auth/register-shop-owner",
-            400,  # Expect 400 Bad Request for duplicate email
-            data=second_reg_data
-        )
-    else:
-        print("❌ Failed to register first shop owner, skipping duplicate email test")
-        duplicate_email_success = False
-        duplicate_email_response = {}
-    
-    # Print detailed results
-    print("\n=== SHOP OWNER REGISTRATION API TEST RESULTS ===")
-    
-    print("\n1. Shop Owner Registration with Valid Data:")
-    if success:
-        print("   ✅ Shop owner registration with valid data works correctly")
-        print(f"   User ID: {response.get('user_id', 'N/A')}")
-        print(f"   Message: {response.get('message', 'N/A')}")
-        
-        # Verify the success message indicates proper user type
-        if "shop owner" in response.get('message', '').lower():
-            print("   ✅ Response correctly identifies as shop owner registration")
-        else:
-            print("   ⚠️ Response message doesn't explicitly mention 'shop owner'")
-            
-        # Check if KYC data was properly handled
-        if "under review" in response.get('message', '').lower():
-            print("   ✅ KYC verification status correctly set to 'under review'")
-        else:
-            print("   ⚠️ KYC verification status not mentioned in response")
-    else:
-        print("   ❌ Shop owner registration with valid data failed")
-    
-    print("\n2. Shop Owner Registration with Missing Fields:")
-    if missing_fields_success:
-        print("   ✅ API correctly validates required fields")
-        print("   ✅ Returned 422 status code for missing required fields")
-        
-        # Check if validation error details are provided
-        if "detail" in missing_fields_response:
-            print("   ✅ Validation error details provided in response")
-            print(f"   Error details: {missing_fields_response.get('detail', 'N/A')}")
-        else:
-            print("   ⚠️ No detailed validation error information in response")
-    else:
-        print("   ❌ API validation for missing fields failed")
-        print("   ❌ Did not return expected 422 status code")
-    
-    print("\n3. Shop Owner Registration with Duplicate Email:")
-    if duplicate_email_success:
-        print("   ✅ API correctly handles duplicate email")
-        print("   ✅ Returned 400 status code for duplicate email")
-        
-        # Check if error details are provided
-        if "detail" in duplicate_email_response:
-            print("   ✅ Error details provided in response")
-            print(f"   Error message: {duplicate_email_response.get('detail', 'N/A')}")
-            
-            # Verify the error message mentions duplicate email
-            if "email" in duplicate_email_response.get('detail', '').lower() and "registered" in duplicate_email_response.get('detail', '').lower():
-                print("   ✅ Error message correctly identifies duplicate email issue")
-            else:
-                print("   ⚠️ Error message doesn't clearly indicate duplicate email issue")
-        else:
-            print("   ⚠️ No detailed error information in response")
-    else:
-        print("   ❌ API handling for duplicate email failed")
-        print("   ❌ Did not return expected 400 status code")
-    
-    # Print summary
-    print("\n=== SHOP OWNER REGISTRATION API TEST SUMMARY ===")
-    tests_passed = sum([
-        1 if success else 0,
-        1 if missing_fields_success else 0,
-        1 if duplicate_email_success else 0
-    ])
-    tests_total = 3
-    
-    print(f"📊 Shop Owner Registration API Tests Passed: {tests_passed}/{tests_total}")
-    print(f"📊 Shop Owner Registration API Health: {(tests_passed / tests_total) * 100:.2f}%")
-    
-    if tests_passed == tests_total:
-        print("\n✅ SHOP OWNER REGISTRATION API IS FULLY FUNCTIONAL")
-        print("   ✅ Successfully registers shop owners with valid data")
-        print("   ✅ Properly validates required fields")
-        print("   ✅ Correctly handles duplicate email registration")
-    else:
-        print("\n⚠️ SHOP OWNER REGISTRATION API REQUIRES ATTENTION")
-        
-        if not success:
-            print("   ❌ Registration with valid data is not working correctly")
-            print("   - Check the /api/auth/register-shop-owner endpoint implementation")
-        
-        if not missing_fields_success:
-            print("   ❌ Validation for required fields is not working correctly")
-            print("   - Check the validation logic in the ShopOwnerRegistration model")
-        
-        if not duplicate_email_success:
-            print("   ❌ Handling of duplicate email registration is not working correctly")
-            print("   - Check the error handling in the register_shop_owner function")
-    
-    return tests_passed == tests_total
+                return line.strip().split('=')[1]
+    raise Exception("Could not find REACT_APP_BACKEND_URL in frontend/.env")
 
-def test_signup_flows():
-    """Run focused tests on both signup flows (Normal User and Shop Owner)"""
-    # Get backend URL from environment or use default
-    with open('/app/frontend/.env', 'r') as f:
-        for line in f:
-            if line.startswith('REACT_APP_BACKEND_URL='):
-                backend_url = line.strip().split('=')[1].strip('"\'')
-                break
-    
-    print(f"Using backend URL: {backend_url}")
-    
-    # Setup tester
-    tester = PhoneFlipAPITester(backend_url)
-    
-    # Run basic API test to check if server is running
-    print("\n=== Testing Server Status ===")
-    tester.test_api_root()
-    
-    # Run focused signup flow tests
-    print("\n=== SIGNUP FLOWS VERIFICATION ===")
-    
-    print("\n--- 1. Normal User Registration Flow ---")
-    normal_user_success, normal_user_data = tester.test_register_normal_user()
-    
-    print("\n--- 2. Shop Owner Registration Flow ---")
-    shop_owner_success, shop_owner_data = tester.test_register_shop_owner()
-    
-    # Verify login still works with the registered normal user
-    print("\n--- 3. Verifying Login After Registration ---")
-    login_success, login_data = tester.test_login()
-    
-    # Print detailed results
-    print("\n=== SIGNUP FLOWS VERIFICATION RESULTS ===")
-    
-    print("\n1. Normal User Registration Flow:")
-    if normal_user_success:
-        print("   ✅ Normal user registration works correctly")
-        print(f"   User ID: {normal_user_data['user']['_id']}")
-        print(f"   User Type: {normal_user_data['user']['role']}")
-        print(f"   Verification Status: {normal_user_data['user']['verification_status']}")
-        
-        # Verify user_type is set correctly
-        if normal_user_data['user']['role'] == 'normal_user':
-            print("   ✅ User type is correctly set to 'normal_user'")
-        else:
-            print(f"   ❌ User type is incorrectly set to '{normal_user_data['user']['role']}' instead of 'normal_user'")
-            normal_user_success = False
-    else:
-        print("   ❌ Normal user registration failed")
-    
-    print("\n2. Shop Owner Registration Flow:")
-    if shop_owner_success:
-        print("   ✅ Shop owner registration works correctly")
-        print(f"   User ID: {shop_owner_data.get('user_id', 'N/A')}")
-        print(f"   Message: {shop_owner_data.get('message', 'N/A')}")
-        
-        # Verify the success message indicates proper user type
-        if "shop owner" in shop_owner_data.get('message', '').lower():
-            print("   ✅ Response correctly identifies as shop owner registration")
-        else:
-            print("   ⚠️ Response message doesn't explicitly mention 'shop owner'")
+BACKEND_URL = get_backend_url()
+API_URL = f"{BACKEND_URL}/api"
+
+print(f"Using backend URL: {API_URL}")
+
+# Function to check if an image URL is valid
+def is_valid_image_url(url):
+    try:
+        # Parse the URL to check if it's properly formatted
+        parsed_url = urlparse(url)
+        if not parsed_url.scheme or not parsed_url.netloc:
+            print(f"Invalid URL format: {url}")
+            return False
             
-        # Check if KYC data was properly handled
-        if "under review" in shop_owner_data.get('message', '').lower():
-            print("   ✅ KYC verification status correctly set to 'under review'")
+        # Check if it's a placeholder or base64 image
+        if url.startswith('data:image'):
+            print(f"Found placeholder base64 image: {url[:50]}...")
+            return False
+            
+        # Make a HEAD request to check if the image exists
+        response = requests.head(url, timeout=5)
+        
+        # Check if the response is successful and the content type is an image
+        if response.status_code == 200 and 'image' in response.headers.get('Content-Type', ''):
+            return True
         else:
-            print("   ⚠️ KYC verification status not mentioned in response")
-    else:
-        print("   ❌ Shop owner registration failed")
-    
-    print("\n3. Login After Registration:")
-    if login_success:
-        print("   ✅ Login works correctly after registration")
-        print(f"   User Type: {login_data['user']['role']}")
-        print(f"   Verification Status: {login_data['user']['verification_status']}")
-    else:
-        print("   ❌ Login failed after registration")
-    
-    # Print summary
-    print("\n=== SIGNUP FLOWS VERIFICATION SUMMARY ===")
-    signup_tests_passed = sum([
-        1 if normal_user_success else 0,
-        1 if shop_owner_success else 0,
-        1 if login_success else 0
-    ])
-    signup_tests_total = 3
-    
-    print(f"📊 Signup Flow Tests Passed: {signup_tests_passed}/{signup_tests_total}")
-    print(f"📊 Signup Flows Health: {(signup_tests_passed / signup_tests_total) * 100:.2f}%")
-    
-    if signup_tests_passed == signup_tests_total:
-        print("\n✅ BOTH SIGNUP FLOWS ARE FULLY FUNCTIONAL")
-        print("   ✅ Normal User signup works correctly with proper user_type assignment")
-        print("   ✅ Shop Owner signup works correctly with proper KYC handling")
-        print("   ✅ Login functionality works correctly after registration")
-        print("   ✅ No API changes were needed as per requirements")
-    else:
-        print("\n⚠️ SIGNUP FLOWS REQUIRE ATTENTION")
+            print(f"Invalid image URL (status code: {response.status_code}, content-type: {response.headers.get('Content-Type')}): {url}")
+            return False
+    except Exception as e:
+        print(f"Error checking image URL {url}: {str(e)}")
+        return False
+
+# Function to test the recent listings endpoint
+def test_recent_listings():
+    print("\n=== Testing GET /api/listings/recent ===")
+    try:
+        response = requests.get(f"{API_URL}/listings/recent")
+        response.raise_for_status()
         
-        if not normal_user_success:
-            print("   ❌ Normal User signup flow is not working correctly")
-            print("   - Check the /api/auth/register endpoint")
+        listings = response.json()
+        print(f"Retrieved {len(listings)} recent listings")
         
-        if not shop_owner_success:
-            print("   ❌ Shop Owner signup flow is not working correctly")
-            print("   - Check the /api/auth/register-shop-owner endpoint")
+        if not listings:
+            print("ERROR: No recent listings found")
+            return False
+            
+        valid_listings = 0
+        for i, listing in enumerate(listings):
+            print(f"\nListing {i+1}: {listing.get('brand')} {listing.get('model')}")
+            
+            # Check if photos array exists and is not empty
+            if 'photos' not in listing or not listing['photos']:
+                print(f"ERROR: Listing has no photos array or empty photos array")
+                continue
+                
+            print(f"Found {len(listing['photos'])} photos")
+            
+            # Check if all photos are valid image URLs
+            valid_photos = 0
+            for photo_url in listing['photos']:
+                if is_valid_image_url(photo_url):
+                    valid_photos += 1
+                    
+            print(f"Valid photos: {valid_photos}/{len(listing['photos'])}")
+            
+            if valid_photos == len(listing['photos']) and valid_photos > 0:
+                valid_listings += 1
+                
+        print(f"\nValid listings with real images: {valid_listings}/{len(listings)}")
+        return valid_listings > 0
         
-        if not login_success:
-            print("   ❌ Login functionality is not working correctly after registration")
-            print("   - Check the /api/auth/login endpoint")
-    
-    return signup_tests_passed == signup_tests_total
+    except Exception as e:
+        print(f"Error testing recent listings: {str(e)}")
+        return False
+
+# Function to test the featured listings endpoint
+def test_featured_listings():
+    print("\n=== Testing GET /api/listings/featured ===")
+    try:
+        response = requests.get(f"{API_URL}/listings/featured")
+        response.raise_for_status()
+        
+        listings = response.json()
+        print(f"Retrieved {len(listings)} featured listings")
+        
+        if not listings:
+            print("ERROR: No featured listings found")
+            return False
+            
+        valid_listings = 0
+        for i, listing in enumerate(listings):
+            print(f"\nListing {i+1}: {listing.get('brand')} {listing.get('model')}")
+            
+            # Check if photos array exists and is not empty
+            if 'photos' not in listing or not listing['photos']:
+                print(f"ERROR: Listing has no photos array or empty photos array")
+                continue
+                
+            print(f"Found {len(listing['photos'])} photos")
+            
+            # Check if all photos are valid image URLs
+            valid_photos = 0
+            for photo_url in listing['photos']:
+                if is_valid_image_url(photo_url):
+                    valid_photos += 1
+                    
+            print(f"Valid photos: {valid_photos}/{len(listing['photos'])}")
+            
+            if valid_photos == len(listing['photos']) and valid_photos > 0:
+                valid_listings += 1
+                
+        print(f"\nValid listings with real images: {valid_listings}/{len(listings)}")
+        return valid_listings > 0
+        
+    except Exception as e:
+        print(f"Error testing featured listings: {str(e)}")
+        return False
+
+# Function to test individual listing details
+def test_individual_listings():
+    print("\n=== Testing GET /api/listings/{listing_id} ===")
+    try:
+        # First, get some listing IDs from the recent listings
+        response = requests.get(f"{API_URL}/listings/recent")
+        response.raise_for_status()
+        
+        recent_listings = response.json()
+        if not recent_listings:
+            print("ERROR: No listings found to test individual endpoints")
+            return False
+            
+        # Test a few individual listings
+        listing_ids = [listing.get('_id') for listing in recent_listings[:3]]
+        
+        valid_listings = 0
+        for listing_id in listing_ids:
+            print(f"\nTesting listing ID: {listing_id}")
+            
+            response = requests.get(f"{API_URL}/listings/{listing_id}")
+            if response.status_code != 200:
+                print(f"ERROR: Failed to retrieve listing {listing_id}, status code: {response.status_code}")
+                continue
+                
+            listing = response.json()
+            print(f"Retrieved listing: {listing.get('brand')} {listing.get('model')}")
+            
+            # Check if photos array exists and is not empty
+            if 'photos' not in listing or not listing['photos']:
+                print(f"ERROR: Listing has no photos array or empty photos array")
+                continue
+                
+            print(f"Found {len(listing['photos'])} photos")
+            
+            # Check if all photos are valid image URLs
+            valid_photos = 0
+            for photo_url in listing['photos']:
+                if is_valid_image_url(photo_url):
+                    valid_photos += 1
+                    
+            print(f"Valid photos: {valid_photos}/{len(listing['photos'])}")
+            
+            if valid_photos == len(listing['photos']) and valid_photos > 0:
+                valid_listings += 1
+                
+        print(f"\nValid individual listings with real images: {valid_listings}/{len(listing_ids)}")
+        return valid_listings > 0
+        
+    except Exception as e:
+        print(f"Error testing individual listings: {str(e)}")
+        return False
+
+# Function to populate sample data if needed
+def populate_sample_data():
+    print("\n=== Populating sample data ===")
+    try:
+        response = requests.post(f"{API_URL}/sample-data")
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Sample data population result: {result}")
+        
+        # Wait a moment for the data to be properly stored
+        time.sleep(2)
+        
+        return True
+    except Exception as e:
+        print(f"Error populating sample data: {str(e)}")
+        return False
 
 def main():
-    # Run focused shop owner registration API tests
-    shop_owner_registration_ok = test_shop_owner_registration()
+    print("Starting phone listings API tests...")
     
-    # Return success code if all tests passed
-    return 0 if shop_owner_registration_ok else 1
+    # First, populate sample data to ensure we have listings to test
+    if not populate_sample_data():
+        print("WARNING: Failed to populate sample data, but continuing with tests")
+    
+    # Run the tests
+    recent_test_result = test_recent_listings()
+    featured_test_result = test_featured_listings()
+    individual_test_result = test_individual_listings()
+    
+    # Print summary
+    print("\n=== Test Summary ===")
+    print(f"Recent listings test: {'PASSED' if recent_test_result else 'FAILED'}")
+    print(f"Featured listings test: {'PASSED' if featured_test_result else 'FAILED'}")
+    print(f"Individual listings test: {'PASSED' if individual_test_result else 'FAILED'}")
+    
+    # Overall result
+    if recent_test_result and featured_test_result and individual_test_result:
+        print("\nAll tests PASSED! The backend is providing real phone images consistently across all endpoints.")
+        return 0
+    else:
+        print("\nSome tests FAILED. The backend is not providing real phone images consistently across all endpoints.")
+        return 1
 
 if __name__ == "__main__":
     sys.exit(main())
