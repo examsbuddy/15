@@ -273,6 +273,18 @@ backend:
         agent: "testing"
         comment: "Tested normal user registration flow, shop owner registration flow, creating a phone listing, and search/filtering for both phones and accessories. All user flows are working correctly."
 
+  - task: "Backend Health Check"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Backend server is running correctly on the configured port. MongoDB connection is working properly. All critical API endpoints are accessible and returning expected responses. The backend logs show successful API requests with 200 OK responses for most endpoints. There are no critical errors in the logs."
+
   - task: "Functionality Verification"
     implemented: true
     working: false
