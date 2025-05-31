@@ -49,6 +49,18 @@ frontend:
       - working: true
         agent: "testing"
         comment: "After further testing with a different approach, I found that the navigation arrows in the Featured Shops section do work correctly. The issue in the initial test was likely due to the testing environment or the way the arrows were being clicked. When testing with direct DOM manipulation, the scroll position changed correctly after clicking the right arrow. All functionality is working as expected."
+        
+  - task: "Streamlined homepage layout verification"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Verified the new streamlined homepage layout. The layout follows the specified order: 1) Centered logo at the top in hero section, 2) Search bar directly below it, 3) Recent/Popular searches section below search, 4) Recent listings section with horizontal scroll, 5) Featured phone shops with horizontal scroll, 6) Featured phones with horizontal scroll, 7) Our special offers with horizontal scroll, 8) Phone accessories section, 9) Sell to PhoneFlip section, 10) Videos & Blog posts section, and 11) Browse Phones section at the bottom. All sections are correctly positioned and maintain their functionality."
 
 metadata:
   created_by: "testing_agent"
