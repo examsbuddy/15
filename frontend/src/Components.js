@@ -2436,91 +2436,147 @@ export const FeaturedPhones = ({ addToCompare, compareList, onViewListing }) => 
   return (
     <section className="bg-white py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-            Featured Phones
-          </h2>
-          <p className="text-gray-600">
-            Handpicked phones with the best value for money
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              Featured Phones
+            </h2>
+            <p className="text-gray-600">
+              Handpicked phones with the best value for money
+            </p>
+          </div>
+          
+          {/* Navigation arrows for desktop */}
+          <div className="hidden md:flex items-center space-x-2">
+            <button 
+              onClick={() => {
+                const container = document.getElementById('featured-phones-scroll');
+                container.scrollBy({ left: -300, behavior: 'smooth' });
+              }}
+              className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <ArrowRight className="w-5 h-5 rotate-180 text-gray-600" />
+            </button>
+            <button 
+              onClick={() => {
+                const container = document.getElementById('featured-phones-scroll');
+                container.scrollBy({ left: 300, behavior: 'smooth' });
+              }}
+              className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <ArrowRight className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredPhones.map((phone, index) => (
-            <div 
-              key={phone._id || index} 
-              onClick={() => onViewListing(phone._id)}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-            >
-              {/* Image Section */}
-              <div className="h-48 relative">
-                <img
-                  src={phone.photos && phone.photos.length > 0 ? phone.photos[0] : '/api/placeholder/300/200'}
-                  alt={`${phone.brand} ${phone.model}`}
-                  className="w-full h-full object-cover"
-                />
-                {/* Featured Badge */}
-                {phone.is_featured && (
-                  <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
-                    ⭐ Featured
+        {/* Horizontal scrolling container */}
+        <div className="relative">
+          <div 
+            id="featured-phones-scroll"
+            className="flex gap-4 overflow-x-auto scrollbar-hide pb-4"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {featuredPhones.map((phone, index) => (
+              <div 
+                key={phone._id || index} 
+                onClick={() => onViewListing(phone._id)}
+                className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer flex-shrink-0 w-[280px]"
+              >
+                {/* Image Section */}
+                <div className="h-48 relative">
+                  <img
+                    src={phone.photos && phone.photos.length > 0 ? phone.photos[0] : '/api/placeholder/300/200'}
+                    alt={`${phone.brand} ${phone.model}`}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Featured Badge */}
+                  {phone.is_featured && (
+                    <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
+                      ⭐ Featured
+                    </div>
+                  )}
+                </div>
+                
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-sm">
+                        {phone.brand} {phone.model}
+                      </h3>
+                      <p className="text-lg font-bold text-green-600">
+                        ₨ {phone.price?.toLocaleString()}
+                      </p>
+                    </div>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      phone.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
+                      phone.condition === 'Very Good' ? 'bg-blue-100 text-blue-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {phone.condition}
+                    </span>
                   </div>
-                )}
+
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-4">
+                    <div>Storage: {phone.storage}</div>
+                    <div>RAM: {phone.ram}</div>
+                    <div>City: {phone.city}</div>
+                    <div>Views: {phone.views}</div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCompare(phone);
+                      }}
+                      disabled={compareList?.includes(phone)}
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                        compareList?.includes(phone)
+                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                          : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                      }`}
+                    >
+                      {compareList?.includes(phone) ? 'Added' : 'Compare'}
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onViewListing(phone._id);
+                      }}
+                      className="text-blue-600 hover:text-blue-700 text-xs font-medium"
+                    >
+                      View Details →
+                    </button>
+                  </div>
+                </div>
               </div>
-              
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-sm">
-                      {phone.brand} {phone.model}
-                    </h3>
-                    <p className="text-lg font-bold text-green-600">
-                      ₨ {phone.price?.toLocaleString()}
-                    </p>
-                  </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    phone.condition === 'Excellent' ? 'bg-green-100 text-green-800' :
-                    phone.condition === 'Very Good' ? 'bg-blue-100 text-blue-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {phone.condition}
-                  </span>
+            ))}
+            
+            {/* See All Phones card - fixed on the right */}
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex-shrink-0 w-[280px] h-[340px] flex items-center justify-center text-white cursor-pointer hover:from-blue-600 hover:to-blue-700 transition-colors">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ArrowRight className="w-8 h-8" />
                 </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-4">
-                  <div>Storage: {phone.storage}</div>
-                  <div>RAM: {phone.ram}</div>
-                  <div>City: {phone.city}</div>
-                  <div>Views: {phone.views}</div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addToCompare(phone);
-                    }}
-                    disabled={compareList?.includes(phone)}
-                    className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                      compareList?.includes(phone)
-                        ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                        : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
-                    }`}
-                  >
-                    {compareList?.includes(phone) ? 'Added' : 'Compare'}
-                  </button>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onViewListing(phone._id);
-                    }}
-                    className="text-blue-600 hover:text-blue-700 text-xs font-medium"
-                  >
-                    View Details →
-                  </button>
-                </div>
+                <h3 className="text-xl font-bold mb-2">See All Phones</h3>
+                <p className="text-blue-100 text-sm">Browse our complete collection</p>
               </div>
             </div>
-          ))}
+          </div>
+          
+          {/* Mobile swipe indicator */}
+          <div className="flex justify-center mt-4 md:hidden">
+            <div className="flex items-center space-x-1 text-gray-400 text-xs">
+              <div className="flex space-x-1">
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+              </div>
+              <span className="ml-2">Swipe to browse</span>
+            </div>
+          </div>
         </div>
 
         {/* Desktop View All Button */}
