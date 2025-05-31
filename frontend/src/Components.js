@@ -4932,6 +4932,15 @@ export const DedicatedSearchPage = ({ onBack, onViewListing, initialFilters = {}
                   </button>
                 )}
               </div>
+              
+              {/* Advanced Search Button */}
+              <button
+                onClick={() => setShowAdvancedSearch(true)}
+                className="w-full mt-3 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2"
+              >
+                <Filter className="w-5 h-5" />
+                <span>Advanced Search</span>
+              </button>
 
               {showSuggestions && suggestions.length > 0 && (
                 <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 mt-2 max-h-80 overflow-y-auto">
