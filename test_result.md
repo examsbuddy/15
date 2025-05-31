@@ -566,10 +566,6 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Verified Shop Owner Signup Step 2 functionality. Successfully navigated from Step 1 to Step 2, filled business information, and proceeded to Step 3. Navigation between steps works correctly with the Previous button returning to Step 2 with form data preserved. No 'Objects are not valid as React child' errors were detected in the console during testing. The form correctly handles validation when attempting to proceed with empty fields."
-        comment: "Verified backend API endpoint for shop owner registration (POST /api/auth/register-shop-owner). The endpoint correctly processes shop owner data including business details and KYC documents. It assigns user_type as 'shop_owner' with verification_status set to 'under_review'. Response includes proper confirmation message and user ID."
-      - working: true
-        agent: "testing"
-        comment: "Fixed the 'Uncaught runtime errors' in the shop owner registration form at step 3. The issue was related to file handling in the FormData object. The file fields (businessLicense, cnicFront, cnicBack) were not initialized in the shopOwnerData state, causing errors when checking 'instanceof File'. Fixed by initializing these fields to null and adding a null check before the instanceof check."
       - working: true
         agent: "testing"
         comment: "Verified that the file handling fix is working correctly. The null check before the instanceof File check prevents runtime errors when file fields are null. The form now properly handles empty file fields without causing uncaught runtime errors. While there are backend validation errors (422) when submitting incomplete data, there are no JavaScript runtime errors related to file handling."
