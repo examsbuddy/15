@@ -1160,6 +1160,26 @@ async def get_featured_listings(limit: int = 4):
         logger.error(f"Error fetching featured listings: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch featured listings")
 
+@api_router.get("/listings/recent", response_model=List[PhoneListing])
+async def get_recent_listings(limit: int = 8):
+    """Get recent phone listings"""
+    try:
+        # Get most recent listings sorted by date_posted
+        recent_cursor = db.phone_listings.find({
+            "is_active": True
+        }).sort("date_posted", -1).limit(limit)
+        
+        recent_listings = await recent_cursor.to_list(length=limit)
+        
+        # Serialize MongoDB documents
+        for listing in recent_listings:
+            listing = serialize_doc(listing)
+        
+        return [PhoneListing(**listing) for listing in recent_listings]
+    except Exception as e:
+        logger.error(f"Error fetching recent listings: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch recent listings")
+
 @api_router.get("/listings", response_model=List[PhoneListing])
 async def get_listings(
     skip: int = 0, 
