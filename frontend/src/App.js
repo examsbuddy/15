@@ -326,16 +326,6 @@ function App() {
         />
       )}
 
-      {showCompareModal && (
-        <CompareModal 
-          isOpen={showCompareModal}
-          onClose={() => setShowCompareModal(false)}
-          compareList={compareList}
-          onRemove={removeFromCompare}
-          clearCompare={() => setCompareList([])}
-        />
-      )}
-
       {showSignInModal && (
         <SignInModal 
           isOpen={showSignInModal}
