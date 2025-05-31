@@ -1873,6 +1873,125 @@ export const CompareSection = ({ compareList, onCompareClick }) => {
   );
 };
 
+export const RecentListingsSection = () => {
+  const [recentListings, setRecentListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchRecentListings();
+  }, []);
+
+  const fetchRecentListings = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/listings/recent?limit=8`);
+      setRecentListings(response.data);
+    } catch (error) {
+      console.error('Error fetching recent listings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatPrice = (price) => {
+    return `PKR ${price.toLocaleString()}`;
+  };
+
+  const timeAgo = (dateString) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+    
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    return `${diffInWeeks}w ago`;
+  };
+
+  return (
+    <section className="bg-gray-50 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+            Recent Listings
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Check out the latest phones and accessories added to our marketplace
+          </p>
+        </div>
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, index) => (
+              <div key={index} className="bg-white rounded-xl p-6 shadow-sm animate-pulse">
+                <div className="w-full h-48 bg-gray-200 rounded-lg mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {recentListings.map((listing) => (
+              <div key={listing._id} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer">
+                <div className="relative mb-4">
+                  <img
+                    src={listing.photos && listing.photos.length > 0 ? listing.photos[0] : '/api/placeholder/300/200'}
+                    alt={`${listing.brand} ${listing.model}`}
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                  <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                    {timeAgo(listing.created_at)}
+                  </div>
+                  {listing.is_featured && (
+                    <div className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
+                      Featured
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+                    {listing.brand} {listing.model}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {listing.storage} • {listing.condition}
+                  </p>
+                  <p className="text-sm text-gray-500 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
+                    {listing.city}
+                  </p>
+                  <div className="flex items-center justify-between pt-2">
+                    <span className="text-xl font-bold text-[#1e40af]">
+                      {formatPrice(listing.price)}
+                    </span>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                      {listing.seller_type}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {recentListings.length === 0 && !isLoading && (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No recent listings found.</p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
 export const SellSection = ({ isLoggedIn, setCurrentPage }) => {
   return (
     <section className="bg-white py-12 md:py-16">
