@@ -314,7 +314,7 @@ function App() {
       {isMobile && (
         <MobileBottomNav 
           currentPage={currentPage}
-          setCurrentPage={debugSetCurrentPage}
+          setCurrentPage={setCurrentPage}
           isLoggedIn={isLoggedIn}
           compareCount={compareList.length}
           onCompareClick={() => {
