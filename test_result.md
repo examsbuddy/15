@@ -35,6 +35,7 @@ metadata:
 test_plan:
   current_focus:
     - "Mobile Homepage Layout Improvements"
+    - "Modernized Mobile Search Bar Design"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
