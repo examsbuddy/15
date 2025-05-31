@@ -170,109 +170,231 @@ export const SignInModal = ({ isOpen, onClose, onLogin, onSwitchToSignUp }) => {
 };
 
 export const ProfilePage = ({ user, setCurrentPage, onLogout }) => {
+  const [analytics, setAnalytics] = useState({
+    profileViews: 247,
+    totalSales: 8,
+    activeListings: 12,
+    revenue: 145000,
+    inquiries: 34
+  });
+  const [savedSearches, setSavedSearches] = useState([
+    'iPhone 15 Pro under 200K',
+    'Samsung Galaxy S24',
+    'OnePlus 12 Karachi'
+  ]);
+  const [activeListings, setActiveListings] = useState([]);
+  const [showSettings, setShowSettings] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch user's active listings
+  useEffect(() => {
+    const fetchUserListings = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/listings/recent?limit=6`);
+        setActiveListings(response.data);
+      } catch (error) {
+        console.error('Error fetching user listings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserListings();
+  }, []);
+
+  // Analytics data for horizontal scroll
+  const analyticsData = [
+    { icon: Eye, label: 'Profile Views', value: analytics.profileViews, color: 'blue' },
+    { icon: BarChart2, label: 'Total Sales', value: analytics.totalSales, color: 'green' },
+    { icon: List, label: 'Active Ads', value: analytics.activeListings, color: 'purple' },
+    { icon: TrendingDown, label: 'Revenue', value: `₨${(analytics.revenue/1000).toFixed(0)}K`, color: 'orange' },
+    { icon: MessageCircle, label: 'Inquiries', value: analytics.inquiries, color: 'pink' }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Profile Header */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center">
-              <User className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{user?.name || 'User Profile'}</h1>
-              <p className="text-gray-600">{user?.email || 'user@phoneflip.pk'}</p>
-              <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mt-1">
-                {user?.role === 'shop_owner' ? 'Shop Owner' : 'Regular User'}
-              </span>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-6">
+        <div className="flex items-center space-x-4">
+          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+            <User className="w-8 h-8 text-white" />
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">12</div>
-              <div className="text-gray-600 text-sm">Active Listings</div>
-            </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">45</div>
-              <div className="text-gray-600 text-sm">Total Views</div>
-            </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">8</div>
-              <div className="text-gray-600 text-sm">Successful Sales</div>
-            </div>
+          <div>
+            <h1 className="text-xl font-bold">{user?.name || 'John Doe'}</h1>
+            <p className="text-blue-100 text-sm">{user?.email || 'john@phoneflip.pk'}</p>
+            <span className="inline-block bg-green-500 text-white text-xs px-2 py-1 rounded-full mt-1">
+              {user?.role === 'shop_owner' ? 'Verified Seller' : 'Active Member'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Live Analytics Bar - Horizontal Scroll */}
+      <div className="bg-white border-b border-gray-200 px-4 py-4">
+        <h2 className="text-sm font-semibold text-gray-900 mb-3">Live Analytics</h2>
+        <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
+          {analyticsData.map((metric, index) => {
+            const IconComponent = metric.icon;
+            const colorClasses = {
+              blue: 'bg-blue-100 text-blue-600',
+              green: 'bg-green-100 text-green-600',
+              purple: 'bg-purple-100 text-purple-600',
+              orange: 'bg-orange-100 text-orange-600',
+              pink: 'bg-pink-100 text-pink-600'
+            };
+            
+            return (
+              <div key={index} className="flex-shrink-0 bg-gray-50 rounded-lg p-3 min-w-[100px]">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${colorClasses[metric.color]}`}>
+                  <IconComponent className="w-4 h-4" />
+                </div>
+                <div className="text-lg font-bold text-gray-900">{metric.value}</div>
+                <div className="text-xs text-gray-600">{metric.label}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="px-4 py-4 space-y-6">
+        {/* Saved Searches */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">Recent Searches</h2>
+          <div className="space-y-2">
+            {savedSearches.map((search, index) => (
+              <div key={index} className="bg-white rounded-lg p-3 border border-gray-200 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Search className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm text-gray-700">{search}</span>
+                </div>
+                <button 
+                  onClick={() => {
+                    // Remove saved search
+                    setSavedSearches(prev => prev.filter((_, i) => i !== index));
+                  }}
+                  className="text-gray-400 hover:text-red-500"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <button 
-            onClick={() => setCurrentPage('my-ads')}
-            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center"
-          >
-            <List className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-1">My Listings</h3>
-            <p className="text-gray-600 text-sm">Manage your ads</p>
-          </button>
+        {/* Post New Ad Button */}
+        <button 
+          onClick={() => setCurrentPage('post-ad')}
+          className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 rounded-xl font-bold text-lg transition-all duration-200 flex items-center justify-center space-x-3 shadow-lg"
+        >
+          <Plus className="w-6 h-6" />
+          <span>Post New Ad</span>
+        </button>
+
+        {/* Active Listings */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-gray-900">My Active Listings</h2>
+            <span className="text-sm text-gray-600">{activeListings.length} ads</span>
+          </div>
           
-          <button 
-            onClick={() => setCurrentPage('post-ad')}
-            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center"
-          >
-            <Plus className="w-8 h-8 text-green-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-1">Post New Ad</h3>
-            <p className="text-gray-600 text-sm">Sell your phone</p>
-          </button>
-          
-          <button className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center">
-            <Settings className="w-8 h-8 text-purple-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-1">Settings</h3>
-            <p className="text-gray-600 text-sm">Account preferences</p>
-          </button>
-          
-          <button 
-            onClick={onLogout}
-            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow text-center"
-          >
-            <LogOut className="w-8 h-8 text-red-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-1">Sign Out</h3>
-            <p className="text-gray-600 text-sm">Exit your account</p>
-          </button>
+          {loading ? (
+            <div className="grid grid-cols-2 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="bg-gray-200 rounded-lg h-48 animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {activeListings.map((listing, index) => (
+                <div 
+                  key={listing._id || index}
+                  onClick={() => setCurrentPage('listing-details')}
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                >
+                  <div className="h-24 relative">
+                    <img
+                      src={listing.photos && listing.photos.length > 0 ? listing.photos[0] : '/api/placeholder/200/150'}
+                      alt={`${listing.brand} ${listing.model}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1 py-0.5 rounded">
+                      Active
+                    </div>
+                  </div>
+                  <div className="p-2">
+                    <h3 className="font-medium text-gray-900 text-xs truncate">{listing.brand} {listing.model}</h3>
+                    <p className="text-sm font-bold text-green-600">₨ {listing.price?.toLocaleString()}</p>
+                    <p className="text-xs text-gray-600">{listing.city}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <Eye className="w-4 h-4 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-900 font-medium">iPhone 15 Pro listing viewed</p>
-                <p className="text-gray-600 text-sm">2 hours ago</p>
+        {/* Settings Section */}
+        <div>
+          <button 
+            onClick={() => setShowSettings(!showSettings)}
+            className="w-full flex items-center justify-between p-4 bg-white rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center space-x-3">
+              <Settings className="w-5 h-5 text-gray-600" />
+              <span className="font-medium text-gray-900">Account Settings</span>
+            </div>
+            <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${showSettings ? 'rotate-90' : ''}`} />
+          </button>
+
+          {showSettings && (
+            <div className="mt-3 bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="divide-y divide-gray-200">
+                <button className="w-full flex items-center space-x-3 p-4 hover:bg-gray-50 transition-colors text-left">
+                  <User className="w-5 h-5 text-gray-600" />
+                  <div>
+                    <div className="font-medium text-gray-900">Update Profile Picture</div>
+                    <div className="text-sm text-gray-600">Change your avatar</div>
+                  </div>
+                </button>
+                
+                <button className="w-full flex items-center space-x-3 p-4 hover:bg-gray-50 transition-colors text-left">
+                  <Shield className="w-5 h-5 text-gray-600" />
+                  <div>
+                    <div className="font-medium text-gray-900">Change Password</div>
+                    <div className="text-sm text-gray-600">Update security credentials</div>
+                  </div>
+                </button>
+                
+                <button className="w-full flex items-center space-x-3 p-4 hover:bg-gray-50 transition-colors text-left">
+                  <AlertCircle className="w-5 h-5 text-gray-600" />
+                  <div>
+                    <div className="font-medium text-gray-900">Notification Preferences</div>
+                    <div className="text-sm text-gray-600">Manage alerts and emails</div>
+                  </div>
+                </button>
+                
+                <button className="w-full flex items-center space-x-3 p-4 hover:bg-gray-50 transition-colors text-left">
+                  <CheckCircle className="w-5 h-5 text-gray-600" />
+                  <div>
+                    <div className="font-medium text-gray-900">Privacy Settings</div>
+                    <div className="text-sm text-gray-600">Control who sees your info</div>
+                  </div>
+                </button>
               </div>
             </div>
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <Plus className="w-4 h-4 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-900 font-medium">New listing posted: Samsung Galaxy S24</p>
-                <p className="text-gray-600 text-sm">1 day ago</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                <MessageCircle className="w-4 h-4 text-purple-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-900 font-medium">Received inquiry for Xiaomi 14</p>
-                <p className="text-gray-600 text-sm">3 days ago</p>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
+      </div>
+
+      {/* Sign Out Button - At the very bottom */}
+      <div className="px-4 pb-8">
+        <button 
+          onClick={onLogout}
+          className="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-xl font-bold transition-colors flex items-center justify-center space-x-3"
+        >
+          <LogOut className="w-5 h-5" />
+          <span>Sign Out</span>
+        </button>
       </div>
     </div>
   );
