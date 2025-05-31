@@ -2196,34 +2196,89 @@ export const OurOfferingsSection = ({ onCompareClick, onPriceAlertsClick }) => {
   return (
     <section className="bg-white py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-            Our Offerings
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Everything you need to buy or sell phones with confidence
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              Our Offerings
+            </h2>
+            <p className="text-gray-600">
+              Everything you need to buy or sell phones with confidence
+            </p>
+          </div>
+          
+          {/* Navigation arrows for desktop */}
+          <div className="hidden md:flex items-center space-x-2">
+            <button 
+              onClick={() => {
+                const container = document.getElementById('offerings-scroll');
+                container.scrollBy({ left: -300, behavior: 'smooth' });
+              }}
+              className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <ArrowRight className="w-5 h-5 rotate-180 text-gray-600" />
+            </button>
+            <button 
+              onClick={() => {
+                const container = document.getElementById('offerings-scroll');
+                container.scrollBy({ left: 300, behavior: 'smooth' });
+              }}
+              className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <ArrowRight className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {offerings.map((offering, index) => {
-            const IconComponent = offering.icon;
-            return (
-              <div key={index} className="text-center group hover:bg-gray-50 p-6 rounded-xl transition-colors">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
-                  <IconComponent className="w-8 h-8 text-blue-600" />
+        {/* Horizontal scrolling container */}
+        <div className="relative">
+          <div 
+            id="offerings-scroll"
+            className="flex gap-6 overflow-x-auto scrollbar-hide pb-4"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {offerings.map((offering, index) => {
+              const IconComponent = offering.icon;
+              return (
+                <div key={index} className="text-center group hover:bg-gray-50 p-6 rounded-xl transition-colors flex-shrink-0 w-[250px]">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
+                    <IconComponent className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{offering.title}</h3>
+                  <p className="text-gray-600 mb-4 text-sm">{offering.description}</p>
+                  <button 
+                    onClick={offering.onClick}
+                    className="text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
+                  >
+                    {offering.action} →
+                  </button>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">{offering.title}</h3>
-                <p className="text-gray-600 mb-4 text-sm">{offering.description}</p>
-                <button 
-                  onClick={offering.onClick}
-                  className="text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
-                >
-                  {offering.action} →
-                </button>
+              );
+            })}
+            
+            {/* See All Deals card - fixed on the right */}
+            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex-shrink-0 w-[250px] h-[240px] flex items-center justify-center text-white cursor-pointer hover:from-green-600 hover:to-green-700 transition-colors">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ArrowRight className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">See All Deals</h3>
+                <p className="text-green-100 text-sm">Explore more offers</p>
               </div>
-            );
-          })}
+            </div>
+          </div>
+          
+          {/* Mobile swipe indicator */}
+          <div className="flex justify-center mt-4 md:hidden">
+            <div className="flex items-center space-x-1 text-gray-400 text-xs">
+              <div className="flex space-x-1">
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+              </div>
+              <span className="ml-2">Swipe to browse</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
