@@ -2074,12 +2074,37 @@ export const RecentSearchesHomepage = ({ onSearch }) => {
 };
 
 // Simplified placeholder components
-export const MobileBottomNav = ({ currentPage, setCurrentPage }) => {
+export const MobileBottomNav = ({ currentPage, setCurrentPage, isLoggedIn, compareCount, onCompareClick, onSignInRequired }) => {
+  const handleNavigation = (key) => {
+    if (key === 'compare') {
+      // Handle compare functionality
+      if (compareCount > 0) {
+        onCompareClick();
+      }
+      return;
+    }
+    
+    if (key === 'post-ad' && !isLoggedIn) {
+      // Handle post-ad authentication requirement
+      onSignInRequired();
+      return;
+    }
+    
+    if (key === 'profile' && !isLoggedIn) {
+      // Handle profile authentication requirement
+      onSignInRequired();
+      return;
+    }
+    
+    // Regular navigation
+    setCurrentPage(key);
+  };
+
   const menuItems = [
     { key: 'home', label: 'Home', icon: Home },
     { key: 'dedicated-search', label: 'Search', icon: Search },
     { key: 'post-ad', label: 'Post Ad', icon: Plus },
-    { key: 'compare', label: 'Compare', icon: BarChart2 },
+    { key: 'compare', label: 'Compare', icon: BarChart2, badge: compareCount },
     { key: 'profile', label: 'Profile', icon: User },
   ];
 
@@ -2088,17 +2113,26 @@ export const MobileBottomNav = ({ currentPage, setCurrentPage }) => {
       <div className="grid grid-cols-5">
         {menuItems.map((item) => {
           const IconComponent = item.icon;
+          const isActive = item.key === 'compare' ? compareCount > 0 : currentPage === item.key;
+          
           return (
             <button
               key={item.key}
-              onClick={() => setCurrentPage(item.key)}
-              className={`flex flex-col items-center py-2 px-1 text-xs transition-colors ${
-                currentPage === item.key 
+              onClick={() => handleNavigation(item.key)}
+              className={`relative flex flex-col items-center py-2 px-1 text-xs transition-colors ${
+                isActive 
                   ? 'text-blue-600 bg-blue-50' 
                   : 'text-gray-600 hover:text-blue-600'
               }`}
             >
-              <IconComponent className="w-5 h-5 mb-1" />
+              <div className="relative">
+                <IconComponent className="w-5 h-5 mb-1" />
+                {item.badge > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px]">
+                    {item.badge > 99 ? '99+' : item.badge}
+                  </span>
+                )}
+              </div>
               <span>{item.label}</span>
             </button>
           );
