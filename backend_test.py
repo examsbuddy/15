@@ -244,6 +244,129 @@ class PhoneFlipAPITester:
             data=test_data
         )
 
+def test_shop_owner_registration():
+    """Run focused tests on shop owner registration API endpoint"""
+    # Get backend URL from environment or use default
+    with open('/app/frontend/.env', 'r') as f:
+        for line in f:
+            if line.startswith('REACT_APP_BACKEND_URL='):
+                backend_url = line.strip().split('=')[1].strip('"\'')
+                break
+    
+    print(f"Using backend URL: {backend_url}")
+    
+    # Setup tester
+    tester = PhoneFlipAPITester(backend_url)
+    
+    # Run basic API test to check if server is running
+    print("\n=== Testing Server Status ===")
+    tester.test_api_root()
+    
+    # Run shop owner registration tests
+    print("\n=== SHOP OWNER REGISTRATION API TESTING ===")
+    
+    print("\n--- 1. Shop Owner Registration with Valid Data ---")
+    success, response = tester.test_register_shop_owner()
+    
+    print("\n--- 2. Shop Owner Registration with Missing Fields ---")
+    missing_fields_success, missing_fields_response = tester.test_register_shop_owner_missing_fields()
+    
+    print("\n--- 3. Shop Owner Registration with Duplicate Email ---")
+    duplicate_email_success, duplicate_email_response = tester.test_register_shop_owner_duplicate_email()
+    
+    # Print detailed results
+    print("\n=== SHOP OWNER REGISTRATION API TEST RESULTS ===")
+    
+    print("\n1. Shop Owner Registration with Valid Data:")
+    if success:
+        print("   ✅ Shop owner registration with valid data works correctly")
+        print(f"   User ID: {response.get('user_id', 'N/A')}")
+        print(f"   Message: {response.get('message', 'N/A')}")
+        
+        # Verify the success message indicates proper user type
+        if "shop owner" in response.get('message', '').lower():
+            print("   ✅ Response correctly identifies as shop owner registration")
+        else:
+            print("   ⚠️ Response message doesn't explicitly mention 'shop owner'")
+            
+        # Check if KYC data was properly handled
+        if "under review" in response.get('message', '').lower():
+            print("   ✅ KYC verification status correctly set to 'under review'")
+        else:
+            print("   ⚠️ KYC verification status not mentioned in response")
+    else:
+        print("   ❌ Shop owner registration with valid data failed")
+    
+    print("\n2. Shop Owner Registration with Missing Fields:")
+    if missing_fields_success:
+        print("   ✅ API correctly validates required fields")
+        print("   ✅ Returned 422 status code for missing required fields")
+        
+        # Check if validation error details are provided
+        if "detail" in missing_fields_response:
+            print("   ✅ Validation error details provided in response")
+            print(f"   Error details: {missing_fields_response.get('detail', 'N/A')}")
+        else:
+            print("   ⚠️ No detailed validation error information in response")
+    else:
+        print("   ❌ API validation for missing fields failed")
+        print("   ❌ Did not return expected 422 status code")
+    
+    print("\n3. Shop Owner Registration with Duplicate Email:")
+    if duplicate_email_success:
+        print("   ✅ API correctly handles duplicate email")
+        print("   ✅ Returned 400 status code for duplicate email")
+        
+        # Check if error details are provided
+        if "detail" in duplicate_email_response:
+            print("   ✅ Error details provided in response")
+            print(f"   Error message: {duplicate_email_response.get('detail', 'N/A')}")
+            
+            # Verify the error message mentions duplicate email
+            if "email" in duplicate_email_response.get('detail', '').lower() and "registered" in duplicate_email_response.get('detail', '').lower():
+                print("   ✅ Error message correctly identifies duplicate email issue")
+            else:
+                print("   ⚠️ Error message doesn't clearly indicate duplicate email issue")
+        else:
+            print("   ⚠️ No detailed error information in response")
+    else:
+        print("   ❌ API handling for duplicate email failed")
+        print("   ❌ Did not return expected 400 status code")
+    
+    # Print summary
+    print("\n=== SHOP OWNER REGISTRATION API TEST SUMMARY ===")
+    tests_passed = sum([
+        1 if success else 0,
+        1 if missing_fields_success else 0,
+        1 if duplicate_email_success else 0
+    ])
+    tests_total = 3
+    
+    print(f"📊 Shop Owner Registration API Tests Passed: {tests_passed}/{tests_total}")
+    print(f"📊 Shop Owner Registration API Health: {(tests_passed / tests_total) * 100:.2f}%")
+    
+    if tests_passed == tests_total:
+        print("\n✅ SHOP OWNER REGISTRATION API IS FULLY FUNCTIONAL")
+        print("   ✅ Successfully registers shop owners with valid data")
+        print("   ✅ Properly validates required fields")
+        print("   ✅ Correctly handles duplicate email registration")
+    else:
+        print("\n⚠️ SHOP OWNER REGISTRATION API REQUIRES ATTENTION")
+        
+        if not success:
+            print("   ❌ Registration with valid data is not working correctly")
+            print("   - Check the /api/auth/register-shop-owner endpoint implementation")
+        
+        if not missing_fields_success:
+            print("   ❌ Validation for required fields is not working correctly")
+            print("   - Check the validation logic in the ShopOwnerRegistration model")
+        
+        if not duplicate_email_success:
+            print("   ❌ Handling of duplicate email registration is not working correctly")
+            print("   - Check the error handling in the register_shop_owner function")
+    
+    return tests_passed == tests_total
+
 def test_signup_flows():
     """Run focused tests on both signup flows (Normal User and Shop Owner)"""
     # Get backend URL from environment or use default
@@ -358,11 +481,11 @@ def test_signup_flows():
     return signup_tests_passed == signup_tests_total
 
 def main():
-    # Run focused signup flows tests
-    signup_flows_ok = test_signup_flows()
+    # Run focused shop owner registration API tests
+    shop_owner_registration_ok = test_shop_owner_registration()
     
     # Return success code if all tests passed
-    return 0 if signup_flows_ok else 1
+    return 0 if shop_owner_registration_ok else 1
 
 if __name__ == "__main__":
     sys.exit(main())
