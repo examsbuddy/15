@@ -325,13 +325,17 @@ function App() {
       {showSignUpModal && (
         <SignUpModal 
           isOpen={showSignUpModal}
-          onClose={() => setShowSignUpModal(false)}
+          onClose={() => {
+            setShowSignUpModal(false);
+            setSignUpType('normal'); // Reset to normal user selection
+          }}
           onSignup={handleLogin}
           signUpType={signUpType}
           setSignUpType={setSignUpType}
           onSwitchToSignIn={() => {
             setShowSignUpModal(false);
             setShowSignInModal(true);
+            setSignUpType('normal'); // Reset to normal user selection
           }}
         />
       )}
