@@ -2074,7 +2074,7 @@ export const RecentSearchesHomepage = ({ onSearch }) => {
 };
 
 // Simplified placeholder components
-export const MobileBottomNav = ({ currentPage, setCurrentPage, isLoggedIn, compareCount, onCompareClick, onSignInRequired }) => {
+export const MobileBottomNav = ({ currentPage, setCurrentPage, isLoggedIn, compareCount, onCompareClick }) => {
   const handleNavigation = (key) => {
     if (key === 'compare') {
       // Handle compare functionality
