@@ -699,6 +699,19 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
     return defaultMessage;
   };
 
+  const resetForms = () => {
+    setNormalUserData({
+      name: '', email: '', password: '', confirmPassword: '', phone: '', city: ''
+    });
+    setShopOwnerData({
+      name: '', email: '', password: '', confirmPassword: '', phone: '', city: '',
+      businessName: '', businessAddress: '', businessType: '', yearsInBusiness: '',
+      cnicNumber: '', businessLicense: null, cnicFront: null, cnicBack: null
+    });
+    setCurrentStep(1);
+    setError('');
+  };
+
   const handleShopOwnerSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
