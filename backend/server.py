@@ -725,7 +725,7 @@ async def populate_sample_data():
                 "processor": "Snapdragon 8 Gen 2",
                 "operating_system": "MIUI 14",
                 "network": "5G",
-                "photos": [sample_image],
+                "photos": [PHONE_IMAGES[5]],
                 "purchase_year": 2023,
                 "warranty_months": 0,
                 "box_included": False,
