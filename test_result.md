@@ -275,6 +275,7 @@ test_plan:
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
+  last_tested: "Compare Button Functionality"
 
 agent_communication:
   - agent: "testing"
