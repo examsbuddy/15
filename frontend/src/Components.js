@@ -730,9 +730,6 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
     // Reset loading and error states to ensure button remains responsive
     setIsLoading(false);
     setError('');
-    // Reset loading and error states to ensure button remains responsive
-    setIsLoading(false);
-    setError('');
   };
 
   if (!isOpen) return null;
