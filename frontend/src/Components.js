@@ -41,7 +41,6 @@ import {
   TrendingUp,
   RefreshCw,
   ArrowLeft,
-  Filter,
   Zap,
   ShoppingBag,
   Video,
