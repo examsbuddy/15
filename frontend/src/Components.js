@@ -5856,7 +5856,323 @@ export const SearchResultsPage = ({ searchFilters, onBack, onViewListing }) => {
 };
 
 // New Comprehensive Dedicated Search Page
-export const DedicatedSearchPage = ({ onBack, onViewListing, initialFilters = {} }) => {
+// Brand-specific Search Page
+export const BrandSearchPage = ({ brand, onBack, onViewListing }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchLocation, setSearchLocation] = useState('');
+  const [filterCondition, setFilterCondition] = useState('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [sortBy, setSortBy] = useState('relevance');
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const brandTitle = brand.charAt(0).toUpperCase() + brand.slice(1);
+  
+  // Sample filtered results based on brand
+  const sampleResults = [
+    {
+      _id: '1',
+      brand: brand === 'iphone' ? 'iPhone' : brand === 'samsung' ? 'Samsung' : brand === 'xiaomi' ? 'Xiaomi' : brand === 'oppo' ? 'Oppo' : brand === 'vivo' ? 'Vivo' : 'Realme',
+      model: brand === 'iphone' ? '15 Pro' : brand === 'samsung' ? 'Galaxy S24' : brand === 'xiaomi' ? 'Redmi Note 13' : brand === 'oppo' ? 'Find X6' : brand === 'vivo' ? 'V30' : 'GT 6',
+      price: brand === 'iphone' ? 450000 : brand === 'samsung' ? 280000 : 65000,
+      photos: ['/api/placeholder/300/200'],
+      storage: '256GB',
+      ram: '8GB',
+      battery: brand === 'iphone' ? '3274mAh' : '5000mAh',
+      camera: brand === 'iphone' ? '48MP + 12MP + 12MP' : '50MP + 12MP + 5MP',
+      condition: 'Excellent',
+      location: 'Lahore',
+      seller: 'TechStore Pro',
+      pta_approved: true,
+      warranty_months: 12,
+      listing_age: '2 days ago'
+    },
+    {
+      _id: '2',
+      brand: brand === 'iphone' ? 'iPhone' : brand === 'samsung' ? 'Samsung' : brand === 'xiaomi' ? 'Xiaomi' : brand === 'oppo' ? 'Oppo' : brand === 'vivo' ? 'Vivo' : 'Realme',
+      model: brand === 'iphone' ? '14 Pro Max' : brand === 'samsung' ? 'Galaxy A54' : brand === 'xiaomi' ? 'Poco X6' : brand === 'oppo' ? 'A98' : brand === 'vivo' ? 'Y36' : 'C67',
+      price: brand === 'iphone' ? 380000 : brand === 'samsung' ? 95000 : 45000,
+      photos: ['/api/placeholder/300/200'],
+      storage: '512GB',
+      ram: '6GB',
+      battery: brand === 'iphone' ? '4323mAh' : '5000mAh',
+      camera: brand === 'iphone' ? '48MP + 12MP + 12MP' : '50MP + 8MP + 2MP',
+      condition: 'Good',
+      location: 'Karachi',
+      seller: 'Mobile Hub',
+      pta_approved: brand === 'iphone' ? true : false,
+      warranty_months: 6,
+      listing_age: '1 week ago'
+    }
+  ];
+
+  useEffect(() => {
+    setSearchResults(sampleResults);
+  }, [brand]);
+
+  const handleSearch = () => {
+    setLoading(true);
+    // Simulate search with brand filter
+    setTimeout(() => {
+      setSearchResults(sampleResults);
+      setLoading(false);
+    }, 500);
+  };
+
+  const conditions = ['all', 'excellent', 'good', 'fair'];
+  const locations = ['All Pakistan', 'Lahore', 'Karachi', 'Islamabad', 'Rawalpindi', 'Faisalabad'];
+  const sortOptions = [
+    { value: 'relevance', label: 'Most Relevant' },
+    { value: 'price-low', label: 'Price: Low to High' },
+    { value: 'price-high', label: 'Price: High to Low' },
+    { value: 'newest', label: 'Newest First' },
+    { value: 'oldest', label: 'Oldest First' }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-6">
+          <button
+            onClick={onBack}
+            className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors mb-4"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back to Home</span>
+          </button>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Used {brandTitle} Phones in Pakistan
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Find the best deals on used {brandTitle} phones
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Search {brandTitle} Models
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={`Search ${brandTitle} models...`}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+              <select
+                value={searchLocation}
+                onChange={(e) => setSearchLocation(e.target.value)}
+                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              >
+                {locations.map((location) => (
+                  <option key={location} value={location}>{location}</option>
+                ))}
+              </select>
+            </div>
+            
+            <button
+              onClick={handleSearch}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 mt-auto"
+            >
+              <Search className="w-5 h-5" />
+              <span>Search</span>
+            </button>
+          </div>
+
+          {/* Filters Toggle */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="mt-4 flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            <Filter className="w-4 h-4" />
+            <span>{showFilters ? 'Hide' : 'Show'} Filters</span>
+          </button>
+
+          {/* Expanded Filters */}
+          {showFilters && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Condition</label>
+                  <select
+                    value={filterCondition}
+                    onChange={(e) => setFilterCondition(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  >
+                    {conditions.map((condition) => (
+                      <option key={condition} value={condition}>
+                        {condition.charAt(0).toUpperCase() + condition.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Min Price (₨)</label>
+                  <input
+                    type="number"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                    placeholder="0"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Max Price (₨)</label>
+                  <input
+                    type="number"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
+                    placeholder="1000000"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  >
+                    {sortOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Results Header */}
+        <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600">
+                Found <span className="font-semibold text-gray-900">{searchResults.length}</span> used {brandTitle} phones
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-500">Sort:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              >
+                {sortOptions.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Search Results */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
+                <div className="w-full h-48 bg-gray-200"></div>
+                <div className="p-4">
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              </div>
+            ))
+          ) : (
+            searchResults.map((phone) => (
+              <div key={phone._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer">
+                <div className="relative">
+                  <img
+                    src={phone.photos[0]}
+                    alt={`${phone.brand} ${phone.model}`}
+                    className="w-full h-48 object-cover"
+                  />
+                  {phone.pta_approved && (
+                    <span className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                      PTA Approved
+                    </span>
+                  )}
+                  <span className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                    {phone.condition}
+                  </span>
+                </div>
+                
+                <div className="p-4">
+                  <h3 className="font-bold text-lg text-gray-900 mb-2">
+                    {phone.brand} {phone.model}
+                  </h3>
+                  <p className="text-2xl font-bold text-blue-600 mb-2">
+                    ₨{phone.price.toLocaleString()}
+                  </p>
+                  
+                  <div className="space-y-1 text-sm text-gray-600 mb-4">
+                    <p>{phone.storage} • {phone.ram} RAM</p>
+                    <p>{phone.camera}</p>
+                    <p>📍 {phone.location}</p>
+                    <p>🏪 {phone.seller}</p>
+                    <p>📅 {phone.listing_age}</p>
+                  </div>
+                  
+                  <button
+                    onClick={() => onViewListing && onViewListing(phone)}
+                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {searchResults.length === 0 && !loading && (
+          <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+            <Smartphone className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No {brandTitle} phones found</h3>
+            <p className="text-gray-600 mb-6">
+              Try adjusting your search criteria or check back later for new listings
+            </p>
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setFilterCondition('all');
+                setMinPrice('');
+                setMaxPrice('');
+                handleSearch();
+              }}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
   const [searchQuery, setSearchQuery] = useState('');
   const [userLocation, setUserLocation] = useState('');
   const [locationLoading, setLocationLoading] = useState(true);
