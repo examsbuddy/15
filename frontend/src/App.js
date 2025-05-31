@@ -167,6 +167,7 @@ function App() {
             <FeaturedPhones 
               addToCompare={addToCompare}
               compareList={compareList}
+              onViewListing={handleViewListing}
             />
             
             {/* Accessories Section */}
