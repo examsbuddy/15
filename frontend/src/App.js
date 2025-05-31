@@ -15,7 +15,7 @@ import {
   FeaturedPhones, 
   Footer,
   PriceDropAlertsModal,
-  CompareModal,
+  ComparisonPage,
   SignInModal,
   SignUpModal,
   ProfilePage,
