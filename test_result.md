@@ -563,6 +563,9 @@ frontend:
         comment: "Seller Type System is implemented correctly. API testing confirms that listings show proper seller type badges (Individual, Shop Owner, Verified Seller)."
       - working: true
         agent: "testing"
+      - working: true
+        agent: "testing"
+        comment: "Verified Shop Owner Signup Step 2 functionality. Successfully navigated from Step 1 to Step 2, filled business information, and proceeded to Step 3. Navigation between steps works correctly with the Previous button returning to Step 2 with form data preserved. No 'Objects are not valid as React child' errors were detected in the console during testing. The form correctly handles validation when attempting to proceed with empty fields."
         comment: "Verified backend API endpoint for shop owner registration (POST /api/auth/register-shop-owner). The endpoint correctly processes shop owner data including business details and KYC documents. It assigns user_type as 'shop_owner' with verification_status set to 'under_review'. Response includes proper confirmation message and user ID."
       - working: true
         agent: "testing"
