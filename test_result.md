@@ -273,6 +273,18 @@ backend:
         agent: "testing"
         comment: "Tested normal user registration flow, shop owner registration flow, creating a phone listing, and search/filtering for both phones and accessories. All user flows are working correctly."
 
+  - task: "MongoDB Connection Status"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "MongoDB connection is working correctly. The backend successfully connects to the MongoDB database at startup and maintains the connection throughout operation. Database operations (read, write, update, delete) are functioning properly. The MongoDB ping command returns a successful response, confirming the database is accessible and responsive."
+
   - task: "Search Functionality API Endpoints"
     implemented: true
     working: true
