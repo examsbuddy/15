@@ -657,9 +657,19 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
 
     try {
       const formData = new FormData();
+      
+      // Add text fields (skip confirmPassword and null/empty values)
       Object.keys(shopOwnerData).forEach(key => {
-        if (key !== 'confirmPassword' && shopOwnerData[key] !== null) {
-          formData.append(key, shopOwnerData[key]);
+        if (key !== 'confirmPassword' && shopOwnerData[key] !== null && shopOwnerData[key] !== '') {
+          // Handle file fields separately
+          if (['businessLicense', 'cnicFront', 'cnicBack'].includes(key)) {
+            if (shopOwnerData[key] instanceof File) {
+              formData.append(key, shopOwnerData[key]);
+            }
+          } else {
+            // Handle text fields
+            formData.append(key, shopOwnerData[key]);
+          }
         }
       });
 
@@ -680,6 +690,7 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
         setError(data.detail || 'Registration failed');
       }
     } catch (error) {
+      console.error('Shop owner registration error:', error);
       setError('Network error. Please try again.');
     } finally {
       setIsLoading(false);
