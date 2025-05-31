@@ -132,14 +132,21 @@ function App() {
               onSearch={handleSearch}
             />
             
+            {/* Recent Listings Section - Moved to top for mobile visibility */}
+            <div className="md:hidden">
+              <RecentListingsSection />
+            </div>
+            
             {/* Compare Section */}
             <CompareSection 
               compareList={compareList}
               onCompareClick={() => setShowCompareModal(true)}
             />
             
-            {/* Recent Listings Section */}
-            <RecentListingsSection />
+            {/* Recent Listings Section - Desktop view */}
+            <div className="hidden md:block">
+              <RecentListingsSection />
+            </div>
             
             {/* Enhanced Selling Section */}
             <SellSection 
