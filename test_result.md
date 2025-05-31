@@ -1,4 +1,16 @@
 frontend:
+  - task: "Mobile Navigation with Debugging Features"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Mobile navigation bar and debug banner are implemented but have issues. The mobile detection works correctly (window.innerWidth < 768px), but there are two main issues: 1) The debug banner doesn't update correctly when clicking the Compare button - it should show 'Show Compare Modal: true' but doesn't. 2) When clicking the Search button, the app correctly logs 'Navigation clicked: dedicated-search' and 'App.js: setCurrentPage called with: dedicated-search', but the DedicatedSearchPage component throws an error: 'Cannot read properties of null (reading 'brand')'. This is because the searchFilters state is initially null, and the DedicatedSearchPage component tries to access initialFilters.brand without checking if initialFilters is null."
+
   - task: "Navigation Bar Implementation"
     implemented: true
     working: true
