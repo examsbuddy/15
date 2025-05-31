@@ -1710,8 +1710,8 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
       }}
     >
       <div className="relative max-w-7xl mx-auto px-4 z-10">
-        <div className="text-center mb-8 md:mb-12">
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 text-center leading-tight">
+        <div className="text-center mb-4 md:mb-12">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-6 text-center leading-tight">
             Find Your Perfect
             <span className="block text-transparent bg-gradient-to-r from-green-400 to-green-600 bg-clip-text">
               Mobile Phone
