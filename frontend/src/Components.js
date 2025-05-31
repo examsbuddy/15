@@ -4641,6 +4641,8 @@ export const DedicatedSearchPage = ({ onBack, onViewListing, initialFilters = {}
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState({});
   
   // Search data and options
   const phoneModels = [
