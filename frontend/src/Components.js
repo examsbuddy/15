@@ -709,19 +709,6 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
     }
   };
 
-  const resetForms = () => {
-    setNormalUserData({
-      name: '', email: '', password: '', confirmPassword: '', phone: '', city: ''
-    });
-    setShopOwnerData({
-      name: '', email: '', password: '', confirmPassword: '', phone: '', city: '',
-      businessName: '', businessAddress: '', businessType: '', yearsInBusiness: '',
-      cnicNumber: '', businessLicense: null, cnicFront: null, cnicBack: null
-    });
-    setCurrentStep(1);
-    setError('');
-  };
-
   const handleFileChange = (fieldName, file) => {
     // Only update if file is defined
     if (file) {
