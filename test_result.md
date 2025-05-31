@@ -73,6 +73,7 @@ test_plan:
     - "Horizontal scrolling for Featured Phones Section"
     - "Horizontal scrolling for Our Offerings Section"
     - "Horizontal scrolling for Featured Shops Section"
+    - "Streamlined homepage layout verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
