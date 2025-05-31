@@ -1926,15 +1926,12 @@ export const RecentListingsSection = () => {
         {isLoading ? (
           <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
             {[...Array(8)].map((_, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-sm animate-pulse flex-shrink-0 w-[280px] sm:w-[320px] h-[120px] flex">
-                <div className="w-24 sm:w-28 h-full bg-gray-200 rounded-l-xl flex-shrink-0"></div>
-                <div className="flex-1 p-3 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                  </div>
-                  <div className="h-5 bg-gray-200 rounded w-1/3"></div>
+              <div key={index} className="bg-white rounded-xl shadow-sm animate-pulse flex-shrink-0 w-[140px] sm:w-[160px]">
+                <div className="w-full h-[120px] sm:h-[140px] bg-gray-200 rounded-t-xl"></div>
+                <div className="p-2 space-y-1">
+                  <div className="h-3 bg-gray-200 rounded w-full"></div>
+                  <div className="h-2 bg-gray-200 rounded w-2/3"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                 </div>
               </div>
             ))}
@@ -1942,54 +1939,43 @@ export const RecentListingsSection = () => {
         ) : (
           <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
             {recentListings.map((listing) => (
-              <div key={listing._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer flex-shrink-0 w-[280px] sm:w-[320px] h-[120px] flex relative overflow-hidden">
-                {/* Image Section - Left Side */}
-                <div className="w-24 sm:w-28 h-full relative flex-shrink-0">
+              <div key={listing._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer flex-shrink-0 w-[140px] sm:w-[160px] relative overflow-hidden">
+                {/* Image Section - Top */}
+                <div className="w-full h-[120px] sm:h-[140px] relative">
                   <img
                     src={listing.photos && listing.photos.length > 0 ? listing.photos[0] : '/api/placeholder/300/200'}
                     alt={`${listing.brand} ${listing.model}`}
-                    className="w-full h-full object-cover rounded-l-xl"
+                    className="w-full h-full object-cover rounded-t-xl"
                   />
                   {/* Featured Badge */}
                   {listing.is_featured && (
-                    <div className="absolute top-1 left-1 bg-yellow-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    <div className="absolute top-1 left-1 bg-yellow-500 text-white text-xs px-1 py-0.5 rounded-full">
                       ⭐
                     </div>
                   )}
-                </div>
-                
-                {/* Details Section - Right Side */}
-                <div className="flex-1 p-3 flex flex-col justify-between relative">
                   {/* Time Badge */}
-                  <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                  <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1 py-0.5 rounded-full">
                     {timeAgo(listing.created_at)}
                   </div>
-                  
-                  {/* Main Content */}
-                  <div className="space-y-1 mt-4">
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 line-clamp-1 leading-tight">
-                      {listing.brand} {listing.model}
-                    </h3>
-                    <p className="text-xs text-gray-600">
-                      {listing.storage} • {listing.condition}
-                    </p>
-                    <p className="text-xs text-gray-500 flex items-center">
-                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="truncate">{listing.city}</span>
-                    </p>
-                  </div>
-                  
-                  {/* Price and Seller Type */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-base sm:text-lg font-bold text-[#1e40af] truncate">
+                </div>
+                
+                {/* Details Section - Bottom */}
+                <div className="p-2 space-y-1">
+                  <h3 className="text-xs font-semibold text-gray-900 line-clamp-1 leading-tight">
+                    {listing.brand} {listing.model}
+                  </h3>
+                  <p className="text-xs text-gray-600 truncate">
+                    {listing.storage}
+                  </p>
+                  <p className="text-xs text-gray-500 flex items-center truncate">
+                    <svg className="w-2.5 h-2.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="truncate">{listing.city}</span>
+                  </p>
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-sm font-bold text-[#1e40af] truncate">
                       {formatPrice(listing.price)}
-                    </span>
-                    <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-1 rounded-full ml-2">
-                      {listing.seller_type === 'Individual' ? 'Ind' : 
-                       listing.seller_type === 'Shop Owner' ? 'Shop' : 
-                       listing.seller_type === 'Verified Seller' ? 'Ver' : listing.seller_type}
                     </span>
                   </div>
                 </div>
