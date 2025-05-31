@@ -302,7 +302,6 @@ function App() {
           isLoggedIn={isLoggedIn}
           compareCount={compareList.length}
           onCompareClick={() => setShowCompareModal(true)}
-          onSignInRequired={() => setShowSignInModal(true)}
         />
       )}
 
