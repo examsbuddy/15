@@ -206,7 +206,7 @@ function App() {
           <ProfilePage 
             user={user}
             setCurrentPage={setCurrentPage}
-            onLogout={logout}
+            onLogout={handleLogout}
           />
         )}
 
