@@ -730,6 +730,7 @@ test_plan:
   current_focus:
     - "Sign Up Modal with User Types"
     - "Shop Owner Registration Process"
+    - "Recent Listings Section"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
