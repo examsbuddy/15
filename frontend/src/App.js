@@ -115,7 +115,7 @@ function App() {
         onLogin={handleLogin}
         onLogout={handleLogout}
         compareCount={compareList.length}
-        onCompareClick={() => setShowCompareModal(true)}
+        onCompareClick={() => setCurrentPage('compare')}
         showSignInModal={showSignInModal}
         setShowSignInModal={setShowSignInModal}
         showSignUpModal={showSignUpModal}
