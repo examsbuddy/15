@@ -676,7 +676,8 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
         }
       });
 
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/register-shop-owner`, {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://dd9d725c-3a7e-4c3a-b904-fbee2ac36da1.preview.emergentagent.com';
+      const response = await fetch(`${backendUrl}/api/auth/register-shop-owner`, {
         method: 'POST',
         body: formData,
       });
