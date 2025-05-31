@@ -714,7 +714,10 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
   };
 
   const handleFileChange = (fieldName, file) => {
-    setShopOwnerData({ ...shopOwnerData, [fieldName]: file });
+    // Only update if file is defined
+    if (file) {
+      setShopOwnerData({ ...shopOwnerData, [fieldName]: file });
+    }
   };
 
   if (!isOpen) return null;
