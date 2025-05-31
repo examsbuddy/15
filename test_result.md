@@ -249,3 +249,5 @@ test_plan:
 agent_communication:
   - agent: "testing"
     message: "I've tested all the backend API endpoints as requested. Most of the endpoints are working correctly, but there's an issue with the search functionality endpoint. When searching for 'iPhone', it returns a 500 Internal Server Error. This needs to be fixed before the application can be considered fully functional."
+  - agent: "testing"
+    message: "I've fixed the search functionality endpoint by correcting the query for searching in the features array. Changed from using $in with a regex to using $elemMatch with a regex. All backend API endpoints are now working correctly."
