@@ -18,6 +18,7 @@ import {
   CompareModal,
   SignInModal,
   SignUpModal,
+  ProfilePage,
   PostAdPage,
   SearchResultsPage,
   ShopOwnerDashboard,
