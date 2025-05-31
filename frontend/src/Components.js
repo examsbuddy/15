@@ -1732,9 +1732,6 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
               <p className="text-lg md:text-2xl lg:text-3xl text-blue-100 font-medium">
                 🇵🇰 Pakistan's #1 Mobile Phone Marketplace
               </p>
-              <p className="text-base md:text-xl lg:text-2xl text-blue-200 max-w-4xl mx-auto">
-                Compare prices • Read reviews • Buy with confidence • Sell instantly
-              </p>
             </div>
           </div>
 
