@@ -1797,7 +1797,7 @@ export const RecentSearchesHomepage = ({ onSearch }) => {
           {sectionTitle}
         </h3>
         <div className="flex flex-wrap gap-1.5">
-          {displaySearches.map((search, index) => (
+          {displaySearches.slice(0, 3).map((search, index) => (
             <button
               key={index}
               onClick={() => handleRecentSearch(search)}
