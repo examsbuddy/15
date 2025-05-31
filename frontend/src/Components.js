@@ -2106,8 +2106,8 @@ export const MobileBottomNav = ({ currentPage, setCurrentPage, isLoggedIn, compa
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-40">
-      <div className="grid grid-cols-5">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-40 h-16">
+      <div className="grid grid-cols-5 h-full">
         {menuItems.map((item) => {
           const IconComponent = item.icon;
           const isActive = item.key === 'compare' ? compareCount > 0 : currentPage === item.key;
@@ -2116,21 +2116,21 @@ export const MobileBottomNav = ({ currentPage, setCurrentPage, isLoggedIn, compa
             <button
               key={item.key}
               onClick={() => handleNavigation(item.key)}
-              className={`relative flex flex-col items-center py-2 px-1 text-xs transition-colors ${
+              className={`relative flex flex-col items-center justify-center py-1 px-1 text-xs transition-colors h-full ${
                 isActive 
                   ? 'text-blue-600 bg-blue-50' 
                   : 'text-gray-600 hover:text-blue-600'
               }`}
             >
-              <div className="relative">
-                <IconComponent className="w-5 h-5 mb-1" />
+              <div className="relative mb-1">
+                <IconComponent className="w-4 h-4" />
                 {item.badge > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center min-w-[20px]">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center min-w-[16px] text-[10px]">
                     {item.badge > 99 ? '99+' : item.badge}
                   </span>
                 )}
               </div>
-              <span>{item.label}</span>
+              <span className="text-[10px]">{item.label}</span>
             </button>
           );
         })}
