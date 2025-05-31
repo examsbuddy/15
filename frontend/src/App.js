@@ -28,6 +28,14 @@ import {
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  
+  // Add debugging wrapper for setCurrentPage
+  const debugSetCurrentPage = (newPage) => {
+    console.log('App.js: setCurrentPage called with:', newPage);
+    console.log('App.js: Previous currentPage was:', currentPage);
+    setCurrentPage(newPage);
+    console.log('App.js: setCurrentPage completed');
+  };
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showPriceAlertsModal, setShowPriceAlertsModal] = useState(false);
