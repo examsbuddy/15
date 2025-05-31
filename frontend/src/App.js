@@ -134,7 +134,7 @@ function App() {
             
             {/* Recent Listings Section - Moved to top for mobile visibility */}
             <div className="md:hidden">
-              <RecentListingsSection />
+              <RecentListingsSection onViewListing={handleViewListing} />
             </div>
             
             {/* Compare Section */}
