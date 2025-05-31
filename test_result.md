@@ -152,7 +152,7 @@ backend:
 
   - task: "Shop Owner Registration (POST /api/auth/register-shop-owner)"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 1
     priority: "medium"
@@ -164,6 +164,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "Initial shop owner registration works correctly, but subsequent attempts fail with a 500 error. This is likely related to the duplicate email issue in the regular registration endpoint. The error handling in the shop owner registration endpoint needs to be improved to properly handle duplicate email errors."
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive testing of the shop owner registration API endpoint confirms it's working correctly. Successfully tested: 1) Registration with valid data (returns 200 status code and proper response with user_id and success message), 2) Validation of required fields (returns 422 status code for missing fields with detailed error messages), 3) Duplicate email handling (returns 400 status code with clear error message). The API correctly identifies shop owner registrations and sets verification status to 'under review'."
 
   - task: "Phone Listings (POST /api/listings)"
     implemented: true
