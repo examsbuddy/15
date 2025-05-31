@@ -302,8 +302,83 @@ def test_shop_owner_registration():
     print("\n--- 2. Shop Owner Registration with Missing Fields ---")
     missing_fields_success, missing_fields_response = tester.test_register_shop_owner_missing_fields()
     
+    # For duplicate email test, we need to use a new email for the first registration
+    # and then try to register again with the same email
     print("\n--- 3. Shop Owner Registration with Duplicate Email ---")
-    duplicate_email_success, duplicate_email_response = tester.test_register_shop_owner_duplicate_email()
+    
+    # Create a new unique email for this test
+    duplicate_test_email = f"duplicate_test_{uuid.uuid4().hex[:8]}@example.com"
+    
+    # First registration with the new email
+    first_reg_data = {
+        "name": "First Shop Owner",
+        "email": duplicate_test_email,
+        "password": "Test@123456",
+        "phone": "03009876543",
+        "business_details": {
+            "business_name": "First Shop",
+            "business_type": "mobile_shop",
+            "business_address": "123 Test Street",
+            "city": "Karachi",
+            "postal_code": "75000",
+            "business_phone": "03009876543",
+            "website": "https://testshop.com",
+            "description": "This is a test shop for automated testing.",
+            "years_in_business": 5
+        },
+        "kyc_documents": {
+            "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",
+            "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",
+            "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",
+            "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="
+        }
+    }
+    
+    first_reg_success, _ = tester.run_test(
+        "First Registration for Duplicate Test",
+        "POST",
+        "api/auth/register-shop-owner",
+        200,
+        data=first_reg_data
+    )
+    
+    # Second registration with the same email
+    if first_reg_success:
+        second_reg_data = {
+            "name": "Second Shop Owner",
+            "email": duplicate_test_email,  # Same email as first registration
+            "password": "Test@123456",
+            "phone": "03009876544",
+            "business_details": {
+                "business_name": "Second Shop",
+                "business_type": "mobile_shop",
+                "business_address": "456 Test Avenue",
+                "city": "Lahore",
+                "postal_code": "54000",
+                "business_phone": "03009876544",
+                "website": "https://secondshop.com",
+                "description": "This is another test shop for automated testing.",
+                "years_in_business": 3
+            },
+            "kyc_documents": {
+                "cnic_front": "dGVzdCBiYXNlNjQgZGF0YQ==",
+                "cnic_back": "dGVzdCBiYXNlNjQgZGF0YQ==",
+                "business_license": "dGVzdCBiYXNlNjQgZGF0YQ==",
+                "trade_license": "dGVzdCBiYXNlNjQgZGF0YQ=="
+            }
+        }
+        
+        duplicate_email_success, duplicate_email_response = tester.run_test(
+            "Second Registration with Same Email",
+            "POST",
+            "api/auth/register-shop-owner",
+            400,  # Expect 400 Bad Request for duplicate email
+            data=second_reg_data
+        )
+    else:
+        print("❌ Failed to register first shop owner, skipping duplicate email test")
+        duplicate_email_success = False
+        duplicate_email_response = {}
     
     # Print detailed results
     print("\n=== SHOP OWNER REGISTRATION API TEST RESULTS ===")
