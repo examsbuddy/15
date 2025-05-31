@@ -791,3 +791,6 @@ agent_communication:
       - working: true
         agent: "testing"
         comment: "Recent Listings section is properly implemented and working as expected. It appears before the Sell Your Phone section as required. The API endpoint /api/listings/recent is working correctly and returns listing data. The listing cards display all required information including phone details, prices, images, and timestamps. The section styling matches the existing design theme with proper responsive layouts for different screen sizes. No console errors were detected."
+      - working: true
+        agent: "testing"
+        comment: "Tested the updated Recent Listings section with horizontal scrolling implementation. In mobile view (390px width), the section shows 1-2 cards visible horizontally with proper card width. In desktop view (1024px width), the section shows 2-3 cards visible horizontally with fixed card width (around 320px). The horizontal scrolling functionality works smoothly in both views. The scrollbar is properly hidden using the 'scrollbar-hide' CSS class while maintaining scrolling functionality. The flex layout is working correctly with flex-shrink-0 on cards to prevent wrapping. The gap spacing between cards is set to 16px. All listing data displays correctly with proper images, prices, and details. No console errors were detected during testing."
