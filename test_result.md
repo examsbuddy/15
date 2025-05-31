@@ -564,6 +564,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Verified that the file handling fix is working correctly. The null check before the instanceof File check prevents runtime errors when file fields are null. The form now properly handles empty file fields without causing uncaught runtime errors. While there are backend validation errors (422) when submitting incomplete data, there are no JavaScript runtime errors related to file handling."
+      - working: true
+        agent: "testing"
+        comment: "Completed end-to-end testing of the shop owner signup flow. Successfully navigated through all three steps of the registration process: 1) Personal Information, 2) Business Information, and 3) Verification. The form correctly handles all required fields and submits the data to the backend API. The modal closes after successful submission, indicating that the registration was processed correctly. No React errors or 'Objects are not valid as React child' errors were encountered during the process."
 
   - task: "Hero Section with Blue Theme"
     implemented: true
