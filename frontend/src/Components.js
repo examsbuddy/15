@@ -6936,7 +6936,7 @@ export const AdminPortalMain = ({ onBack }) => {
   // Load stats from backend
   const loadStats = async () => {
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/stats`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/stats`);
       if (response.ok) {
         const data = await response.json();
         setStats(data);
