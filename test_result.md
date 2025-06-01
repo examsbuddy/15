@@ -426,7 +426,41 @@ backend:
         agent: "testing"
         comment: "Delete phone spec endpoint (/api/phone-specs/{spec_id}) is working correctly. It successfully deletes a phone specification from the database and returns a success message. Verification confirmed the spec was actually deleted."
 
-metadata:
+  - task: "CSV Template Download Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "The CSV template download endpoint (/api/phone-specs/csv-template) is working correctly. It returns a properly formatted CSV file with the correct Content-Type header. The CSV contains all the required headers and sample data for phone specifications. The file can be successfully downloaded and used for bulk import."
+
+  - task: "CSV Bulk Import Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "The CSV bulk import endpoint (/api/phone-specs/bulk-import) is working correctly. It successfully processes CSV files uploaded via multipart/form-data and adds the phone specifications to the database. The response format matches the CSVUploadResponse model with proper statistics about the import process. The imported phone specs are correctly added to the database and can be retrieved via the GET /api/phone-specs endpoint."
+
+  - task: "CSV Bulk Import Error Handling"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "The error handling for the CSV bulk import endpoint is working correctly. It properly rejects invalid file formats with a 400 status code, handles missing required fields by reporting them in the errors array, and prevents duplicate entries by checking if the brand and model combination already exists in the database. The error messages are helpful and provide clear information about what went wrong."
   created_by: "testing_agent"
   version: "1.0"
   test_sequence: 2
