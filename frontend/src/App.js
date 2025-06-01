@@ -24,7 +24,7 @@ import {
   ShopOwnerDashboard,
   DetailedListingPage,
   BrandSearchPage,
-  AdminPortal
+  AdminPortalMain
 } from './Components';
 
 function App() {
