@@ -829,6 +829,293 @@ async def get_admin_stats():
         logger.error(f"Error fetching admin stats: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch admin statistics")
 
+# CSV Bulk Import Endpoint
+@api_router.post("/phone-specs/bulk-import", response_model=CSVUploadResponse)
+async def bulk_import_phone_specs(file: UploadFile = File(...)):
+    """Bulk import phone specifications from CSV file"""
+    try:
+        # Validate file type
+        if not file.filename.endswith(('.csv', '.xlsx', '.xls')):
+            raise HTTPException(status_code=400, detail="File must be CSV or Excel format")
+        
+        # Read file content
+        contents = await file.read()
+        
+        # Parse CSV content
+        if file.filename.endswith('.csv'):
+            csv_string = contents.decode('utf-8')
+            csv_reader = csv.DictReader(io.StringIO(csv_string))
+        else:
+            # For Excel files, we'll need to convert them to CSV format
+            # For now, let's focus on CSV support
+            raise HTTPException(status_code=400, detail="Excel support coming soon. Please use CSV format.")
+        
+        total_rows = 0
+        successful_imports = 0
+        failed_imports = 0
+        errors = []
+        imported_specs = []
+        
+        # Process each row
+        for row_num, row in enumerate(csv_reader, start=2):  # Start at 2 because row 1 is headers
+            total_rows += 1
+            
+            try:
+                # Clean and validate required fields
+                brand = row.get('brand', '').strip()
+                model = row.get('model', '').strip()
+                
+                if not brand or not model:
+                    errors.append(f"Row {row_num}: Brand and Model are required")
+                    failed_imports += 1
+                    continue
+                
+                # Check if phone spec already exists
+                existing_spec = await db.phone_specs.find_one({
+                    "brand": brand,
+                    "model": model
+                })
+                
+                if existing_spec:
+                    errors.append(f"Row {row_num}: {brand} {model} already exists")
+                    failed_imports += 1
+                    continue
+                
+                # Extract price values
+                price_pkr = None
+                price_usd = None
+                
+                try:
+                    if row.get('price_pkr'):
+                        price_pkr = int(str(row['price_pkr']).replace(',', '').replace('Rs', '').replace('PKR', '').strip())
+                except:
+                    pass
+                    
+                try:
+                    if row.get('price_usd'):
+                        price_usd = int(str(row['price_usd']).replace(',', '').replace('$', '').replace('USD', '').strip())
+                except:
+                    pass
+                
+                # Create phone spec document
+                new_spec = {
+                    "_id": str(uuid.uuid4()),
+                    "brand": brand,
+                    "model": model,
+                    
+                    # Build Information
+                    "os": row.get('os', '').strip() or None,
+                    "ui": row.get('ui', '').strip() or None,
+                    "dimensions": row.get('dimensions', '').strip() or None,
+                    "weight": row.get('weight', '').strip() or None,
+                    "sim": row.get('sim', '').strip() or None,
+                    "colors": row.get('colors', '').strip() or None,
+                    
+                    # Network & Frequency
+                    "network_2g": row.get('network_2g', '').strip() or None,
+                    "network_3g": row.get('network_3g', '').strip() or None,
+                    "network_4g": row.get('network_4g', '').strip() or None,
+                    "network_5g": row.get('network_5g', '').strip() or None,
+                    
+                    # Processor
+                    "cpu": row.get('cpu', '').strip() or None,
+                    "chipset": row.get('chipset', '').strip() or None,
+                    "gpu": row.get('gpu', '').strip() or None,
+                    
+                    # Display
+                    "display_technology": row.get('display_technology', '').strip() or None,
+                    "display_size": row.get('display_size', '').strip() or None,
+                    "display_resolution": row.get('display_resolution', '').strip() or None,
+                    "display_features": row.get('display_features', '').strip() or None,
+                    
+                    # Memory
+                    "storage": row.get('storage', '').strip() or None,
+                    "ram": row.get('ram', '').strip() or None,
+                    "card_slot": row.get('card_slot', '').strip() or None,
+                    
+                    # Camera
+                    "main_camera": row.get('main_camera', '').strip() or None,
+                    "camera_features": row.get('camera_features', '').strip() or None,
+                    "front_camera": row.get('front_camera', '').strip() or None,
+                    
+                    # Connectivity
+                    "wlan": row.get('wlan', '').strip() or None,
+                    "bluetooth": row.get('bluetooth', '').strip() or None,
+                    "gps": row.get('gps', '').strip() or None,
+                    "radio": row.get('radio', '').strip() or None,
+                    "usb": row.get('usb', '').strip() or None,
+                    "nfc": row.get('nfc', '').strip() or None,
+                    "infrared": row.get('infrared', '').strip() or None,
+                    
+                    # Features
+                    "sensors": row.get('sensors', '').strip() or None,
+                    "audio": row.get('audio', '').strip() or None,
+                    "browser": row.get('browser', '').strip() or None,
+                    "messaging": row.get('messaging', '').strip() or None,
+                    "games": row.get('games', '').strip() or None,
+                    "torch": row.get('torch', '').strip() or None,
+                    "extra_features": row.get('extra_features', '').strip() or None,
+                    
+                    # Battery
+                    "battery_capacity": row.get('battery_capacity', '').strip() or None,
+                    "charging": row.get('charging', '').strip() or None,
+                    
+                    # Pricing
+                    "price_pkr": price_pkr,
+                    "price_usd": price_usd,
+                    
+                    # Legacy fields for backward compatibility
+                    "display_size_legacy": row.get('display_size', '').strip() or None,
+                    "camera_mp": row.get('camera_mp', '').strip() or None,
+                    "battery_mah": row.get('battery_mah', '').strip() or None,
+                    "storage_gb": row.get('storage_gb', '').strip() or None,
+                    "ram_gb": row.get('ram_gb', '').strip() or None,
+                    "processor": row.get('processor', '').strip() or None,
+                    "operating_system": row.get('operating_system', '').strip() or None,
+                    "price_range_min": price_pkr,
+                    "price_range_max": price_pkr,
+                    "release_year": int(row.get('release_year', datetime.now().year)) if row.get('release_year') else datetime.now().year,
+                    
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                
+                # Insert into database
+                result = await db.phone_specs.insert_one(new_spec)
+                
+                if result.inserted_id:
+                    successful_imports += 1
+                    imported_specs.append(f"{brand} {model}")
+                else:
+                    errors.append(f"Row {row_num}: Failed to insert {brand} {model}")
+                    failed_imports += 1
+                    
+            except Exception as e:
+                errors.append(f"Row {row_num}: {str(e)}")
+                failed_imports += 1
+                logger.error(f"Error processing row {row_num}: {str(e)}")
+        
+        return CSVUploadResponse(
+            success=True,
+            total_rows=total_rows,
+            successful_imports=successful_imports,
+            failed_imports=failed_imports,
+            errors=errors[:50],  # Limit errors to first 50 to avoid huge responses
+            imported_specs=imported_specs
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in bulk import: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to process CSV file: {str(e)}")
+
+# Download CSV Template Endpoint
+@api_router.get("/phone-specs/csv-template")
+async def download_csv_template():
+    """Download a CSV template for bulk import"""
+    try:
+        # Create CSV template with all supported columns
+        template_data = [
+            {
+                # Required fields
+                "brand": "Apple",
+                "model": "iPhone 15 Pro",
+                
+                # Build Information
+                "os": "iOS 17",
+                "ui": "iOS 17",
+                "dimensions": "146.6 x 70.6 x 8.25 mm",
+                "weight": "187 g",
+                "sim": "Nano-SIM + eSIM",
+                "colors": "Natural Titanium, Blue Titanium, White Titanium, Black Titanium",
+                
+                # Network & Frequency
+                "network_2g": "GSM 850 / 900 / 1800 / 1900",
+                "network_3g": "HSDPA 850 / 900 / 1700(AWS) / 1900 / 2100",
+                "network_4g": "LTE band 1,2,3,4,5,7,8,12,13,17,18,19,20,25,26,28,30,32,34,38,39,40,41,42,46,48,53,66",
+                "network_5g": "5G SA/NSA",
+                
+                # Processor
+                "cpu": "Hexa-core (2x3.78 GHz Everest + 4x2.11 GHz Sawtooth)",
+                "chipset": "Apple A17 Pro (3 nm)",
+                "gpu": "Apple GPU (6-core graphics)",
+                
+                # Display
+                "display_technology": "LTPO Super Retina XDR OLED",
+                "display_size": "6.1 inches",
+                "display_resolution": "1179 x 2556 pixels",
+                "display_features": "120Hz, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM)",
+                
+                # Memory
+                "storage": "128GB",
+                "ram": "8GB",
+                "card_slot": "No",
+                
+                # Camera
+                "main_camera": "48 MP, f/1.78, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS + 12 MP, f/2.8, 77mm (telephoto), 1/3.5\", 1.0µm, PDAF, OIS, 3x optical zoom + 12 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\", 1.4µm, dual pixel PDAF",
+                "camera_features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+                "front_camera": "12 MP, f/1.9, 23mm (wide), 1/3.6\", PDAF, OIS",
+                
+                # Connectivity
+                "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, dual band, hotspot",
+                "bluetooth": "5.3, A2DP, LE",
+                "gps": "GPS, GLONASS, GALILEO, BDS, QZSS",
+                "radio": "No",
+                "usb": "USB Type-C 3.0, DisplayPort",
+                "nfc": "Yes",
+                "infrared": "No",
+                
+                # Features
+                "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer, Ultra Wideband 2 (UWB) support",
+                "audio": "Stereo speakers",
+                "browser": "Safari",
+                "messaging": "iMessage, SMS(threaded view), MMS, Email, Push Email",
+                "games": "Built-in + Downloadable",
+                "torch": "Yes",
+                "extra_features": "IP68 dust/water resistant (up to 6m for 30 min), Apple Pay (Visa, MasterCard, AMEX certified), Ultra Wideband 2 (UWB) support",
+                
+                # Battery
+                "battery_capacity": "3274 mAh",
+                "charging": "Wired, PD2.0, 50% in 30 min (advertised), 15W wireless (MagSafe), 7.5W wireless (Qi), 4.5W reverse wired",
+                
+                # Pricing
+                "price_pkr": "334999",
+                "price_usd": "999",
+                
+                # Legacy fields (for backward compatibility)
+                "camera_mp": "48",
+                "battery_mah": "3274",
+                "storage_gb": "128",
+                "ram_gb": "8",
+                "processor": "Apple A17 Pro",
+                "operating_system": "iOS 17",
+                "release_year": "2023"
+            }
+        ]
+        
+        # Create CSV string
+        output = io.StringIO()
+        if template_data:
+            writer = csv.DictWriter(output, fieldnames=template_data[0].keys())
+            writer.writeheader()
+            writer.writerows(template_data)
+        
+        csv_content = output.getvalue()
+        output.close()
+        
+        # Return CSV file
+        from fastapi.responses import Response
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=phone_specs_template.csv"}
+        )
+        
+    except Exception as e:
+        logger.error(f"Error generating CSV template: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to generate CSV template")
+
 # Authentication Routes
 @api_router.post("/auth/register", response_model=LoginResponse)
 async def register_normal_user(user_data: UserRegistration):
