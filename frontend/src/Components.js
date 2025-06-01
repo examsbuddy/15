@@ -6569,6 +6569,7 @@ export const AdminPortalV2 = ({ onBack }) => {
   ];
   const conditions = ['New', 'Like New', 'Excellent', 'Very Good', 'Good', 'Fair'];
   
+  const initialFilters = { brand: '', priceRange: '', condition: '' };
   const [userLocation, setUserLocation] = useState('Pakistan');
   const [locationLoading, setLocationLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
