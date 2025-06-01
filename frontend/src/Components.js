@@ -6232,6 +6232,10 @@ const PhoneSpecsManager = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingSpec, setEditingSpec] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showBulkImport, setShowBulkImport] = useState(false);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadResult, setUploadResult] = useState(null);
   const [newSpec, setNewSpec] = useState({
     brand: '',
     model: '',
