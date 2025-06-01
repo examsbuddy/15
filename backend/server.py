@@ -1799,12 +1799,20 @@ async def get_featured_listings(limit: int = 4):
 async def get_recent_listings(limit: int = 8):
     """Get recent phone listings"""
     try:
-        # Get most recent listings sorted by date_posted or created_at
-        recent_cursor = db.phone_listings.find({
-            "is_active": True
-        }).sort([("date_posted", -1), ("created_at", -1)]).limit(limit)
+        # Get most recent listings - sort by both date_posted and created_at fields
+        # Using aggregation pipeline to handle different field names
+        pipeline = [
+            {"$match": {"is_active": True}},
+            {"$addFields": {
+                "sort_date": {
+                    "$ifNull": ["$date_posted", "$created_at"]
+                }
+            }},
+            {"$sort": {"sort_date": -1}},
+            {"$limit": limit}
+        ]
         
-        recent_listings = await recent_cursor.to_list(length=limit)
+        recent_listings = await db.phone_listings.aggregate(pipeline).to_list(length=limit)
         
         # Serialize MongoDB documents
         for listing in recent_listings:
