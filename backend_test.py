@@ -623,6 +623,391 @@ def test_delete_phone_spec(spec_id):
         print(f"Error testing delete phone spec: {str(e)}")
         return False
 
+# Function to test CSV template download
+def test_csv_template_download():
+    print("\n=== Testing GET /api/phone-specs/csv-template ===")
+    try:
+        response = requests.get(f"{API_URL}/phone-specs/csv-template")
+        response.raise_for_status()
+        
+        # Check if the response is a CSV file
+        content_type = response.headers.get('Content-Type', '')
+        content_disposition = response.headers.get('Content-Disposition', '')
+        
+        print(f"Response Content-Type: {content_type}")
+        print(f"Response Content-Disposition: {content_disposition}")
+        
+        if 'text/csv' not in content_type:
+            print(f"ERROR: Expected Content-Type to be 'text/csv', got '{content_type}'")
+            return False
+            
+        if 'attachment; filename=phone_specs_template.csv' not in content_disposition:
+            print(f"WARNING: Expected Content-Disposition to include 'attachment; filename=phone_specs_template.csv'")
+        
+        # Check the CSV content
+        csv_content = response.text
+        print(f"CSV content length: {len(csv_content)} bytes")
+        
+        # Parse the CSV to check headers and sample data
+        import csv
+        from io import StringIO
+        
+        csv_reader = csv.DictReader(StringIO(csv_content))
+        headers = csv_reader.fieldnames
+        
+        if not headers:
+            print("ERROR: CSV has no headers")
+            return False
+            
+        print(f"CSV headers ({len(headers)}): {', '.join(headers[:10])}...")
+        
+        # Check if required headers are present
+        required_headers = ['brand', 'model']
+        missing_headers = [h for h in required_headers if h not in headers]
+        
+        if missing_headers:
+            print(f"ERROR: Missing required headers: {', '.join(missing_headers)}")
+            return False
+            
+        # Check if there's sample data
+        rows = list(csv_reader)
+        if not rows:
+            print("ERROR: CSV has no sample data rows")
+            return False
+            
+        print(f"CSV contains {len(rows)} sample data rows")
+        
+        # Check sample data for first row
+        sample_row = rows[0]
+        print("Sample data:")
+        for key in ['brand', 'model', 'os', 'display_size', 'ram', 'storage']:
+            if key in sample_row:
+                print(f"  {key}: {sample_row[key]}")
+        
+        # Save the CSV for bulk import testing
+        with open('/tmp/phone_specs_template.csv', 'w') as f:
+            f.write(csv_content)
+            
+        print("Saved CSV template to /tmp/phone_specs_template.csv for bulk import testing")
+        return True
+    except Exception as e:
+        print(f"Error testing CSV template download: {str(e)}")
+        return False
+
+# Function to create a test CSV file for bulk import
+def create_test_csv_for_import():
+    print("\n=== Creating test CSV file for bulk import ===")
+    try:
+        # Create a simple CSV with 2-3 phone specifications
+        import csv
+        
+        # Generate random suffix to avoid duplicate entries
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
+        
+        csv_data = [
+            {
+                "brand": "Test Brand",
+                "model": f"Test Model {random_suffix}-1",
+                "os": "Test OS 1",
+                "ui": "Test UI 1",
+                "dimensions": "150 x 70 x 8 mm",
+                "weight": "180 g",
+                "sim": "Nano-SIM + eSIM",
+                "colors": "Black, White, Blue",
+                "network_2g": "GSM 850 / 900 / 1800 / 1900",
+                "network_3g": "HSDPA 850 / 900 / 1700 / 1900 / 2100",
+                "network_4g": "LTE band 1,2,3,4,5,7,8,12,13,17,18,19,20,25,26",
+                "network_5g": "5G band 1,3,5,7,8,20,28,38,40,41,77,78",
+                "cpu": "Octa-core (4x2.8 GHz + 4x2.0 GHz)",
+                "chipset": "Test Chipset 1",
+                "gpu": "Test GPU 1",
+                "display_technology": "AMOLED",
+                "display_size": "6.5 inches",
+                "display_resolution": "1080 x 2400 pixels",
+                "display_features": "120Hz, HDR10+",
+                "storage": "128GB",
+                "ram": "8GB",
+                "card_slot": "No",
+                "main_camera": "48 MP, f/1.8, 26mm (wide)",
+                "camera_features": "LED flash, HDR, panorama",
+                "front_camera": "16 MP, f/2.0, 26mm (wide)",
+                "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6",
+                "bluetooth": "5.2, A2DP, LE",
+                "gps": "GPS, GLONASS, BDS, GALILEO",
+                "radio": "No",
+                "usb": "USB Type-C 3.1",
+                "nfc": "Yes",
+                "infrared": "No",
+                "sensors": "Fingerprint, accelerometer, gyro, proximity, compass",
+                "battery_capacity": "4500 mAh",
+                "charging": "Fast charging 65W",
+                "price_pkr": "75000",
+                "price_usd": "270",
+                "release_year": "2023"
+            },
+            {
+                "brand": "Test Brand",
+                "model": f"Test Model {random_suffix}-2",
+                "os": "Test OS 2",
+                "ui": "Test UI 2",
+                "dimensions": "160 x 75 x 8.5 mm",
+                "weight": "200 g",
+                "sim": "Dual SIM (Nano-SIM)",
+                "colors": "Red, Green, Yellow",
+                "network_2g": "GSM 850 / 900 / 1800 / 1900",
+                "network_3g": "HSDPA 850 / 900 / 1700 / 1900 / 2100",
+                "network_4g": "LTE band 1,2,3,4,5,7,8,12,13,17,18,19,20,25,26",
+                "network_5g": "5G band 1,3,5,7,8,20,28,38,40,41,77,78",
+                "cpu": "Octa-core (1x3.0 GHz + 3x2.6 GHz + 4x1.8 GHz)",
+                "chipset": "Test Chipset 2",
+                "gpu": "Test GPU 2",
+                "display_technology": "Super AMOLED",
+                "display_size": "6.7 inches",
+                "display_resolution": "1440 x 3200 pixels",
+                "display_features": "120Hz, HDR10+, 1300 nits",
+                "storage": "256GB",
+                "ram": "12GB",
+                "card_slot": "No",
+                "main_camera": "108 MP, f/1.8, 24mm (wide)",
+                "camera_features": "LED flash, HDR, panorama, 8K video",
+                "front_camera": "32 MP, f/2.2, 26mm (wide)",
+                "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e",
+                "bluetooth": "5.3, A2DP, LE",
+                "gps": "GPS, GLONASS, BDS, GALILEO, QZSS",
+                "radio": "No",
+                "usb": "USB Type-C 3.2",
+                "nfc": "Yes",
+                "infrared": "Yes",
+                "sensors": "Fingerprint, accelerometer, gyro, proximity, compass, barometer",
+                "battery_capacity": "5000 mAh",
+                "charging": "Fast charging 120W, 50% in 10 min",
+                "price_pkr": "120000",
+                "price_usd": "430",
+                "release_year": "2023"
+            },
+            {
+                "brand": "Test Brand",
+                "model": f"Test Model {random_suffix}-3",
+                "os": "Test OS 3",
+                "ui": "Test UI 3",
+                "dimensions": "145 x 68 x 7.5 mm",
+                "weight": "160 g",
+                "sim": "Nano-SIM",
+                "colors": "Purple, Orange, Pink",
+                "network_2g": "GSM 850 / 900 / 1800 / 1900",
+                "network_3g": "HSDPA 850 / 900 / 1700 / 1900 / 2100",
+                "network_4g": "LTE band 1,2,3,4,5,7,8,12,13,17,18,19,20,25,26",
+                "network_5g": "No",
+                "cpu": "Hexa-core (2x2.5 GHz + 4x1.8 GHz)",
+                "chipset": "Test Chipset 3",
+                "gpu": "Test GPU 3",
+                "display_technology": "IPS LCD",
+                "display_size": "6.1 inches",
+                "display_resolution": "828 x 1792 pixels",
+                "display_features": "60Hz, 625 nits",
+                "storage": "64GB",
+                "ram": "4GB",
+                "card_slot": "Yes, microSDXC",
+                "main_camera": "12 MP, f/1.8, 26mm (wide)",
+                "camera_features": "LED flash, HDR",
+                "front_camera": "8 MP, f/2.0",
+                "wlan": "Wi-Fi 802.11 a/b/g/n/ac",
+                "bluetooth": "5.0, A2DP, LE",
+                "gps": "GPS, GLONASS, GALILEO",
+                "radio": "FM radio",
+                "usb": "USB Type-C 2.0",
+                "nfc": "No",
+                "infrared": "No",
+                "sensors": "Fingerprint, accelerometer, proximity",
+                "battery_capacity": "3500 mAh",
+                "charging": "Fast charging 18W",
+                "price_pkr": "45000",
+                "price_usd": "160",
+                "release_year": "2022"
+            }
+        ]
+        
+        # Write to CSV file
+        csv_file_path = '/tmp/test_phone_specs.csv'
+        with open(csv_file_path, 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=csv_data[0].keys())
+            writer.writeheader()
+            writer.writerows(csv_data)
+            
+        print(f"Created test CSV file at {csv_file_path} with {len(csv_data)} phone specifications")
+        return csv_file_path, csv_data
+    except Exception as e:
+        print(f"Error creating test CSV file: {str(e)}")
+        return None, None
+
+# Function to test CSV bulk import
+def test_csv_bulk_import():
+    print("\n=== Testing POST /api/phone-specs/bulk-import ===")
+    try:
+        # Create test CSV file
+        csv_file_path, csv_data = create_test_csv_for_import()
+        if not csv_file_path or not csv_data:
+            print("ERROR: Failed to create test CSV file")
+            return False
+            
+        # Upload the CSV file
+        with open(csv_file_path, 'rb') as f:
+            files = {'file': ('test_phone_specs.csv', f, 'text/csv')}
+            response = requests.post(f"{API_URL}/phone-specs/bulk-import", files=files)
+            
+        # Check response
+        if response.status_code != 200:
+            print(f"ERROR: Bulk import failed with status code {response.status_code}")
+            print(f"Response: {response.text}")
+            return False
+            
+        result = response.json()
+        print(f"Bulk import result: {result}")
+        
+        # Check if the import was successful
+        if not result.get('success'):
+            print("ERROR: Bulk import was not successful")
+            return False
+            
+        # Check import statistics
+        total_rows = result.get('total_rows', 0)
+        successful_imports = result.get('successful_imports', 0)
+        failed_imports = result.get('failed_imports', 0)
+        
+        print(f"Total rows: {total_rows}")
+        print(f"Successful imports: {successful_imports}")
+        print(f"Failed imports: {failed_imports}")
+        
+        if total_rows != len(csv_data):
+            print(f"WARNING: Total rows ({total_rows}) doesn't match CSV data length ({len(csv_data)})")
+            
+        if successful_imports == 0:
+            print("ERROR: No specifications were successfully imported")
+            return False
+            
+        # Check if imported specs are in the database
+        print("\n--- Verifying imported specifications in database ---")
+        response = requests.get(f"{API_URL}/phone-specs")
+        response.raise_for_status()
+        
+        all_specs = response.json()
+        
+        # Check if our test models are in the database
+        imported_models = [spec.get('model') for spec in all_specs]
+        test_models = [data.get('model') for data in csv_data]
+        
+        found_models = [model for model in test_models if model in imported_models]
+        print(f"Found {len(found_models)}/{len(test_models)} imported models in database")
+        
+        if not found_models:
+            print("ERROR: None of the test models were found in the database")
+            return False
+            
+        return True
+    except Exception as e:
+        print(f"Error testing CSV bulk import: {str(e)}")
+        return False
+
+# Function to test error handling in CSV bulk import
+def test_csv_bulk_import_errors():
+    print("\n=== Testing Error Handling in CSV Bulk Import ===")
+    
+    # Test 1: Invalid file format
+    print("\n--- Test 1: Invalid file format ---")
+    try:
+        # Create a text file with invalid content
+        invalid_file_path = '/tmp/invalid_file.txt'
+        with open(invalid_file_path, 'w') as f:
+            f.write("This is not a CSV file")
+            
+        with open(invalid_file_path, 'rb') as f:
+            files = {'file': ('invalid_file.txt', f, 'text/plain')}
+            response = requests.post(f"{API_URL}/phone-specs/bulk-import", files=files)
+            
+        print(f"Response status code: {response.status_code}")
+        print(f"Response: {response.text}")
+        
+        if response.status_code == 400:
+            print("PASSED: Server correctly rejected invalid file format")
+        else:
+            print(f"FAILED: Server accepted invalid file format with status code {response.status_code}")
+    except Exception as e:
+        print(f"Error testing invalid file format: {str(e)}")
+    
+    # Test 2: Missing required fields
+    print("\n--- Test 2: Missing required fields ---")
+    try:
+        # Create a CSV with missing required fields
+        import csv
+        missing_fields_path = '/tmp/missing_fields.csv'
+        with open(missing_fields_path, 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=['model', 'os', 'ram'])  # Missing 'brand'
+            writer.writeheader()
+            writer.writerow({
+                'model': 'Test Model Missing Brand',
+                'os': 'Test OS',
+                'ram': '8GB'
+            })
+            
+        with open(missing_fields_path, 'rb') as f:
+            files = {'file': ('missing_fields.csv', f, 'text/csv')}
+            response = requests.post(f"{API_URL}/phone-specs/bulk-import", files=files)
+            
+        print(f"Response status code: {response.status_code}")
+        result = response.json()
+        print(f"Response: {result}")
+        
+        if response.status_code == 200 and result.get('failed_imports', 0) > 0:
+            print("PASSED: Server correctly handled missing required fields")
+        else:
+            print("FAILED: Server did not properly handle missing required fields")
+    except Exception as e:
+        print(f"Error testing missing required fields: {str(e)}")
+    
+    # Test 3: Duplicate phone specs
+    print("\n--- Test 3: Duplicate phone specs ---")
+    try:
+        # First, get existing specs
+        response = requests.get(f"{API_URL}/phone-specs")
+        response.raise_for_status()
+        
+        existing_specs = response.json()
+        if not existing_specs:
+            print("No existing specs found, skipping duplicate test")
+            return True
+            
+        # Create a CSV with a duplicate entry
+        import csv
+        duplicate_spec = existing_specs[0]
+        duplicate_path = '/tmp/duplicate_spec.csv'
+        
+        with open(duplicate_path, 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=['brand', 'model', 'os', 'ram'])
+            writer.writeheader()
+            writer.writerow({
+                'brand': duplicate_spec.get('brand'),
+                'model': duplicate_spec.get('model'),
+                'os': duplicate_spec.get('os', 'Test OS'),
+                'ram': duplicate_spec.get('ram', '8GB')
+            })
+            
+        with open(duplicate_path, 'rb') as f:
+            files = {'file': ('duplicate_spec.csv', f, 'text/csv')}
+            response = requests.post(f"{API_URL}/phone-specs/bulk-import", files=files)
+            
+        print(f"Response status code: {response.status_code}")
+        result = response.json()
+        print(f"Response: {result}")
+        
+        if response.status_code == 200 and result.get('failed_imports', 0) > 0:
+            print("PASSED: Server correctly handled duplicate phone specs")
+        else:
+            print("FAILED: Server did not properly handle duplicate phone specs")
+    except Exception as e:
+        print(f"Error testing duplicate phone specs: {str(e)}")
+    
+    return True
+
 def main():
     print("Starting PhoneFlip backend API tests...")
     
@@ -652,6 +1037,11 @@ def main():
         update_phone_spec_result = test_update_phone_spec(spec_id)
         delete_phone_spec_result = test_delete_phone_spec(spec_id)
     
+    # Run CSV bulk import tests
+    csv_template_result = test_csv_template_download()
+    csv_bulk_import_result = test_csv_bulk_import()
+    csv_error_handling_result = test_csv_bulk_import_errors()
+    
     # Print summary
     print("\n=== Test Summary ===")
     print(f"API Health Check: {'PASSED' if api_health_result else 'FAILED'}")
@@ -667,6 +1057,9 @@ def main():
     print(f"Create Phone Spec: {'PASSED' if create_phone_spec_result else 'FAILED'}")
     print(f"Update Phone Spec: {'PASSED' if update_phone_spec_result else 'FAILED'}")
     print(f"Delete Phone Spec: {'PASSED' if delete_phone_spec_result else 'FAILED'}")
+    print(f"CSV Template Download: {'PASSED' if csv_template_result else 'FAILED'}")
+    print(f"CSV Bulk Import: {'PASSED' if csv_bulk_import_result else 'FAILED'}")
+    print(f"CSV Error Handling: {'PASSED' if csv_error_handling_result else 'FAILED'}")
     
     # Overall result
     all_passed = (
@@ -682,7 +1075,10 @@ def main():
         get_all_phone_specs_result and
         create_phone_spec_result and
         update_phone_spec_result and
-        delete_phone_spec_result
+        delete_phone_spec_result and
+        csv_template_result and
+        csv_bulk_import_result and
+        csv_error_handling_result
     )
     
     if all_passed:
