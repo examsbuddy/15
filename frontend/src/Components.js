@@ -6174,17 +6174,6 @@ export const BrandSearchPage = ({ brand, onBack, onViewListing }) => {
   );
 };
 
-// Dedicated Search Page
-export const DedicatedSearchPage = ({ onBack, onViewListing, initialFilters = {} }) => {
-  return (
-    <BrandSearchPage 
-      brand="all" 
-      onBack={onBack} 
-      onViewListing={onViewListing} 
-    />
-  );
-};
-
 export const SearchResults = ({ onBack }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [userLocation, setUserLocation] = useState('');
