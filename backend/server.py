@@ -829,6 +829,36 @@ async def get_admin_stats():
         logger.error(f"Error fetching admin stats: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch admin statistics")
 
+# Admin Listings Management Endpoint
+@api_router.get("/admin/listings", response_model=List[PhoneListing])
+async def get_admin_listings(limit: int = 50, offset: int = 0):
+    """Get all listings for admin portal management"""
+    try:
+        # Get all listings with pagination, sorted by newest first
+        pipeline = [
+            {"$addFields": {
+                "sort_date": {
+                    "$ifNull": ["$date_posted", "$created_at"]
+                }
+            }},
+            {"$sort": {"sort_date": -1}},
+            {"$skip": offset},
+            {"$limit": limit}
+        ]
+        
+        listings = await db.phone_listings.aggregate(pipeline).to_list(length=limit)
+        
+        # Convert ObjectId to string for JSON serialization
+        for listing in listings:
+            if "_id" in listing:
+                listing["_id"] = str(listing["_id"])
+                
+        return listings
+        
+    except Exception as e:
+        logger.error(f"Error fetching admin listings: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch admin listings")
+
 # CSV Bulk Import Endpoint
 @api_router.post("/phone-specs/bulk-import", response_model=CSVUploadResponse)
 async def bulk_import_phone_specs(file: UploadFile = File(...)):
