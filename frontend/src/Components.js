@@ -6721,6 +6721,177 @@ const PhoneSpecsManager = () => {
           </div>
         </div>
       )}
+
+      {/* Bulk Import Modal */}
+      {showBulkImport && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-2xl w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-medium text-gray-900">Bulk Import Phone Specifications</h3>
+                <button
+                  onClick={() => {
+                    setShowBulkImport(false);
+                    setUploadFile(null);
+                    setUploadResult(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {!uploadResult ? (
+                <>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <h4 className="font-medium text-blue-900 mb-2">Instructions:</h4>
+                    <ul className="text-sm text-blue-800 space-y-1">
+                      <li>• Upload a CSV file with phone specifications</li>
+                      <li>• Required fields: brand, model</li>
+                      <li>• Download the template below to see all supported fields</li>
+                      <li>• The system will skip duplicates and report any errors</li>
+                    </ul>
+                  </div>
+
+                  <div className="mb-6">
+                    <button
+                      onClick={downloadTemplate}
+                      className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>Download CSV Template</span>
+                    </button>
+                  </div>
+
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select CSV File
+                    </label>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                      <div className="space-y-1 text-center">
+                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                        <div className="flex text-sm text-gray-600">
+                          <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
+                            <span>Upload a file</span>
+                            <input
+                              type="file"
+                              accept=".csv"
+                              onChange={(e) => setUploadFile(e.target.files[0])}
+                              className="sr-only"
+                            />
+                          </label>
+                          <p className="pl-1">or drag and drop</p>
+                        </div>
+                        <p className="text-xs text-gray-500">CSV files only</p>
+                      </div>
+                    </div>
+                    
+                    {uploadFile && (
+                      <div className="mt-2 text-sm text-gray-600">
+                        Selected: {uploadFile.name}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end space-x-4">
+                    <button
+                      onClick={() => {
+                        setShowBulkImport(false);
+                        setUploadFile(null);
+                      }}
+                      className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleFileUpload}
+                      disabled={!uploadFile || uploadLoading}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    >
+                      {uploadLoading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <span>Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4" />
+                          <span>Import Data</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <div className={`p-4 rounded-lg ${uploadResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                    <div className="flex items-center">
+                      {uploadResult.success ? (
+                        <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+                      ) : (
+                        <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
+                      )}
+                      <h4 className={`font-medium ${uploadResult.success ? 'text-green-900' : 'text-red-900'}`}>
+                        {uploadResult.success ? 'Import Completed' : 'Import Failed'}
+                      </h4>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="bg-gray-50 p-3 rounded-lg text-center">
+                      <div className="text-xl font-semibold text-gray-900">{uploadResult.total_rows || 0}</div>
+                      <div className="text-sm text-gray-600">Total Rows</div>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg text-center">
+                      <div className="text-xl font-semibold text-green-600">{uploadResult.successful_imports || 0}</div>
+                      <div className="text-sm text-gray-600">Successful</div>
+                    </div>
+                    <div className="bg-red-50 p-3 rounded-lg text-center">
+                      <div className="text-xl font-semibold text-red-600">{uploadResult.failed_imports || 0}</div>
+                      <div className="text-sm text-gray-600">Failed</div>
+                    </div>
+                  </div>
+
+                  {uploadResult.imported_specs && uploadResult.imported_specs.length > 0 && (
+                    <div>
+                      <h5 className="font-medium text-gray-900 mb-2">Successfully Imported:</h5>
+                      <div className="bg-green-50 p-3 rounded-lg max-h-32 overflow-y-auto">
+                        {uploadResult.imported_specs.map((spec, index) => (
+                          <div key={index} className="text-sm text-green-800">• {spec}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {uploadResult.errors && uploadResult.errors.length > 0 && (
+                    <div>
+                      <h5 className="font-medium text-gray-900 mb-2">Errors:</h5>
+                      <div className="bg-red-50 p-3 rounded-lg max-h-32 overflow-y-auto">
+                        {uploadResult.errors.map((error, index) => (
+                          <div key={index} className="text-sm text-red-800">• {error}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => {
+                        setShowBulkImport(false);
+                        setUploadFile(null);
+                        setUploadResult(null);
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
