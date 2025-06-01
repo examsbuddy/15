@@ -534,6 +534,160 @@ async def get_phone_brands():
         logger.error(f"Error fetching phone brands: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch phone brands")
 
+# Admin Phone Specs Management Endpoints
+@api_router.get("/phone-specs", response_model=List[PhoneSpec])
+async def get_all_phone_specs():
+    """Get all phone specifications for admin management"""
+    try:
+        phone_specs = []
+        async for spec in db.phone_specs.find():
+            phone_specs.append(serialize_doc(spec))
+        return phone_specs
+    except Exception as e:
+        logger.error(f"Error fetching phone specs: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch phone specifications")
+
+@api_router.post("/phone-specs", response_model=PhoneSpec)
+async def create_phone_spec(spec_data: PhoneSpecCreate):
+    """Create a new phone specification"""
+    try:
+        # Check if phone spec already exists
+        existing_spec = await db.phone_specs.find_one({
+            "brand": spec_data.brand,
+            "model": spec_data.model
+        })
+        
+        if existing_spec:
+            raise HTTPException(status_code=400, detail="Phone specification already exists")
+        
+        # Create new phone spec
+        new_spec = {
+            "_id": str(uuid.uuid4()),
+            "brand": spec_data.brand,
+            "model": spec_data.model,
+            "display_size": spec_data.display_size,
+            "camera_mp": spec_data.camera_mp,
+            "battery_mah": spec_data.battery_mah,
+            "storage_gb": spec_data.storage_gb,
+            "ram_gb": spec_data.ram_gb,
+            "processor": spec_data.processor,
+            "operating_system": spec_data.operating_system,
+            "price_range_min": spec_data.price_range_min,
+            "price_range_max": spec_data.price_range_max,
+            "release_year": spec_data.release_year,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        result = await db.phone_specs.insert_one(new_spec)
+        if result.inserted_id:
+            return serialize_doc(new_spec)
+        else:
+            raise HTTPException(status_code=500, detail="Failed to create phone specification")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating phone spec: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create phone specification")
+
+@api_router.put("/phone-specs/{spec_id}", response_model=PhoneSpec)
+async def update_phone_spec(spec_id: str, spec_data: PhoneSpecCreate):
+    """Update an existing phone specification"""
+    try:
+        # Check if spec exists
+        existing_spec = await db.phone_specs.find_one({"_id": spec_id})
+        if not existing_spec:
+            raise HTTPException(status_code=404, detail="Phone specification not found")
+        
+        # Update spec
+        updated_spec = {
+            "brand": spec_data.brand,
+            "model": spec_data.model,
+            "display_size": spec_data.display_size,
+            "camera_mp": spec_data.camera_mp,
+            "battery_mah": spec_data.battery_mah,
+            "storage_gb": spec_data.storage_gb,
+            "ram_gb": spec_data.ram_gb,
+            "processor": spec_data.processor,
+            "operating_system": spec_data.operating_system,
+            "price_range_min": spec_data.price_range_min,
+            "price_range_max": spec_data.price_range_max,
+            "release_year": spec_data.release_year,
+            "updated_at": datetime.utcnow()
+        }
+        
+        result = await db.phone_specs.update_one(
+            {"_id": spec_id},
+            {"$set": updated_spec}
+        )
+        
+        if result.modified_count:
+            updated_doc = await db.phone_specs.find_one({"_id": spec_id})
+            return serialize_doc(updated_doc)
+        else:
+            raise HTTPException(status_code=500, detail="Failed to update phone specification")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating phone spec: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update phone specification")
+
+@api_router.delete("/phone-specs/{spec_id}")
+async def delete_phone_spec(spec_id: str):
+    """Delete a phone specification"""
+    try:
+        # Check if spec exists
+        existing_spec = await db.phone_specs.find_one({"_id": spec_id})
+        if not existing_spec:
+            raise HTTPException(status_code=404, detail="Phone specification not found")
+        
+        # Delete spec
+        result = await db.phone_specs.delete_one({"_id": spec_id})
+        
+        if result.deleted_count:
+            return {"message": "Phone specification deleted successfully"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to delete phone specification")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting phone spec: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete phone specification")
+
+# Admin Stats Endpoint
+@api_router.get("/stats", response_model=AdminStats)
+async def get_admin_stats():
+    """Get admin dashboard statistics"""
+    try:
+        # Get total listings count
+        total_listings = await db.listings.count_documents({})
+        
+        # Get total users count
+        total_users = await db.users.count_documents({})
+        
+        # Get pending shop owner approvals count
+        pending_approvals = await db.users.count_documents({
+            "role": "shop_owner",
+            "verification_status": "pending"
+        })
+        
+        # Get total phone models count
+        phone_models = await db.phone_specs.count_documents({})
+        
+        return AdminStats(
+            totalListings=total_listings,
+            totalUsers=total_users,
+            pendingApprovals=pending_approvals,
+            phoneModels=phone_models
+        )
+        
+    except Exception as e:
+        logger.error(f"Error fetching admin stats: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch admin statistics")
+
 # Authentication Routes
 @api_router.post("/auth/register", response_model=LoginResponse)
 async def register_normal_user(user_data: UserRegistration):
