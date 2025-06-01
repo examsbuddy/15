@@ -6306,7 +6306,7 @@ const PhoneSpecsManager = () => {
     if (!window.confirm('Are you sure you want to delete this phone specification?')) return;
     
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/phone-specs/${specId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-specs/${specId}`, {
         method: 'DELETE',
       });
 
