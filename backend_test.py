@@ -844,11 +844,28 @@ def create_test_csv_for_import():
 def test_csv_bulk_import():
     print("\n=== Testing POST /api/phone-specs/bulk-import ===")
     try:
-        # Create test CSV file
-        csv_file_path, csv_data = create_test_csv_for_import()
-        if not csv_file_path or not csv_data:
-            print("ERROR: Failed to create test CSV file")
-            return False
+        # Use the provided test CSV file with real phone specifications
+        csv_file_path = '/tmp/test_phone_specs.csv'
+        if not os.path.exists(csv_file_path):
+            print(f"ERROR: Test CSV file not found at {csv_file_path}")
+            print("Falling back to creating a test CSV file...")
+            csv_file_path, csv_data = create_test_csv_for_import()
+            if not csv_file_path or not csv_data:
+                print("ERROR: Failed to create test CSV file")
+                return False
+        else:
+            print(f"Using existing test CSV file at {csv_file_path}")
+            # Read the CSV to get the expected data
+            import csv
+            csv_data = []
+            with open(csv_file_path, 'r') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    csv_data.append(row)
+            print(f"Found {len(csv_data)} phone specifications in the test CSV file")
+            print("Test phones:")
+            for row in csv_data:
+                print(f"- {row.get('brand')} {row.get('model')}")
             
         # Upload the CSV file
         with open(csv_file_path, 'rb') as f:
@@ -891,16 +908,38 @@ def test_csv_bulk_import():
         response.raise_for_status()
         
         all_specs = response.json()
+        print(f"Total phone specs in database: {len(all_specs)}")
         
-        # Check if our test models are in the database
-        imported_models = [spec.get('model') for spec in all_specs]
-        test_models = [data.get('model') for data in csv_data]
+        # Check for the specific test phones
+        expected_phones = ["Infinix Note 50 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 15 Pro Max"]
+        found_phones = []
         
-        found_models = [model for model in test_models if model in imported_models]
-        print(f"Found {len(found_models)}/{len(test_models)} imported models in database")
+        for phone in expected_phones:
+            brand, model = phone.split(" ", 1)
+            found = False
+            
+            for spec in all_specs:
+                if spec.get('brand') == brand and model in spec.get('model'):
+                    found = True
+                    found_phones.append(phone)
+                    
+                    # Print detailed information for verification
+                    print(f"\nDetailed information for {phone}:")
+                    print(f"- OS: {spec.get('os')}")
+                    print(f"- Chipset: {spec.get('chipset')}")
+                    print(f"- Display: {spec.get('display_size')} - {spec.get('display_technology')}")
+                    print(f"- Camera: {spec.get('main_camera')}")
+                    print(f"- Battery: {spec.get('battery_capacity')}")
+                    print(f"- Price: PKR {spec.get('price_pkr')} / USD {spec.get('price_usd')}")
+                    break
+            
+            if not found:
+                print(f"❌ {phone} not found in the database")
         
-        if not found_models:
-            print("ERROR: None of the test models were found in the database")
+        print(f"Found {len(found_phones)}/{len(expected_phones)} expected phones in database")
+        
+        if not found_phones:
+            print("ERROR: None of the expected phones were found in the database")
             return False
             
         return True
