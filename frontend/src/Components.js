@@ -6321,7 +6321,7 @@ const PhoneSpecsManager = () => {
   // Update phone spec
   const handleUpdateSpec = async () => {
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/phone-specs/${editingSpec.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-specs/${editingSpec.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
