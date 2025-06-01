@@ -936,10 +936,10 @@ def test_csv_bulk_import():
             if not found:
                 print(f"❌ {phone} not found in the database")
         
-        print(f"Found {len(found_phones)}/{len(expected_phones)} expected phones in database")
+        print(f"Found {len(found_phones)} test phones in database")
         
         if not found_phones:
-            print("ERROR: None of the expected phones were found in the database")
+            print("ERROR: No test phones were found in the database")
             return False
             
         return True
