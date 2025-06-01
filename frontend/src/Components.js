@@ -6576,6 +6576,7 @@ export const AdminPortalV2 = ({ onBack }) => {
   const [trendingSearches, setTrendingSearches] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('search');
+  const [suggestions, setSuggestions] = useState([]);
 
   // Get user location
   useEffect(() => {
