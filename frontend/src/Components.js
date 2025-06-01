@@ -4052,7 +4052,8 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
       seller_name: user?.name || '',
       seller_phone: user?.phone || '',
       seller_email: user?.email || '',
-      features: []
+      features: [],
+      photos: []  // Add missing photos field
     });
     setShowPreview(false);
     setSubmittedListing(null);
