@@ -6301,13 +6301,14 @@ export const AdminLogin = ({ onLogin, onBack }) => {
       }
       
       // Simulate 2FA check (accept any 6-digit code for demo)
-      if (twoFactorCode.length === 6) {
+      if (twoFactorCode && twoFactorCode.length === 6) {
         setTimeout(() => {
+          console.log('Logging in user:', admin);
           onLogin(admin);
           setLoading(false);
         }, 1000);
       } else {
-        setError('Invalid 2FA code');
+        setError('Please enter a 6-digit code');
         setLoading(false);
       }
     } else {
