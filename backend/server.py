@@ -382,8 +382,8 @@ class PhoneListingCreate(BaseModel):
     operating_system: Optional[str] = None  # e.g., "Android 13", "iOS 17"
     network: Optional[str] = None  # e.g., "4G", "5G"
     color: Optional[str] = None  # Phone color
-    # Mandatory photos (base64 encoded)
-    photos: List[str] = Field(min_items=1, description="At least one photo is required")
+    # Photos (optional with default provided by backend if missing)
+    photos: List[str] = Field(default=[], description="Photos of the phone (at least one recommended)")
     # Additional metadata
     purchase_year: Optional[int] = None
     purchase_date: Optional[str] = None  # Full purchase date
