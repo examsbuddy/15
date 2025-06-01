@@ -6240,13 +6240,26 @@ export const AdminPortalMain = ({ onBack }) => {
     pendingApprovals: 0,
     phoneModels: 0
   });
-  const [currentSection, setCurrentSection] = useState('dashboard'); // dashboard, phone-specs, user-management, listings, analytics, security
-  const [stats, setStats] = useState({
-    totalListings: 0,
-    totalUsers: 0,
-    pendingApprovals: 0,
-    phoneModels: 0
-  });
+
+  // Load stats from backend
+  const loadStats = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/stats`);
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    }
+  };
+
+  // Load stats when logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      loadStats();
+    }
+  }, [isLoggedIn]);
 
   // Sample admin users
   const admins = [
