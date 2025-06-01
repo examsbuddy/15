@@ -6529,7 +6529,7 @@ export const AdminHeader = ({ user, currentPage, setCurrentPage, onLogout, onBac
 };
 
 // Admin Portal - Simplified for Demo
-export const AdminPortal = ({ onBack }) => {
+export const AdminPortalV2 = ({ onBack }) => {
   const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
   const priceRanges = [
     { label: 'Under ₨25,000', value: 'under-25k', min: 0, max: 25000 },
