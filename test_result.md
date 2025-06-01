@@ -461,6 +461,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "The CSV bulk import endpoint (/api/phone-specs/bulk-import) is working correctly. It successfully processes CSV files uploaded via multipart/form-data and adds the phone specifications to the database. The response format matches the CSVUploadResponse model with proper statistics about the import process. The imported phone specs are correctly added to the database and can be retrieved via the GET /api/phone-specs endpoint."
+      - working: true
+        agent: "testing"
+        comment: "Tested the CSV bulk import with the comprehensive test file containing real phone specifications (Infinix Note 50 Pro, Samsung Galaxy S24 Ultra, and Apple iPhone 15 Pro Max). All three phones were successfully imported with their detailed specifications including network bands, camera details, battery specs, etc. The endpoint correctly processed all rows and returned appropriate success statistics. Verification confirmed that all imported data matched the CSV input and was properly stored in the database."
 
   - task: "CSV Bulk Import Error Handling"
     implemented: true
