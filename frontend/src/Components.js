@@ -6571,6 +6571,7 @@ export const AdminPortalV2 = ({ onBack }) => {
   
   const [userLocation, setUserLocation] = useState('Pakistan');
   const [locationLoading, setLocationLoading] = useState(false);
+  const [recentSearches, setRecentSearches] = useState([]);
 
   // Get user location
   useEffect(() => {
