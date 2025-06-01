@@ -803,8 +803,8 @@ async def delete_phone_spec(spec_id: str):
 async def get_admin_stats():
     """Get admin dashboard statistics"""
     try:
-        # Get total listings count
-        total_listings = await db.listings.count_documents({})
+        # Get total listings count (using correct collection name)
+        total_listings = await db.phone_listings.count_documents({})
         
         # Get total users count
         total_users = await db.users.count_documents({})
