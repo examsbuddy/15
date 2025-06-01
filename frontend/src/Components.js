@@ -6255,7 +6255,7 @@ const PhoneSpecsManager = () => {
   const loadPhoneSpecs = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/phone-specs`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-specs`);
       if (response.ok) {
         const data = await response.json();
         setPhoneSpecs(data);
