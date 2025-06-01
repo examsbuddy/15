@@ -2456,35 +2456,31 @@ export const SellSection = ({ isLoggedIn, setCurrentPage }) => {
 };
 
 export const FeaturedShopsSection = () => {
-  const featuredShops = [
-    {
-      name: 'TechMart Karachi',
-      location: 'Saddar, Karachi',
-      rating: 4.8,
-      reviews: 1250,
-      specialties: ['iPhone', 'Samsung', 'Accessories'],
-      yearsInBusiness: 8,
-      phoneCount: 450
-    },
-    {
-      name: 'Mobile Zone Lahore',
-      location: 'Liberty Market, Lahore',
-      rating: 4.7,
-      reviews: 980,
-      specialties: ['All Brands', 'Repair', 'Trade-in'],
-      yearsInBusiness: 12,
-      phoneCount: 680
-    },
-    {
-      name: 'Galaxy Electronics',
-      location: 'Blue Area, Islamabad',
-      rating: 4.9,
-      reviews: 750,
-      specialties: ['Premium Phones', 'Warranty'],
-      yearsInBusiness: 6,
-      phoneCount: 320
-    }
-  ];
+  const [featuredShops, setFeaturedShops] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
+
+  // Fetch featured shops from API
+  useEffect(() => {
+    const fetchFeaturedShops = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/shops/featured`);
+        if (!response.ok) throw new Error('Failed to fetch featured shops');
+        
+        const data = await response.json();
+        setFeaturedShops(data.featured_shops || []);
+      } catch (error) {
+        console.error('Error fetching featured shops:', error);
+        // Fallback to empty array if API fails
+        setFeaturedShops([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedShops();
+  }, [BACKEND_URL]);
 
   return (
     <section className="bg-gray-50 py-12 md:py-16">
@@ -2522,86 +2518,115 @@ export const FeaturedShopsSection = () => {
           </div>
         </div>
 
-        {/* Horizontal scrolling container */}
-        <div className="relative">
-          <div 
-            id="shops-scroll"
-            className="flex gap-6 overflow-x-auto scrollbar-hide pb-4"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {featuredShops.map((shop, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow flex-shrink-0 w-[320px]">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">{shop.name}</h3>
-                    <p className="text-gray-600 text-sm flex items-center">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      {shop.location}
-                    </p>
+        {/* Loading state */}
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading featured shops...</span>
+          </div>
+        ) : featuredShops.length === 0 ? (
+          /* No shops available */
+          <div className="text-center py-12">
+            <Store className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No Featured Shops Yet</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              We're working on getting verified shops approved. Check back soon!
+            </p>
+          </div>
+        ) : (
+          /* Horizontal scrolling container */
+          <div className="relative">
+            <div 
+              id="shops-scroll"
+              className="flex gap-6 overflow-x-auto scrollbar-hide pb-4"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {featuredShops.map((shop, index) => (
+                <div key={shop.id || index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow flex-shrink-0 w-[320px]">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">{shop.name}</h3>
+                      <p className="text-gray-600 text-sm flex items-center">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        {shop.location || 'Location not specified'}
+                      </p>
+                    </div>
+                    <div className="flex items-center bg-green-100 px-2 py-1 rounded-full">
+                      <Star className="w-4 h-4 text-green-600 mr-1" />
+                      <span className="text-green-800 text-sm font-medium">{shop.rating || '4.5'}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center bg-green-100 px-2 py-1 rounded-full">
-                    <Star className="w-4 h-4 text-green-600 mr-1" />
-                    <span className="text-green-800 text-sm font-medium">{shop.rating}</span>
+
+                  <div className="space-y-3 mb-6">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Reviews:</span>
+                      <span className="font-medium">{(shop.reviewCount || 0).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Business Type:</span>
+                      <span className="font-medium">{shop.businessType ? shop.businessType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Mobile Shop'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Status:</span>
+                      <span className="font-medium text-green-600">Verified ✓</span>
+                    </div>
+                    {shop.phone && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Phone:</span>
+                        <span className="font-medium">{shop.phone}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {shop.description && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-2">About:</h4>
+                      <p className="text-xs text-gray-600 line-clamp-2">{shop.description}</p>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                      View Shop
+                    </button>
+                    {shop.phone && (
+                      <button 
+                        onClick={() => window.open(`tel:${shop.phone}`, '_self')}
+                        className="w-full border border-blue-600 text-blue-600 py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors text-sm font-medium"
+                      >
+                        Contact Shop
+                      </button>
+                    )}
                   </div>
                 </div>
-
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Reviews:</span>
-                    <span className="font-medium">{shop.reviews.toLocaleString()}</span>
+              ))}
+              
+              {/* See All Shops card - fixed on the right */}
+              <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex-shrink-0 w-[320px] h-[300px] flex items-center justify-center text-white cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-colors">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <ArrowRight className="w-8 h-8" />
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Years in Business:</span>
-                    <span className="font-medium">{shop.yearsInBusiness} years</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Phones Available:</span>
-                    <span className="font-medium">{shop.phoneCount}</span>
-                  </div>
+                  <h3 className="text-xl font-bold mb-2">See All Shops</h3>
+                  <p className="text-purple-100 text-sm">Browse verified sellers</p>
                 </div>
-
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Specialties:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {shop.specialties.map((specialty, specialtyIndex) => (
-                      <span key={specialtyIndex} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                        {specialty}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                  View Shop
-                </button>
               </div>
-            ))}
+            </div>
             
-            {/* See All Shops card - fixed on the right */}
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex-shrink-0 w-[320px] h-[300px] flex items-center justify-center text-white cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-colors">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ArrowRight className="w-8 h-8" />
+            {/* Mobile swipe indicator */}
+            <div className="flex justify-center mt-4 md:hidden">
+              <div className="flex items-center space-x-1 text-gray-400 text-xs">
+                <div className="flex space-x-1">
+                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                  <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
+                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
                 </div>
-                <h3 className="text-xl font-bold mb-2">See All Shops</h3>
-                <p className="text-purple-100 text-sm">Browse verified sellers</p>
+                <span className="ml-2">Swipe to browse</span>
               </div>
             </div>
           </div>
-          
-          {/* Mobile swipe indicator */}
-          <div className="flex justify-center mt-4 md:hidden">
-            <div className="flex items-center space-x-1 text-gray-400 text-xs">
-              <div className="flex space-x-1">
-                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                <div className="w-1 h-1 bg-purple-500 rounded-full"></div>
-                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-              </div>
-              <span className="ml-2">Swipe to browse</span>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </section>
   );
