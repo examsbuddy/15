@@ -60,6 +60,7 @@ import {
   Trash2,
   BarChart2,
   AlertCircle,
+  AlertTriangle,
   Check,
   Bell,
   Settings,
