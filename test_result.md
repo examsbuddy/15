@@ -1,15 +1,18 @@
 frontend:
   - task: "Phone Specs Manager Button Functionality"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/Components.js"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "The 'Add Phone Spec' button works correctly and opens the modal. The 'Bulk Import' button also opens the modal correctly. However, the 'Download CSV Template' button inside the Bulk Import modal doesn't work. The issue appears to be that the downloadTemplate function is defined outside of the PhoneSpecsManager component (on line 8868), but it's being called from within the component (on line 6758). This means the function is not in scope when the button is clicked."
+      - working: true
+        agent: "testing"
+        comment: "After fixing the duplicate downloadTemplate function issue, the bulk import functionality now works correctly. The 'Download CSV Template' button successfully triggers a download of the CSV template file. The backend API endpoint for the CSV template is working correctly and returns a properly formatted CSV file. All UI elements in the bulk import modal are visible and properly styled, and the modal can be closed using both the Cancel button and the X button."
 
   - task: "Bulk Import UI Functionality"
     implemented: true
