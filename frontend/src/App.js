@@ -183,6 +183,11 @@ function App() {
           />
         )}
         
+        {/* Admin Portal */}
+        {currentPage === 'admin' && (
+          <AdminPortal onBack={handleBackToHome} />
+        )}
+
         {/* Brand-specific Search Pages */}
         {currentPage.startsWith('used-phones-') && (
           <BrandSearchPage 
