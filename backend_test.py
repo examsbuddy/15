@@ -466,6 +466,163 @@ def populate_sample_data():
         print(f"Error populating sample data: {str(e)}")
         return False
 
+# Function to test admin stats endpoint
+def test_admin_stats():
+    print("\n=== Testing GET /api/stats (Admin Statistics) ===")
+    try:
+        response = requests.get(f"{API_URL}/stats")
+        response.raise_for_status()
+        
+        stats = response.json()
+        print(f"Retrieved admin statistics:")
+        for key, value in stats.items():
+            if isinstance(value, list):
+                print(f"  {key}: {len(value)} items")
+            else:
+                print(f"  {key}: {value}")
+        
+        # Check if all required fields are present
+        required_fields = ['totalListings', 'totalUsers', 'pendingApprovals', 'phoneModels']
+        missing_fields = [field for field in required_fields if field not in stats]
+        
+        if missing_fields:
+            print(f"ERROR: Missing required fields in admin stats: {', '.join(missing_fields)}")
+            return False
+            
+        return True
+    except Exception as e:
+        print(f"Error testing admin stats: {str(e)}")
+        return False
+
+# Function to test getting all phone specs
+def test_get_all_phone_specs():
+    print("\n=== Testing GET /api/phone-specs (Get All Phone Specs) ===")
+    try:
+        response = requests.get(f"{API_URL}/phone-specs")
+        response.raise_for_status()
+        
+        specs = response.json()
+        print(f"Retrieved {len(specs)} phone specifications")
+        
+        if specs:
+            print("Sample phone spec:")
+            sample_spec = specs[0]
+            for key, value in sample_spec.items():
+                print(f"  {key}: {value}")
+        
+        return True
+    except Exception as e:
+        print(f"Error testing get all phone specs: {str(e)}")
+        return False
+
+# Function to test creating a new phone spec
+def test_create_phone_spec():
+    print("\n=== Testing POST /api/phone-specs (Create Phone Spec) ===")
+    try:
+        # Create a sample phone spec
+        random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
+        sample_spec = {
+            "brand": "Test Brand",
+            "model": f"Test Model {random_suffix}",
+            "display_size": "6.5 inch",
+            "camera_mp": "48MP",
+            "battery_mah": "4000mAh",
+            "storage_gb": "128GB",
+            "ram_gb": "8GB",
+            "processor": "Test Processor",
+            "operating_system": "Test OS",
+            "price_range_min": 20000,
+            "price_range_max": 40000,
+            "release_year": 2023
+        }
+        
+        response = requests.post(f"{API_URL}/phone-specs", json=sample_spec)
+        response.raise_for_status()
+        
+        created_spec = response.json()
+        print(f"Successfully created phone spec: {created_spec.get('brand')} {created_spec.get('model')}")
+        
+        # Save the spec ID for update and delete tests
+        spec_id = created_spec.get('_id')
+        if not spec_id:
+            print("ERROR: Created spec does not have an ID")
+            return False, None
+            
+        print(f"Created spec ID: {spec_id}")
+        return True, spec_id
+    except Exception as e:
+        print(f"Error testing create phone spec: {str(e)}")
+        return False, None
+
+# Function to test updating a phone spec
+def test_update_phone_spec(spec_id):
+    print(f"\n=== Testing PUT /api/phone-specs/{spec_id} (Update Phone Spec) ===")
+    try:
+        # Update the sample phone spec
+        updated_spec = {
+            "brand": "Updated Brand",
+            "model": "Updated Model",
+            "display_size": "6.7 inch",
+            "camera_mp": "64MP",
+            "battery_mah": "5000mAh",
+            "storage_gb": "256GB",
+            "ram_gb": "12GB",
+            "processor": "Updated Processor",
+            "operating_system": "Updated OS",
+            "price_range_min": 30000,
+            "price_range_max": 50000,
+            "release_year": 2024
+        }
+        
+        response = requests.put(f"{API_URL}/phone-specs/{spec_id}", json=updated_spec)
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Successfully updated phone spec: {result.get('brand')} {result.get('model')}")
+        
+        # Verify the update was successful
+        if result.get('brand') != "Updated Brand" or result.get('model') != "Updated Model":
+            print("ERROR: Update was not successful")
+            return False
+            
+        return True
+    except Exception as e:
+        print(f"Error testing update phone spec: {str(e)}")
+        return False
+
+# Function to test deleting a phone spec
+def test_delete_phone_spec(spec_id):
+    print(f"\n=== Testing DELETE /api/phone-specs/{spec_id} (Delete Phone Spec) ===")
+    try:
+        response = requests.delete(f"{API_URL}/phone-specs/{spec_id}")
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Delete result: {result}")
+        
+        if result.get('message') == "Phone specification deleted successfully":
+            print("Successfully deleted phone spec")
+            
+            # Verify the spec was deleted by trying to get it
+            verify_response = requests.get(f"{API_URL}/phone-specs")
+            verify_response.raise_for_status()
+            
+            specs = verify_response.json()
+            deleted = all(spec.get('_id') != spec_id for spec in specs)
+            
+            if deleted:
+                print("Verified spec was deleted successfully")
+                return True
+            else:
+                print("ERROR: Spec was not deleted")
+                return False
+        else:
+            print("ERROR: Delete operation did not return success message")
+            return False
+    except Exception as e:
+        print(f"Error testing delete phone spec: {str(e)}")
+        return False
+
 def main():
     print("Starting PhoneFlip backend API tests...")
     
@@ -483,6 +640,18 @@ def main():
     search_result = test_search_functionality()
     compare_result = test_compare_functionality()
     
+    # Run admin-related tests
+    admin_stats_result = test_admin_stats()
+    get_all_phone_specs_result = test_get_all_phone_specs()
+    create_phone_spec_result, spec_id = test_create_phone_spec()
+    
+    # Only run update and delete tests if create was successful
+    update_phone_spec_result = False
+    delete_phone_spec_result = False
+    if create_phone_spec_result and spec_id:
+        update_phone_spec_result = test_update_phone_spec(spec_id)
+        delete_phone_spec_result = test_delete_phone_spec(spec_id)
+    
     # Print summary
     print("\n=== Test Summary ===")
     print(f"API Health Check: {'PASSED' if api_health_result else 'FAILED'}")
@@ -493,6 +662,11 @@ def main():
     print(f"Create Listing: {'PASSED' if create_listing_result else 'FAILED'}")
     print(f"Search Functionality: {'PASSED' if search_result else 'FAILED'}")
     print(f"Compare Functionality: {'PASSED' if compare_result else 'FAILED'}")
+    print(f"Admin Stats: {'PASSED' if admin_stats_result else 'FAILED'}")
+    print(f"Get All Phone Specs: {'PASSED' if get_all_phone_specs_result else 'FAILED'}")
+    print(f"Create Phone Spec: {'PASSED' if create_phone_spec_result else 'FAILED'}")
+    print(f"Update Phone Spec: {'PASSED' if update_phone_spec_result else 'FAILED'}")
+    print(f"Delete Phone Spec: {'PASSED' if delete_phone_spec_result else 'FAILED'}")
     
     # Overall result
     all_passed = (
@@ -503,7 +677,12 @@ def main():
         individual_listings_result and 
         create_listing_result and 
         search_result and 
-        compare_result
+        compare_result and
+        admin_stats_result and
+        get_all_phone_specs_result and
+        create_phone_spec_result and
+        update_phone_spec_result and
+        delete_phone_spec_result
     )
     
     if all_passed:
