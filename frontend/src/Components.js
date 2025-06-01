@@ -7226,10 +7226,7 @@ export const AdminPortalMain = ({ onBack }) => {
           )}
 
           {currentSection === 'listings' && (
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Listings Moderation</h2>
-              <p className="text-gray-600">Listings moderation functionality coming soon...</p>
-            </div>
+            <AdminListingsManager />
           )}
 
           {currentSection === 'security' && (
