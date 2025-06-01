@@ -86,7 +86,8 @@ import {
   Battery,
   Play,
   Filter,
-  Upload
+  Upload,
+  Store
 } from 'lucide-react';
 
 // Enhanced Sign In Modal
