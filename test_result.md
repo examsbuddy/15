@@ -495,11 +495,11 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
-  stuck_tasks: ["Compare Page", "Brand-specific Search Pages"]
+  current_focus: ["Phone Specs Manager Button Functionality"]
+  stuck_tasks: ["Compare Page", "Brand-specific Search Pages", "Phone Specs Manager Button Functionality"]
   test_all: false
   test_priority: "high_first"
-  last_tested: "CSV Bulk Import Functionality"
+  last_tested: "Phone Specs Manager Button Functionality"
 
 agent_communication:
   - agent: "testing"
