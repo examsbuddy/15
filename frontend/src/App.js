@@ -186,7 +186,7 @@ function App() {
         
         {/* Admin Portal */}
         {currentPage === 'admin' && (
-          <AdminPortal onBack={handleBackToHome} />
+          <AdminPortalMain onBack={handleBackToHome} />
         )}
 
         {/* Brand-specific Search Pages */}
