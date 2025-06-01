@@ -6223,7 +6223,7 @@ export const BrandSearchPage = ({ brand, onBack, onViewListing }) => {
   );
 };
 
-// Simplified Admin Portal for Testing
+// Admin Portal Components
 export const AdminPortalMain = ({ onBack }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
