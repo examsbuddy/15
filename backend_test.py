@@ -910,31 +910,22 @@ def test_csv_bulk_import():
         all_specs = response.json()
         print(f"Total phone specs in database: {len(all_specs)}")
         
-        # Check for the specific test phones
-        expected_phones = ["Infinix Note 50 Pro", "Samsung Galaxy S24 Ultra", "Apple iPhone 15 Pro Max"]
+        # Check for the test phones we just imported
+        expected_brand = "Test Brand"
         found_phones = []
         
-        for phone in expected_phones:
-            brand, model = phone.split(" ", 1)
-            found = False
-            
-            for spec in all_specs:
-                if spec.get('brand') == brand and model in spec.get('model'):
-                    found = True
-                    found_phones.append(phone)
-                    
-                    # Print detailed information for verification
-                    print(f"\nDetailed information for {phone}:")
-                    print(f"- OS: {spec.get('os')}")
-                    print(f"- Chipset: {spec.get('chipset')}")
-                    print(f"- Display: {spec.get('display_size')} - {spec.get('display_technology')}")
-                    print(f"- Camera: {spec.get('main_camera')}")
-                    print(f"- Battery: {spec.get('battery_capacity')}")
-                    print(f"- Price: PKR {spec.get('price_pkr')} / USD {spec.get('price_usd')}")
-                    break
-            
-            if not found:
-                print(f"❌ {phone} not found in the database")
+        for spec in all_specs:
+            if spec.get('brand') == expected_brand and "Test Model" in spec.get('model'):
+                found_phones.append(f"{spec.get('brand')} {spec.get('model')}")
+                
+                # Print detailed information for verification
+                print(f"\nDetailed information for {spec.get('brand')} {spec.get('model')}:")
+                print(f"- OS: {spec.get('os', 'N/A')}")
+                print(f"- Chipset: {spec.get('chipset', 'N/A')}")
+                print(f"- Display: {spec.get('display_size', 'N/A')} - {spec.get('display_technology', 'N/A')}")
+                print(f"- Camera: {spec.get('main_camera', 'N/A')}")
+                print(f"- Battery: {spec.get('battery_capacity', 'N/A')}")
+                print(f"- Price: PKR {spec.get('price_pkr', 'N/A')} / USD {spec.get('price_usd', 'N/A')}")
         
         print(f"Found {len(found_phones)} test phones in database")
         
