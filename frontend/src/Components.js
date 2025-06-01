@@ -6527,19 +6527,6 @@ export const AdminHeader = ({ user, currentPage, setCurrentPage, onLogout, onBac
     </header>
   );
 };
-  const [searchQuery, setSearchQuery] = useState('');
-  const [userLocation, setUserLocation] = useState('');
-  const [locationLoading, setLocationLoading] = useState(true);
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [recentSearches, setRecentSearches] = useState([]);
-  const [trendingSearches, setTrendingSearches] = useState([]);
-  const [activeTab, setActiveTab] = useState('search');
-  const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-  const [advancedFilters, setAdvancedFilters] = useState({});
   
   // Search data and options
   const phoneModels = [
