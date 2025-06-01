@@ -483,11 +483,11 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: ["Bulk Import UI Functionality"]
+  current_focus: []
   stuck_tasks: ["Compare Page", "Brand-specific Search Pages"]
   test_all: false
   test_priority: "high_first"
-  last_tested: "Bulk Import UI Functionality"
+  last_tested: "CSV Bulk Import Functionality"
 
 agent_communication:
   - agent: "testing"
