@@ -844,28 +844,17 @@ def create_test_csv_for_import():
 def test_csv_bulk_import():
     print("\n=== Testing POST /api/phone-specs/bulk-import ===")
     try:
-        # Use the provided test CSV file with real phone specifications
-        csv_file_path = '/tmp/test_phone_specs.csv'
-        if not os.path.exists(csv_file_path):
-            print(f"ERROR: Test CSV file not found at {csv_file_path}")
-            print("Falling back to creating a test CSV file...")
-            csv_file_path, csv_data = create_test_csv_for_import()
-            if not csv_file_path or not csv_data:
-                print("ERROR: Failed to create test CSV file")
-                return False
-        else:
-            print(f"Using existing test CSV file at {csv_file_path}")
-            # Read the CSV to get the expected data
-            import csv
-            csv_data = []
-            with open(csv_file_path, 'r') as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    csv_data.append(row)
-            print(f"Found {len(csv_data)} phone specifications in the test CSV file")
-            print("Test phones:")
-            for row in csv_data:
-                print(f"- {row.get('brand')} {row.get('model')}")
+        # Always create a fresh CSV file with unique model names
+        print("Creating a fresh CSV file with unique model names...")
+        csv_file_path, csv_data = create_test_csv_for_import()
+        if not csv_file_path or not csv_data:
+            print("ERROR: Failed to create test CSV file")
+            return False
+            
+        print(f"Created test CSV file at {csv_file_path}")
+        print(f"Test phones:")
+        for row in csv_data:
+            print(f"- {row.get('brand')} {row.get('model')}")
             
         # Upload the CSV file
         with open(csv_file_path, 'rb') as f:
@@ -914,8 +903,11 @@ def test_csv_bulk_import():
         expected_brand = "Test Brand"
         found_phones = []
         
+        # Extract model names from the CSV data for verification
+        expected_models = [row.get('model') for row in csv_data]
+        
         for spec in all_specs:
-            if spec.get('brand') == expected_brand and "Test Model" in spec.get('model'):
+            if spec.get('brand') == expected_brand and spec.get('model') in expected_models:
                 found_phones.append(f"{spec.get('brand')} {spec.get('model')}")
                 
                 # Print detailed information for verification
@@ -927,11 +919,14 @@ def test_csv_bulk_import():
                 print(f"- Battery: {spec.get('battery_capacity', 'N/A')}")
                 print(f"- Price: PKR {spec.get('price_pkr', 'N/A')} / USD {spec.get('price_usd', 'N/A')}")
         
-        print(f"Found {len(found_phones)} test phones in database")
+        print(f"Found {len(found_phones)}/{len(expected_models)} expected phones in database")
         
-        if not found_phones:
-            print("ERROR: No test phones were found in the database")
-            return False
+        if len(found_phones) < len(expected_models):
+            print("WARNING: Not all expected phones were found in the database")
+            # Don't fail the test if at least one phone was imported successfully
+            if not found_phones:
+                print("ERROR: No test phones were found in the database")
+                return False
             
         return True
     except Exception as e:
