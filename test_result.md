@@ -360,15 +360,15 @@ backend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
-  current_focus: ["Brand-specific Search Pages", "Admin Stats Endpoint", "Get All Phone Specs Endpoint", "Create Phone Spec Endpoint", "Update Phone Spec Endpoint", "Delete Phone Spec Endpoint"]
-  stuck_tasks: ["Compare Page", "Brand-specific Search Pages"]
+  current_focus: ["Brand-specific Search Pages", "Admin Portal Functionality"]
+  stuck_tasks: ["Compare Page", "Brand-specific Search Pages", "Admin Portal 2FA Verification"]
   test_all: false
   test_priority: "high_first"
-  last_tested: "Admin-related Backend Endpoints"
+  last_tested: "Admin Portal Functionality"
 
 agent_communication:
   - agent: "testing"
