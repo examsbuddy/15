@@ -6233,6 +6233,13 @@ export const AdminPortalMain = ({ onBack }) => {
   const [credentials, setCredentials] = useState({ email: '', password: '', code: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [currentSection, setCurrentSection] = useState('dashboard'); // dashboard, phone-specs, user-management, listings, analytics, security
+  const [stats, setStats] = useState({
+    totalListings: 0,
+    totalUsers: 0,
+    pendingApprovals: 0,
+    phoneModels: 0
+  });
 
   // Sample admin users
   const admins = [
