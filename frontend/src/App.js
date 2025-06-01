@@ -194,10 +194,10 @@ function App() {
 
         {/* Dedicated Search Page */}
         {currentPage === 'dedicated-search' && (
-          <DedicatedSearchPage 
+          <BrandSearchPage 
+            brand="all"
             onBack={handleBackToHome}
             onViewListing={handleViewListing}
-            initialFilters={searchFilters || {}}
           />
         )}
         
