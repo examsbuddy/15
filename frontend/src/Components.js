@@ -5879,6 +5879,7 @@ export const BrandSearchPage = ({ brand, onBack, onViewListing }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const brandTitle = brand.charAt(0).toUpperCase() + brand.slice(1);
   
