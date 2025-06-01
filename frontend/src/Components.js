@@ -6355,7 +6355,7 @@ const PhoneSpecsManager = () => {
       const formData = new FormData();
       formData.append('file', uploadFile);
       
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/phone-specs/bulk-import`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-specs/bulk-import`, {
         method: 'POST',
         body: formData,
       });
