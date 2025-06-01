@@ -6993,20 +6993,6 @@ export const AdminPortalMain = ({ onBack }) => {
               <p className="text-gray-600">Security settings functionality coming soon...</p>
             </div>
           )}
-              
-              <div className="bg-red-50 rounded-lg p-4">
-                <Shield className="w-8 h-8 text-red-600 mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">Security & Logging</h3>
-                <p className="text-sm text-gray-600">Activity logs and security monitoring</p>
-              </div>
-              
-              <div className="bg-indigo-50 rounded-lg p-4">
-                <Upload className="w-8 h-8 text-indigo-600 mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">Bulk Operations</h3>
-                <p className="text-sm text-gray-600">CSV upload and batch processing tools</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     );
