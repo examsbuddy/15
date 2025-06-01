@@ -47,6 +47,42 @@ backend:
         agent: "testing"
         comment: "The POST /api/phone-specs/bulk-import endpoint is working correctly. It successfully imports phone specifications from a CSV file with proper validation and error handling. The endpoint correctly handles invalid file formats, missing required fields, and duplicate entries. The response includes appropriate statistics about the import process."
 
+  - task: "Admin User Management Endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "The GET /api/admin/users endpoint is working correctly. It returns a paginated list of users with proper filtering options for role and verification status. The endpoint supports pagination with limit and offset parameters. The response includes the expected user fields and properly excludes sensitive information like passwords."
+
+  - task: "Pending Approvals Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "The GET /api/admin/pending-approvals endpoint is working correctly. It returns a list of shop owner accounts with pending verification status. The response includes the expected user fields including business details. The endpoint correctly filters users by role=shop_owner and verification_status=pending."
+
+  - task: "Featured Shops Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "The GET /api/shops/featured endpoint is working correctly. It returns a list of approved shop owner accounts for the featured section. The response includes the expected shop fields. The endpoint correctly filters shops by verificationStatus=approved."
+
 frontend:
   - task: "Admin Login Page"
     implemented: true
@@ -133,7 +169,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Post an Ad Functionality"
+    - "Admin User Management Endpoints"
+    - "Pending Approvals Endpoint"
+    - "Featured Shops Endpoint"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -155,3 +193,7 @@ agent_communication:
     message: "I've fixed the React error 'Objects are not valid as a React child' in the Post an Ad functionality. Please test this feature to verify the error has been fixed."
   - agent: "testing"
     message: "I've verified that the React error 'Objects are not valid as a React child' has been fixed in the Post an Ad functionality. No React errors were detected in the console logs during testing. The error handling now properly converts validation errors to strings."
+  - agent: "main"
+    message: "I've added new admin user management endpoints to the backend. Please test these endpoints to ensure they're working correctly: GET /api/admin/users, GET /api/admin/pending-approvals, and GET /api/shops/featured."
+  - agent: "testing"
+    message: "I've tested the new admin user management endpoints and they're all working correctly. The GET /api/admin/users endpoint returns a paginated list of users with proper filtering options. The GET /api/admin/pending-approvals endpoint returns a list of shop owner accounts with pending verification status. The GET /api/shops/featured endpoint returns a list of approved shop owner accounts for the featured section. All endpoints return the expected data structure and properly handle error cases."
