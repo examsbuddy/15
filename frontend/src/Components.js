@@ -6270,7 +6270,7 @@ const PhoneSpecsManager = () => {
   // Add new phone spec
   const handleAddSpec = async () => {
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/phone-specs`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-specs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
