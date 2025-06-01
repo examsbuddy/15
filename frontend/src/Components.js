@@ -4052,6 +4052,25 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
         
         setError(errorMessage);
       }
+        
+        if (data.detail) {
+          if (Array.isArray(data.detail)) {
+            // Handle Pydantic validation errors
+            errorMessage = data.detail.map(err => {
+              if (typeof err === 'object' && err.msg) {
+                return `${err.loc ? err.loc.join('.') + ': ' : ''}${err.msg}`;
+              }
+              return err.toString();
+            }).join(', ');
+          } else if (typeof data.detail === 'string') {
+            errorMessage = data.detail;
+          } else if (typeof data.detail === 'object') {
+            errorMessage = JSON.stringify(data.detail);
+          }
+        }
+        
+        setError(errorMessage);
+      }
     } catch (error) {
       setError('Network error. Please try again.');
     } finally {
