@@ -151,3 +151,7 @@ agent_communication:
     message: "I've fixed the issue with the Post an Ad functionality. The backend now correctly handles the 'photos' field. Please test this feature to ensure it's working correctly."
   - agent: "testing"
     message: "I've tested the Post an Ad functionality and it's now working correctly. The form accepts all required inputs and successfully submits the data to the backend. The 'photos' field is now properly handled, resolving the previous error. After submission, the new listing appears in the Recent Listings section on the homepage."
+  - agent: "main"
+    message: "I've fixed the React error 'Objects are not valid as a React child' in the Post an Ad functionality. Please test this feature to verify the error has been fixed."
+  - agent: "testing"
+    message: "I've verified that the React error 'Objects are not valid as a React child' has been fixed in the Post an Ad functionality. No React errors were detected in the console logs during testing. The error handling now properly converts validation errors to strings."
