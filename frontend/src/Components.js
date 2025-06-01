@@ -6185,6 +6185,17 @@ export const DedicatedSearchPage = ({ onBack, onViewListing, initialFilters = {}
   );
 };
 
+// Dedicated Search Page (uses BrandSearchPage for all brands)
+export const DedicatedSearchPage = ({ onBack, onViewListing, initialFilters = {} }) => {
+  return (
+    <BrandSearchPage 
+      brand="all" 
+      onBack={onBack} 
+      onViewListing={onViewListing} 
+    />
+  );
+};
+
 export const SearchResults = ({ onBack }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [userLocation, setUserLocation] = useState('');
