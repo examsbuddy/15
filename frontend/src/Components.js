@@ -4274,7 +4274,9 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
               
               {photoError && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-                  <p className="text-red-600 text-sm">{photoError}</p>
+                  <p className="text-red-600 text-sm">
+                    {typeof photoError === 'string' ? photoError : 'An error occurred. Please try again.'}
+                  </p>
                 </div>
               )}
 
