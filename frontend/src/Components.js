@@ -6527,16 +6527,6 @@ export const AdminHeader = ({ user, currentPage, setCurrentPage, onLogout, onBac
     </header>
   );
 };
-  
-  // Search data and options
-  const phoneModels = [
-    'iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14',
-    'Samsung Galaxy S24 Ultra', 'Samsung Galaxy S24+', 'Samsung Galaxy S24', 'Samsung Galaxy A55', 'Samsung Galaxy A35',
-    'Xiaomi 14', 'Xiaomi 13T Pro', 'Xiaomi Redmi Note 13 Pro+', 'Xiaomi Redmi Note 13 Pro', 'Xiaomi Redmi Note 13',
-    'Oppo Find X7', 'Oppo Reno 11 Pro', 'Oppo A79', 'Vivo V29 Pro', 'Vivo V29', 'Vivo Y100',
-    'Realme GT 5 Pro', 'Realme 12 Pro+', 'Realme C67', 'OnePlus 12', 'OnePlus 11T', 'OnePlus Nord CE4',
-    'Google Pixel 8 Pro', 'Google Pixel 8', 'Google Pixel 7a', 'Nothing Phone 2a', 'Nothing Phone 2'
-  ];
 
   const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'];
   const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
