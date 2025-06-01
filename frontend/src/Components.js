@@ -4031,7 +4031,28 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
           }, 2000); // Show preview for 2 seconds then redirect
         }
       } else {
-        setError(data.detail || 'Failed to submit listing');
+        // Handle different error response formats
+        let errorMessage = 'Failed to submit listing';
+        
+        if (data.detail) {
+          if (Array.isArray(data.detail)) {
+            // Handle Pydantic validation errors (array of error objects)
+            const errorMessages = data.detail.map(err => {
+              if (typeof err === 'object' && err.msg) {
+                const location = err.loc && err.loc.length > 0 ? `${err.loc.join('.')}: ` : '';
+                return `${location}${err.msg}`;
+              }
+              return String(err);
+            });
+            errorMessage = errorMessages.join(', ');
+          } else if (typeof data.detail === 'string') {
+            errorMessage = data.detail;
+          } else {
+            errorMessage = 'Validation error occurred';
+          }
+        }
+        
+        setError(errorMessage);
       }
     } catch (error) {
       setError('Network error. Please try again.');
