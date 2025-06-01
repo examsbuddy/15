@@ -179,38 +179,177 @@ class StatusCheckCreate(BaseModel):
 
 # Phone Specification Models
 class PhoneSpecCreate(BaseModel):
+    # Basic Information
     brand: str
     model: str
-    display_size: str
-    camera_mp: str
-    battery_mah: str
-    storage_gb: str
-    ram_gb: str
-    processor: str
-    operating_system: str
-    price_range_min: int
-    price_range_max: int
-    release_year: int
+    
+    # Build Information
+    os: Optional[str] = None
+    ui: Optional[str] = None
+    dimensions: Optional[str] = None  # e.g., "163.3 x 74.4 x 7.3 mm"
+    weight: Optional[str] = None  # e.g., "198 g"
+    sim: Optional[str] = None  # e.g., "Nano-SIM + Nano-SIM"
+    colors: Optional[str] = None  # e.g., "Titanium Grey, Enchanted Purple"
+    
+    # Network & Frequency
+    network_2g: Optional[str] = None
+    network_3g: Optional[str] = None
+    network_4g: Optional[str] = None
+    network_5g: Optional[str] = None
+    
+    # Processor
+    cpu: Optional[str] = None
+    chipset: Optional[str] = None
+    gpu: Optional[str] = None
+    
+    # Display
+    display_technology: Optional[str] = None
+    display_size: Optional[str] = None
+    display_resolution: Optional[str] = None
+    display_features: Optional[str] = None
+    
+    # Memory
+    storage: Optional[str] = None  # e.g., "256GB Built-in"
+    ram: Optional[str] = None  # e.g., "12GB RAM"
+    card_slot: Optional[str] = None
+    
+    # Camera
+    main_camera: Optional[str] = None
+    camera_features: Optional[str] = None
+    front_camera: Optional[str] = None
+    
+    # Connectivity
+    wlan: Optional[str] = None
+    bluetooth: Optional[str] = None
+    gps: Optional[str] = None
+    radio: Optional[str] = None
+    usb: Optional[str] = None
+    nfc: Optional[str] = None
+    infrared: Optional[str] = None
+    
+    # Features
+    sensors: Optional[str] = None
+    audio: Optional[str] = None
+    browser: Optional[str] = None
+    messaging: Optional[str] = None
+    games: Optional[str] = None
+    torch: Optional[str] = None
+    extra_features: Optional[str] = None
+    
+    # Battery
+    battery_capacity: Optional[str] = None
+    charging: Optional[str] = None
+    
+    # Pricing
+    price_pkr: Optional[int] = None
+    price_usd: Optional[int] = None
+    
+    # Legacy fields for backward compatibility
+    display_size_legacy: Optional[str] = Field(None, alias="display_size_inches")
+    camera_mp: Optional[str] = None
+    battery_mah: Optional[str] = None
+    storage_gb: Optional[str] = None
+    ram_gb: Optional[str] = None
+    processor: Optional[str] = None
+    operating_system: Optional[str] = None
+    price_range_min: Optional[int] = None
+    price_range_max: Optional[int] = None
+    release_year: Optional[int] = None
 
 class PhoneSpec(BaseModel):
     id: Optional[str] = Field(alias="_id")
+    
+    # Basic Information
     brand: str
     model: str
-    display_size: str
-    camera_mp: str
-    battery_mah: str
-    storage_gb: str
-    ram_gb: str
-    processor: str
-    operating_system: str
-    price_range_min: int
-    price_range_max: int
-    release_year: int
+    
+    # Build Information
+    os: Optional[str] = None
+    ui: Optional[str] = None
+    dimensions: Optional[str] = None
+    weight: Optional[str] = None
+    sim: Optional[str] = None
+    colors: Optional[str] = None
+    
+    # Network & Frequency
+    network_2g: Optional[str] = None
+    network_3g: Optional[str] = None
+    network_4g: Optional[str] = None
+    network_5g: Optional[str] = None
+    
+    # Processor
+    cpu: Optional[str] = None
+    chipset: Optional[str] = None
+    gpu: Optional[str] = None
+    
+    # Display
+    display_technology: Optional[str] = None
+    display_size: Optional[str] = None
+    display_resolution: Optional[str] = None
+    display_features: Optional[str] = None
+    
+    # Memory
+    storage: Optional[str] = None
+    ram: Optional[str] = None
+    card_slot: Optional[str] = None
+    
+    # Camera
+    main_camera: Optional[str] = None
+    camera_features: Optional[str] = None
+    front_camera: Optional[str] = None
+    
+    # Connectivity
+    wlan: Optional[str] = None
+    bluetooth: Optional[str] = None
+    gps: Optional[str] = None
+    radio: Optional[str] = None
+    usb: Optional[str] = None
+    nfc: Optional[str] = None
+    infrared: Optional[str] = None
+    
+    # Features
+    sensors: Optional[str] = None
+    audio: Optional[str] = None
+    browser: Optional[str] = None
+    messaging: Optional[str] = None
+    games: Optional[str] = None
+    torch: Optional[str] = None
+    extra_features: Optional[str] = None
+    
+    # Battery
+    battery_capacity: Optional[str] = None
+    charging: Optional[str] = None
+    
+    # Pricing
+    price_pkr: Optional[int] = None
+    price_usd: Optional[int] = None
+    
+    # Legacy fields for backward compatibility
+    display_size_legacy: Optional[str] = None
+    camera_mp: Optional[str] = None
+    battery_mah: Optional[str] = None
+    storage_gb: Optional[str] = None
+    ram_gb: Optional[str] = None
+    processor: Optional[str] = None
+    operating_system: Optional[str] = None
+    price_range_min: Optional[int] = None
+    price_range_max: Optional[int] = None
+    release_year: Optional[int] = None
+    
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
     class Config:
         populate_by_name = True
+
+# CSV Upload Models
+class CSVUploadResponse(BaseModel):
+    success: bool
+    total_rows: int
+    successful_imports: int
+    failed_imports: int
+    errors: List[str] = []
+    imported_specs: List[str] = []  # List of "Brand Model" names that were imported
 
 # Admin Stats Response Model
 class AdminStats(BaseModel):
