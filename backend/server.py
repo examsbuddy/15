@@ -177,6 +177,48 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+# Phone Specification Models
+class PhoneSpecCreate(BaseModel):
+    brand: str
+    model: str
+    display_size: str
+    camera_mp: str
+    battery_mah: str
+    storage_gb: str
+    ram_gb: str
+    processor: str
+    operating_system: str
+    price_range_min: int
+    price_range_max: int
+    release_year: int
+
+class PhoneSpec(BaseModel):
+    id: Optional[str] = Field(alias="_id")
+    brand: str
+    model: str
+    display_size: str
+    camera_mp: str
+    battery_mah: str
+    storage_gb: str
+    ram_gb: str
+    processor: str
+    operating_system: str
+    price_range_min: int
+    price_range_max: int
+    release_year: int
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    class Config:
+        populate_by_name = True
+
+# Admin Stats Response Model
+class AdminStats(BaseModel):
+    totalListings: int
+    totalUsers: int
+    pendingApprovals: int
+    phoneModels: int
+
 # Phone Listing Models
 class PhoneListingCreate(BaseModel):
     brand: str
