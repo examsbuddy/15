@@ -1,4 +1,64 @@
 frontend:
+  - task: "Admin Portal Access"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Admin Portal is accessible from the main website via the Admin button in the header. The login page loads correctly and displays demo credentials."
+  
+  - task: "Admin Login Functionality"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Admin login page shows correctly with email and password fields. Demo credentials are displayed on the login page. The 2FA step appears after entering credentials."
+  
+  - task: "Admin 2FA Verification"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "2FA verification step appears but there seems to be an issue with the input field for entering the 6-digit code. Unable to proceed past this step."
+  
+  - task: "Admin Dashboard"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Unable to test the admin dashboard as we couldn't get past the 2FA verification step."
+  
+  - task: "Phone Specs Manager"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/Components.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Unable to test the Phone Specs Manager as we couldn't get past the 2FA verification step."
+  
   - task: "Admin Portal Login Functionality"
     implemented: true
     working: true
