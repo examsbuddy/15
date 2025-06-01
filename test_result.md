@@ -433,8 +433,8 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: ["Brand-specific Search Pages", "Admin Portal Functionality"]
-  stuck_tasks: ["Compare Page", "Brand-specific Search Pages", "Admin Portal 2FA Verification"]
+  current_focus: ["Brand-specific Search Pages", "Compare Page"]
+  stuck_tasks: ["Compare Page", "Brand-specific Search Pages"]
   test_all: false
   test_priority: "high_first"
   last_tested: "Admin Portal Functionality"
