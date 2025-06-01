@@ -7073,10 +7073,16 @@ export const AdminPortalMain = ({ onBack }) => {
                 <input
                   type="text"
                   value={credentials.code}
-                  onChange={(e) => setCredentials({...credentials, code: e.target.value.replace(/\D/g, '').slice(0, 6)})}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-center text-2xl tracking-widest"
-                  placeholder="000000"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                    setCredentials({...credentials, code: value});
+                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-center text-xl tracking-wider"
+                  placeholder="Enter 6-digit code"
                   maxLength={6}
+                  autoComplete="off"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                 />
                 <p className="text-sm text-gray-600 mt-2">
                   Enter any 6-digit code for demo (e.g., 123456)
