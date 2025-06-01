@@ -6261,6 +6261,609 @@ export const BrandSearchPage = ({ brand, onBack, onViewListing }) => {
   );
 };
 
+// User Management Component
+const UserManagement = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [approvalAction, setApprovalAction] = useState('');
+  const [approvalNotes, setApprovalNotes] = useState('');
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [pagination, setPagination] = useState({ 
+    total: 0, 
+    offset: 0, 
+    limit: 20 
+  });
+
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
+
+  // Fetch users with filtering
+  const fetchUsers = async (role = 'all', verificationStatus = 'all', offset = 0) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        limit: pagination.limit.toString(),
+        offset: offset.toString()
+      });
+      
+      if (role && role !== 'all') {
+        params.append('role', role);
+      }
+      if (verificationStatus && verificationStatus !== 'all') {
+        params.append('verification_status', verificationStatus);
+      }
+
+      const response = await fetch(`${BACKEND_URL}/api/admin/users?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch users');
+      
+      const data = await response.json();
+      setUsers(data.users || []);
+      setPagination({
+        ...pagination,
+        total: data.total || 0,
+        offset: offset
+      });
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      alert('Failed to fetch users. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch user details
+  const fetchUserDetails = async (userId) => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/admin/users/${userId}`);
+      if (!response.ok) throw new Error('Failed to fetch user details');
+      
+      const userData = await response.json();
+      setSelectedUser(userData);
+      setShowUserModal(true);
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+      alert('Failed to fetch user details. Please try again.');
+    }
+  };
+
+  // Approve or reject shop owner
+  const handleApprovalAction = async () => {
+    if (!selectedUser) return;
+    
+    setLoading(true);
+    try {
+      const endpoint = approvalAction === 'approve' 
+        ? `/api/admin/users/${selectedUser._id}/approve`
+        : `/api/admin/users/${selectedUser._id}/reject`;
+      
+      const body = approvalAction === 'approve' 
+        ? { notes: approvalNotes }
+        : { reason: rejectionReason, notes: approvalNotes };
+
+      const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) throw new Error(`Failed to ${approvalAction} user`);
+
+      alert(`Shop owner ${approvalAction === 'approve' ? 'approved' : 'rejected'} successfully!`);
+      
+      // Reset modal states
+      setShowApprovalModal(false);
+      setShowUserModal(false);
+      setApprovalNotes('');
+      setRejectionReason('');
+      
+      // Refresh user list
+      fetchUsers(selectedFilter, statusFilter, pagination.offset);
+      
+    } catch (error) {
+      console.error(`Error ${approvalAction}ing user:`, error);
+      alert(`Failed to ${approvalAction} user. Please try again.`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load users on component mount and when filters change
+  useEffect(() => {
+    fetchUsers(selectedFilter, statusFilter, 0);
+  }, [selectedFilter, statusFilter]);
+
+  // Filter users based on search term
+  const filteredUsers = users.filter(user =>
+    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.business_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handlePreviousPage = () => {
+    if (pagination.offset > 0) {
+      const newOffset = Math.max(0, pagination.offset - pagination.limit);
+      fetchUsers(selectedFilter, statusFilter, newOffset);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (pagination.offset + pagination.limit < pagination.total) {
+      const newOffset = pagination.offset + pagination.limit;
+      fetchUsers(selectedFilter, statusFilter, newOffset);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getStatusBadge = (status) => {
+    const statusColors = {
+      'pending': 'bg-yellow-100 text-yellow-800',
+      'approved': 'bg-green-100 text-green-800',
+      'rejected': 'bg-red-100 text-red-800',
+      'under_review': 'bg-blue-100 text-blue-800'
+    };
+    
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>
+        {status ? status.replace('_', ' ').toUpperCase() : 'N/A'}
+      </span>
+    );
+  };
+
+  const getRoleBadge = (role) => {
+    const roleColors = {
+      'normal_user': 'bg-blue-100 text-blue-800',
+      'shop_owner': 'bg-purple-100 text-purple-800',
+      'admin': 'bg-red-100 text-red-800'
+    };
+    
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleColors[role] || 'bg-gray-100 text-gray-800'}`}>
+        {role ? role.replace('_', ' ').toUpperCase() : 'N/A'}
+      </span>
+    );
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg">
+      {/* Header */}
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">User Management</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Manage user accounts and shop owner approvals
+            </p>
+          </div>
+          
+          <div className="mt-4 lg:mt-0 flex flex-col sm:flex-row gap-3">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="mt-4 flex flex-wrap gap-3">
+          {/* Role Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+            <select
+              value={selectedFilter}
+              onChange={(e) => setSelectedFilter(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Roles</option>
+              <option value="normal_user">Normal Users</option>
+              <option value="shop_owner">Shop Owners</option>
+              <option value="admin">Admins</option>
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="under_review">Under Review</option>
+            </select>
+          </div>
+
+          {/* Results Info */}
+          <div className="flex items-end">
+            <div className="text-sm text-gray-600">
+              Showing {pagination.offset + 1}-{Math.min(pagination.offset + pagination.limit, pagination.total)} of {pagination.total} users
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Users Table */}
+      <div className="overflow-x-auto">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading users...</span>
+          </div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="text-center py-12">
+            <Users className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No users found</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {searchTerm ? 'Try adjusting your search terms.' : 'No users match the selected filters.'}
+            </p>
+          </div>
+        ) : (
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  User Details
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Role
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Joined Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredUsers.map((user) => (
+                <tr key={user._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-10 w-10">
+                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                          <User className="h-6 w-6 text-blue-600" />
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">
+                          {user.business_name || user.name || 'N/A'}
+                        </div>
+                        <div className="text-sm text-gray-500">{user.email}</div>
+                        {user.phone && (
+                          <div className="text-sm text-gray-500">{user.phone}</div>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {getRoleBadge(user.role)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {getStatusBadge(user.verification_status)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatDate(user.created_at)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                    <button
+                      onClick={() => fetchUserDetails(user._id)}
+                      className="text-blue-600 hover:text-blue-900"
+                    >
+                      View Details
+                    </button>
+                    {user.role === 'shop_owner' && user.verification_status === 'pending' && (
+                      <>
+                        <button
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setApprovalAction('approve');
+                            setShowApprovalModal(true);
+                          }}
+                          className="text-green-600 hover:text-green-900 ml-3"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setApprovalAction('reject');
+                            setShowApprovalModal(true);
+                          }}
+                          className="text-red-600 hover:text-red-900 ml-3"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Pagination */}
+      {pagination.total > pagination.limit && (
+        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+          <div className="text-sm text-gray-500">
+            Showing {pagination.offset + 1} to {Math.min(pagination.offset + pagination.limit, pagination.total)} of {pagination.total} results
+          </div>
+          <div className="flex space-x-2">
+            <button
+              onClick={handlePreviousPage}
+              disabled={pagination.offset === 0}
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={handleNextPage}
+              disabled={pagination.offset + pagination.limit >= pagination.total}
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* User Details Modal */}
+      {showUserModal && selectedUser && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">User Details</h3>
+              <button
+                onClick={() => setShowUserModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Basic Information */}
+              <div>
+                <h4 className="text-md font-medium text-gray-900 mb-3">Basic Information</h4>
+                <div className="space-y-2">
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">Name:</span>
+                    <span className="ml-2 text-sm text-gray-900">{selectedUser.name || 'N/A'}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">Email:</span>
+                    <span className="ml-2 text-sm text-gray-900">{selectedUser.email}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">Phone:</span>
+                    <span className="ml-2 text-sm text-gray-900">{selectedUser.phone || 'N/A'}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">Role:</span>
+                    <span className="ml-2">{getRoleBadge(selectedUser.role)}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">Status:</span>
+                    <span className="ml-2">{getStatusBadge(selectedUser.verification_status)}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">Joined:</span>
+                    <span className="ml-2 text-sm text-gray-900">{formatDate(selectedUser.created_at)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Business Information (for shop owners) */}
+              {selectedUser.role === 'shop_owner' && (
+                <div>
+                  <h4 className="text-md font-medium text-gray-900 mb-3">Business Information</h4>
+                  <div className="space-y-2">
+                    <div>
+                      <span className="text-sm font-medium text-gray-500">Business Name:</span>
+                      <span className="ml-2 text-sm text-gray-900">{selectedUser.business_name || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-500">Business Type:</span>
+                      <span className="ml-2 text-sm text-gray-900">{selectedUser.business_type || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-500">Address:</span>
+                      <span className="ml-2 text-sm text-gray-900">{selectedUser.business_address || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-500">Description:</span>
+                      <span className="ml-2 text-sm text-gray-900">{selectedUser.business_description || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* KYC Documents (for shop owners) */}
+            {selectedUser.role === 'shop_owner' && selectedUser.kyc_documents && (
+              <div className="mt-6">
+                <h4 className="text-md font-medium text-gray-900 mb-3">KYC Documents</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {selectedUser.kyc_documents.business_license && (
+                    <div>
+                      <span className="text-sm font-medium text-gray-500">Business License:</span>
+                      <div className="mt-1">
+                        <img 
+                          src={selectedUser.kyc_documents.business_license} 
+                          alt="Business License" 
+                          className="max-w-full h-auto rounded border"
+                          style={{ maxHeight: '200px' }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {selectedUser.kyc_documents.tax_certificate && (
+                    <div>
+                      <span className="text-sm font-medium text-gray-500">Tax Certificate:</span>
+                      <div className="mt-1">
+                        <img 
+                          src={selectedUser.kyc_documents.tax_certificate} 
+                          alt="Tax Certificate" 
+                          className="max-w-full h-auto rounded border"
+                          style={{ maxHeight: '200px' }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {selectedUser.kyc_documents.owner_id && (
+                    <div>
+                      <span className="text-sm font-medium text-gray-500">Owner ID:</span>
+                      <div className="mt-1">
+                        <img 
+                          src={selectedUser.kyc_documents.owner_id} 
+                          alt="Owner ID" 
+                          className="max-w-full h-auto rounded border"
+                          style={{ maxHeight: '200px' }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            {selectedUser.role === 'shop_owner' && selectedUser.verification_status === 'pending' && (
+              <div className="mt-6 flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setApprovalAction('reject');
+                    setShowApprovalModal(true);
+                  }}
+                  className="px-4 py-2 border border-red-300 text-red-700 rounded-md hover:bg-red-50"
+                >
+                  Reject
+                </button>
+                <button
+                  onClick={() => {
+                    setApprovalAction('approve');
+                    setShowApprovalModal(true);
+                  }}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                >
+                  Approve
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Approval/Rejection Modal */}
+      {showApprovalModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-md bg-white">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {approvalAction === 'approve' ? 'Approve' : 'Reject'} Shop Owner
+              </h3>
+              <button
+                onClick={() => setShowApprovalModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              {approvalAction === 'reject' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Rejection Reason *
+                  </label>
+                  <select
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select a reason</option>
+                    <option value="incomplete_documents">Incomplete Documents</option>
+                    <option value="invalid_documents">Invalid Documents</option>
+                    <option value="business_not_verified">Business Not Verified</option>
+                    <option value="policy_violation">Policy Violation</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              )}
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Additional Notes (Optional)
+                </label>
+                <textarea
+                  value={approvalNotes}
+                  onChange={(e) => setApprovalNotes(e.target.value)}
+                  rows={3}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Add any additional notes..."
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={() => setShowApprovalModal(false)}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleApprovalAction}
+                disabled={approvalAction === 'reject' && !rejectionReason}
+                className={`px-4 py-2 rounded-md text-white ${
+                  approvalAction === 'approve'
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-red-600 hover:bg-red-700'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {approvalAction === 'approve' ? 'Approve' : 'Reject'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Phone Specs Manager Component
 const PhoneSpecsManager = () => {
   const [phoneSpecs, setPhoneSpecs] = useState([]);
