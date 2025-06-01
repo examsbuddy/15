@@ -468,11 +468,11 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: ["Brand-specific Search Pages", "Compare Page"]
+  current_focus: ["CSV Template Download Endpoint", "CSV Bulk Import Endpoint", "CSV Bulk Import Error Handling"]
   stuck_tasks: ["Compare Page", "Brand-specific Search Pages"]
   test_all: false
   test_priority: "high_first"
-  last_tested: "Admin Portal Functionality"
+  last_tested: "CSV Bulk Import Endpoints"
 
 agent_communication:
   - agent: "testing"
