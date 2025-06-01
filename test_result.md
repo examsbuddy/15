@@ -122,6 +122,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "The 'Post an Ad' functionality is now working correctly. The form accepts all required inputs (brand, model, price, condition, RAM, storage, city, description, seller details, and photos) and successfully submits the data to the backend. The backend API endpoint (/api/listings) correctly processes the form data and creates a new listing. The 'photos' field is now properly handled, resolving the previous error. After submission, the new listing appears in the Recent Listings section on the homepage. Form validation works correctly, showing error messages for missing required fields."
+      - working: true
+        agent: "testing"
+        comment: "Verified that the React error 'Objects are not valid as a React child (found: object with keys {type, loc, msg, input, url})' has been fixed. No React errors were detected in the console logs during testing. The error handling now properly converts validation errors to strings."
 
 metadata:
   created_by: "main_agent"
