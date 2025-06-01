@@ -6385,7 +6385,7 @@ const PhoneSpecsManager = () => {
   // Download CSV template
   const downloadTemplate = async () => {
     try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/phone-specs/csv-template`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-specs/csv-template`);
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
