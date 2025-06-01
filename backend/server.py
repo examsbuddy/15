@@ -1146,6 +1146,176 @@ async def download_csv_template():
         logger.error(f"Error generating CSV template: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to generate CSV template")
 
+# Admin User Management Endpoints
+@api_router.get("/admin/users")
+async def get_admin_users(
+    role: Optional[str] = None,
+    verification_status: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0
+):
+    """Get all users for admin management with optional filtering"""
+    try:
+        # Build filter query
+        filter_query = {}
+        if role and role != "all":
+            filter_query["role"] = role
+        if verification_status and verification_status != "all":
+            filter_query["verification_status"] = verification_status
+        
+        # Get total count for pagination
+        total_count = await db.users.count_documents(filter_query)
+        
+        # Get users with pagination, sorted by newest first
+        users = await db.users.find(filter_query).sort("created_at", -1).skip(offset).limit(limit).to_list(length=limit)
+        
+        # Serialize ObjectIds and remove sensitive data
+        for user in users:
+            user["_id"] = str(user["_id"])
+            # Remove password from response
+            if "password" in user:
+                del user["password"]
+                
+        return {
+            "users": users,
+            "total": total_count,
+            "offset": offset,
+            "limit": limit
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching admin users: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch users")
+
+@api_router.get("/admin/users/{user_id}")
+async def get_user_details(user_id: str):
+    """Get detailed user information including KYC documents for shop owners"""
+    try:
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Serialize ObjectId and remove password
+        user["_id"] = str(user["_id"])
+        if "password" in user:
+            del user["password"]
+            
+        return user
+        
+    except Exception as e:
+        logger.error(f"Error fetching user details: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch user details")
+
+@api_router.put("/admin/users/{user_id}/approve")
+async def approve_shop_owner(user_id: str, approval_data: dict = None):
+    """Approve a shop owner account"""
+    try:
+        # Update user verification status
+        result = await db.users.update_one(
+            {"_id": ObjectId(user_id), "role": "shop_owner"},
+            {
+                "$set": {
+                    "verification_status": VerificationStatus.APPROVED,
+                    "approved_at": datetime.utcnow(),
+                    "approval_notes": approval_data.get("notes", "") if approval_data else ""
+                }
+            }
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Shop owner not found")
+        
+        # Get updated user data for notification
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        
+        return {"message": "Shop owner approved successfully", "user_id": user_id}
+        
+    except Exception as e:
+        logger.error(f"Error approving shop owner: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to approve shop owner")
+
+@api_router.put("/admin/users/{user_id}/reject")
+async def reject_shop_owner(user_id: str, rejection_data: dict):
+    """Reject a shop owner account"""
+    try:
+        # Update user verification status
+        result = await db.users.update_one(
+            {"_id": ObjectId(user_id), "role": "shop_owner"},
+            {
+                "$set": {
+                    "verification_status": VerificationStatus.REJECTED,
+                    "rejected_at": datetime.utcnow(),
+                    "rejection_reason": rejection_data.get("reason", ""),
+                    "rejection_notes": rejection_data.get("notes", "")
+                }
+            }
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Shop owner not found")
+        
+        return {"message": "Shop owner rejected", "user_id": user_id}
+        
+    except Exception as e:
+        logger.error(f"Error rejecting shop owner: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to reject shop owner")
+
+@api_router.get("/admin/pending-approvals")
+async def get_pending_approvals():
+    """Get all pending shop owner approvals"""
+    try:
+        pending_users = await db.users.find({
+            "role": "shop_owner",
+            "verification_status": "pending"
+        }).sort("created_at", 1).to_list(length=None)
+        
+        # Serialize ObjectIds and remove passwords
+        for user in pending_users:
+            user["_id"] = str(user["_id"])
+            if "password" in user:
+                del user["password"]
+                
+        return {"pending_approvals": pending_users, "count": len(pending_users)}
+        
+    except Exception as e:
+        logger.error(f"Error fetching pending approvals: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch pending approvals")
+
+@api_router.get("/shops/featured")
+async def get_featured_shops():
+    """Get approved shop owners for featured shops section"""
+    try:
+        # Get approved shop owners
+        approved_shops = await db.users.find({
+            "role": "shop_owner",
+            "verification_status": "approved"
+        }).sort("approved_at", -1).to_list(length=None)
+        
+        # Transform data for frontend consumption
+        featured_shops = []
+        for shop in approved_shops:
+            shop_data = {
+                "id": str(shop["_id"]),
+                "name": shop.get("business_name", shop.get("name", "Unknown Shop")),
+                "description": shop.get("business_description", "Quality mobile phones and accessories"),
+                "location": shop.get("business_address", shop.get("address", "Location not specified")),
+                "phone": shop.get("phone", ""),
+                "email": shop.get("email", ""),
+                "businessType": shop.get("business_type", "mobile_shop"),
+                "rating": 4.5,  # Default rating, can be made dynamic later
+                "reviewCount": 127,  # Default review count, can be made dynamic later
+                "image": shop.get("business_logo", ""),
+                "verificationStatus": shop.get("verification_status", "approved"),
+                "joinedDate": shop.get("created_at", datetime.utcnow()).isoformat() if shop.get("created_at") else None
+            }
+            featured_shops.append(shop_data)
+            
+        return {"featured_shops": featured_shops, "count": len(featured_shops)}
+        
+    except Exception as e:
+        logger.error(f"Error fetching featured shops: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch featured shops")
+
 # Authentication Routes
 @api_router.post("/auth/register", response_model=LoginResponse)
 async def register_normal_user(user_data: UserRegistration):
