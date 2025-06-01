@@ -8907,18 +8907,6 @@ export const BulkUploadSpecs = ({ onUpload }) => {
     }, 2000);
   };
 
-  const downloadTemplate = () => {
-    // Create CSV template
-    const csvContent = "Brand,Model,Storage,RAM,Camera,Battery,Screen Size,Processor,OS,Colors\niPhone,15 Pro,\"128GB,256GB,512GB\",8GB,\"48MP + 12MP + 12MP\",3274mAh,6.1\",A17 Pro,iOS 17,\"Black,White,Blue\"\nSamsung,Galaxy S24,\"256GB,512GB\",12GB,\"200MP + 50MP + 12MP\",5000mAh,6.8\",Snapdragon 8 Gen 3,Android 14,\"Black,White,Violet\"";
-    
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'phone_specs_template.csv';
-    link.click();
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-6">Bulk Upload Phone Specifications</h2>
