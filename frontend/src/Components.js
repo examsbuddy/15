@@ -9003,3 +9003,218 @@ export const BulkUploadSpecs = ({ onUpload }) => {
     </div>
   );
 };
+
+// Admin Listings Manager Component
+export const AdminListingsManager = () => {
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalListings, setTotalListings] = useState(0);
+  const itemsPerPage = 10;
+
+  const loadListings = async () => {
+    try {
+      setLoading(true);
+      const offset = (currentPage - 1) * itemsPerPage;
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/admin/listings?limit=${itemsPerPage}&offset=${offset}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setListings(data);
+        setTotalListings(data.length);
+      } else {
+        console.error('Failed to load listings');
+      }
+    } catch (error) {
+      console.error('Error loading listings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredListings = listings.filter(listing =>
+    listing.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    listing.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    listing.seller_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-PK', {
+      style: 'currency',
+      currency: 'PKR',
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString('en-PK', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return 'Invalid Date';
+    }
+  };
+
+  useEffect(() => {
+    loadListings();
+  }, [currentPage]);
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Listings Management</h2>
+          <p className="text-gray-600 mt-1">Monitor and manage all user listings</p>
+        </div>
+        <button
+          onClick={loadListings}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+        >
+          <RefreshCw className="w-5 h-5" />
+          <span>Refresh</span>
+        </button>
+      </div>
+
+      {/* Search and Stats */}
+      <div className="bg-white rounded-lg shadow p-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex-1 max-w-md">
+            <input
+              type="text"
+              placeholder="Search by brand, model, or seller..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="text-sm text-gray-600">
+            Showing {filteredListings.length} of {totalListings} listings
+          </div>
+        </div>
+      </div>
+
+      {/* Listings Table */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading listings...</span>
+          </div>
+        ) : filteredListings.length === 0 ? (
+          <div className="text-center py-12">
+            <List className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-600">No listings found</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Phone Details
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Seller
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Location
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Posted
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredListings.map((listing, index) => (
+                  <tr key={listing._id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {listing.brand} {listing.model}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {listing.ram} • {listing.storage} • {listing.condition}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {formatPrice(listing.price)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {listing.seller_name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {listing.seller_phone}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {listing.city}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {formatDate(listing.date_posted || listing.created_at)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        listing.is_active
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {listing.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Pagination */}
+      {totalListings > itemsPerPage && (
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-gray-600">
+            Page {currentPage} of {Math.ceil(totalListings / itemsPerPage)}
+          </span>
+          <button
+            onClick={() => setCurrentPage(prev => prev + 1)}
+            disabled={currentPage >= Math.ceil(totalListings / itemsPerPage)}
+            className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
