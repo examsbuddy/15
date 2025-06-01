@@ -6568,6 +6568,7 @@ export const AdminPortalV2 = ({ onBack }) => {
     { label: 'Above ₨300,000', value: 'above-300k', min: 300000, max: 999999999 }
   ];
   const conditions = ['New', 'Like New', 'Excellent', 'Very Good', 'Good', 'Fair'];
+  const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'];
   
   const initialFilters = { brand: '', priceRange: '', condition: '' };
   const [userLocation, setUserLocation] = useState('Pakistan');
