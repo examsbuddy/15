@@ -567,7 +567,7 @@ test_plan:
   stuck_tasks: ["Compare Page", "Brand-specific Search Pages"]
   test_all: false
   test_priority: "high_first"
-  last_tested: "PhoneFlip Marketplace End-to-End Functionality"
+  last_tested: "Recent Listings Display Verification"
 
 agent_communication:
   - agent: "testing"
