@@ -7116,3 +7116,693 @@ export const AdminHeader = ({ user, currentPage, setCurrentPage, onLogout, onBac
     </div>
   );
 };
+
+// Admin Dashboard Component
+export const AdminDashboard = ({ user }) => {
+  const [stats, setStats] = useState({
+    totalListings: 1247,
+    activeUsers: 856,
+    pendingApprovals: 23,
+    todayRevenue: 125000,
+    totalPhoneModels: 342,
+    flaggedListings: 7
+  });
+
+  const recentActivity = [
+    { type: 'listing', action: 'New listing posted', user: 'Ahmad Khan', time: '2 mins ago', status: 'pending' },
+    { type: 'user', action: 'User registered', user: 'Sara Ahmed', time: '15 mins ago', status: 'active' },
+    { type: 'listing', action: 'Listing approved', user: 'Mobile Hub', time: '30 mins ago', status: 'approved' },
+    { type: 'user', action: 'User flagged', user: 'Suspicious User', time: '1 hour ago', status: 'flagged' },
+    { type: 'specs', action: 'Phone model added', user: user.name, time: '2 hours ago', status: 'completed' }
+  ];
+
+  return (
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+        <p className="text-gray-600 mt-2">Welcome back, {user.name}</p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex items-center">
+            <div className="p-3 bg-blue-100 rounded-full">
+              <List className="w-6 h-6 text-blue-600" />
+            </div>
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-gray-900">{stats.totalListings}</h3>
+              <p className="text-gray-600">Total Listings</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex items-center">
+            <div className="p-3 bg-green-100 rounded-full">
+              <Users className="w-6 h-6 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-gray-900">{stats.activeUsers}</h3>
+              <p className="text-gray-600">Active Users</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex items-center">
+            <div className="p-3 bg-yellow-100 rounded-full">
+              <Clock className="w-6 h-6 text-yellow-600" />
+            </div>
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-gray-900">{stats.pendingApprovals}</h3>
+              <p className="text-gray-600">Pending Approvals</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex items-center">
+            <div className="p-3 bg-purple-100 rounded-full">
+              <DollarSign className="w-6 h-6 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-gray-900">₨{stats.todayRevenue.toLocaleString()}</h3>
+              <p className="text-gray-600">Today's Revenue</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex items-center">
+            <div className="p-3 bg-indigo-100 rounded-full">
+              <Smartphone className="w-6 h-6 text-indigo-600" />
+            </div>
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-gray-900">{stats.totalPhoneModels}</h3>
+              <p className="text-gray-600">Phone Models</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex items-center">
+            <div className="p-3 bg-red-100 rounded-full">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
+            </div>
+            <div className="ml-4">
+              <h3 className="text-lg font-semibold text-gray-900">{stats.flaggedListings}</h3>
+              <p className="text-gray-600">Flagged Listings</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="bg-white rounded-lg shadow-lg">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Recent Activity</h2>
+        </div>
+        <div className="p-6">
+          <div className="space-y-4">
+            {recentActivity.map((activity, index) => (
+              <div key={index} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                <div className={`p-2 rounded-full ${
+                  activity.type === 'listing' ? 'bg-blue-100' :
+                  activity.type === 'user' ? 'bg-green-100' :
+                  activity.type === 'specs' ? 'bg-purple-100' : 'bg-gray-100'
+                }`}>
+                  {activity.type === 'listing' && <List className="w-4 h-4 text-blue-600" />}
+                  {activity.type === 'user' && <Users className="w-4 h-4 text-green-600" />}
+                  {activity.type === 'specs' && <Smartphone className="w-4 h-4 text-purple-600" />}
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">{activity.action}</p>
+                  <p className="text-sm text-gray-600">by {activity.user} • {activity.time}</p>
+                </div>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  activity.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                  activity.status === 'approved' ? 'bg-green-100 text-green-800' :
+                  activity.status === 'flagged' ? 'bg-red-100 text-red-800' :
+                  activity.status === 'active' ? 'bg-blue-100 text-blue-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {activity.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Phone Specs Manager Component
+export const SpecsManager = ({ user }) => {
+  const [currentTab, setCurrentTab] = useState('browse');
+  const [phoneSpecs, setPhoneSpecs] = useState([
+    {
+      id: '1',
+      brand: 'iPhone',
+      model: '15 Pro',
+      specs: {
+        storage: ['128GB', '256GB', '512GB', '1TB'],
+        ram: ['8GB'],
+        camera: '48MP + 12MP + 12MP',
+        battery: '3274mAh',
+        screen_size: '6.1"',
+        processor: 'A17 Pro',
+        operating_system: 'iOS 17',
+        colors: ['Natural Titanium', 'Blue Titanium', 'White Titanium', 'Black Titanium']
+      },
+      created_at: '2024-01-15',
+      updated_at: '2024-01-20'
+    },
+    {
+      id: '2',
+      brand: 'Samsung',
+      model: 'Galaxy S24 Ultra',
+      specs: {
+        storage: ['256GB', '512GB', '1TB'],
+        ram: ['12GB'],
+        camera: '200MP + 50MP + 12MP + 10MP',
+        battery: '5000mAh',
+        screen_size: '6.8"',
+        processor: 'Snapdragon 8 Gen 3',
+        operating_system: 'Android 14',
+        colors: ['Titanium Black', 'Titanium Gray', 'Titanium Violet', 'Titanium Yellow']
+      },
+      created_at: '2024-01-10',
+      updated_at: '2024-01-18'
+    }
+  ]);
+
+  const [editingSpec, setEditingSpec] = useState(null);
+  const [showBulkUpload, setShowBulkUpload] = useState(false);
+
+  const tabs = [
+    { key: 'browse', label: 'Browse Specs', icon: List },
+    { key: 'add', label: 'Add New', icon: Plus },
+    { key: 'bulk', label: 'Bulk Upload', icon: Upload }
+  ];
+
+  return (
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Phone Specs Manager</h1>
+        <p className="text-gray-600 mt-2">Manage phone specifications and models</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex space-x-1 mb-6">
+        {tabs.map((tab) => {
+          const IconComponent = tab.icon;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setCurrentTab(tab.key)}
+              className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-colors ${
+                currentTab === tab.key
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <IconComponent className="w-4 h-4" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Browse Specs Tab */}
+      {currentTab === 'browse' && (
+        <div className="bg-white rounded-lg shadow-lg">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-900">Phone Specifications</h2>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setCurrentTab('add')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add New</span>
+                </button>
+                <button
+                  onClick={() => setCurrentTab('bulk')}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+                >
+                  <Upload className="w-4 h-4" />
+                  <span>Bulk Upload</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand & Model</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Storage</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">RAM</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Camera</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Battery</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {phoneSpecs.map((phone) => (
+                  <tr key={phone.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{phone.brand}</div>
+                        <div className="text-sm text-gray-500">{phone.model}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {phone.specs.storage.join(', ')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {phone.specs.ram.join(', ')}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {phone.specs.camera}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {phone.specs.battery}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {phone.updated_at}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => setEditingSpec(phone)}
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button className="text-red-600 hover:text-red-700">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Add New Spec Tab */}
+      {currentTab === 'add' && <AddSpecForm onSave={(spec) => {
+        setPhoneSpecs([...phoneSpecs, { id: Date.now().toString(), ...spec }]);
+        setCurrentTab('browse');
+      }} />}
+
+      {/* Bulk Upload Tab */}
+      {currentTab === 'bulk' && <BulkUploadSpecs onUpload={(specs) => {
+        setPhoneSpecs([...phoneSpecs, ...specs]);
+        setCurrentTab('browse');
+      }} />}
+
+      {/* Edit Modal */}
+      {editingSpec && (
+        <EditSpecModal 
+          spec={editingSpec}
+          onSave={(updatedSpec) => {
+            setPhoneSpecs(phoneSpecs.map(p => p.id === editingSpec.id ? updatedSpec : p));
+            setEditingSpec(null);
+          }}
+          onClose={() => setEditingSpec(null)}
+        />
+      )}
+    </div>
+  );
+};
+
+// Add Spec Form Component
+export const AddSpecForm = ({ onSave }) => {
+  const [formData, setFormData] = useState({
+    brand: '',
+    model: '',
+    specs: {
+      storage: [],
+      ram: [],
+      camera: '',
+      battery: '',
+      screen_size: '',
+      processor: '',
+      operating_system: '',
+      colors: []
+    }
+  });
+
+  const handleArrayInput = (field, value) => {
+    const items = value.split(',').map(item => item.trim()).filter(item => item);
+    setFormData({
+      ...formData,
+      specs: {
+        ...formData.specs,
+        [field]: items
+      }
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave({
+      ...formData,
+      created_at: new Date().toISOString().split('T')[0],
+      updated_at: new Date().toISOString().split('T')[0]
+    });
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-6">
+      <h2 className="text-xl font-semibold text-gray-900 mb-6">Add New Phone Specification</h2>
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
+            <input
+              type="text"
+              value={formData.brand}
+              onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="e.g., iPhone, Samsung, Xiaomi"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Model</label>
+            <input
+              type="text"
+              value={formData.model}
+              onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="e.g., 15 Pro, Galaxy S24"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Storage Options</label>
+            <input
+              type="text"
+              onChange={(e) => handleArrayInput('storage', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="e.g., 128GB, 256GB, 512GB (comma separated)"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">RAM Options</label>
+            <input
+              type="text"
+              onChange={(e) => handleArrayInput('ram', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="e.g., 8GB, 12GB (comma separated)"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Camera</label>
+            <input
+              type="text"
+              value={formData.specs.camera}
+              onChange={(e) => setFormData({
+                ...formData,
+                specs: { ...formData.specs, camera: e.target.value }
+              })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="e.g., 48MP + 12MP + 12MP"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Battery</label>
+            <input
+              type="text"
+              value={formData.specs.battery}
+              onChange={(e) => setFormData({
+                ...formData,
+                specs: { ...formData.specs, battery: e.target.value }
+              })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="e.g., 3274mAh"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Screen Size</label>
+            <input
+              type="text"
+              value={formData.specs.screen_size}
+              onChange={(e) => setFormData({
+                ...formData,
+                specs: { ...formData.specs, screen_size: e.target.value }
+              })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="e.g., 6.1\""
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Processor</label>
+            <input
+              type="text"
+              value={formData.specs.processor}
+              onChange={(e) => setFormData({
+                ...formData,
+                specs: { ...formData.specs, processor: e.target.value }
+              })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="e.g., A17 Pro"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Operating System</label>
+            <input
+              type="text"
+              value={formData.specs.operating_system}
+              onChange={(e) => setFormData({
+                ...formData,
+                specs: { ...formData.specs, operating_system: e.target.value }
+              })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="e.g., iOS 17, Android 14"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Color Options</label>
+          <input
+            type="text"
+            onChange={(e) => handleArrayInput('colors', e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            placeholder="e.g., Black, White, Blue (comma separated)"
+          />
+        </div>
+
+        <div className="flex justify-end space-x-4">
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Save Specification
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+// Bulk Upload Component
+export const BulkUploadSpecs = ({ onUpload }) => {
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [preview, setPreview] = useState([]);
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    setUploadedFile(file);
+    
+    // Simulate file processing and preview
+    setProcessing(true);
+    setTimeout(() => {
+      setPreview([
+        {
+          brand: 'iPhone',
+          model: '16 Pro',
+          storage: ['128GB', '256GB', '512GB'],
+          ram: ['8GB'],
+          camera: '48MP + 12MP + 12MP',
+          battery: '3200mAh'
+        },
+        {
+          brand: 'Samsung',
+          model: 'Galaxy S25',
+          storage: ['256GB', '512GB'],
+          ram: ['12GB'],
+          camera: '200MP + 50MP + 12MP',
+          battery: '5100mAh'
+        }
+      ]);
+      setProcessing(false);
+    }, 2000);
+  };
+
+  const downloadTemplate = () => {
+    // Create CSV template
+    const csvContent = "Brand,Model,Storage,RAM,Camera,Battery,Screen Size,Processor,OS,Colors\niPhone,15 Pro,\"128GB,256GB,512GB\",8GB,\"48MP + 12MP + 12MP\",3274mAh,6.1\",A17 Pro,iOS 17,\"Black,White,Blue\"\nSamsung,Galaxy S24,\"256GB,512GB\",12GB,\"200MP + 50MP + 12MP\",5000mAh,6.8\",Snapdragon 8 Gen 3,Android 14,\"Black,White,Violet\"";
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'phone_specs_template.csv';
+    link.click();
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-6">
+      <h2 className="text-xl font-semibold text-gray-900 mb-6">Bulk Upload Phone Specifications</h2>
+      
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-gray-600">Upload a CSV file with phone specifications</p>
+          <button
+            onClick={downloadTemplate}
+            className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            <span>Download Template</span>
+          </button>
+        </div>
+        
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+          <input
+            type="file"
+            accept=".csv,.xlsx"
+            onChange={handleFileUpload}
+            className="hidden"
+            id="file-upload"
+          />
+          <label
+            htmlFor="file-upload"
+            className="cursor-pointer flex flex-col items-center space-y-2"
+          >
+            <Upload className="w-12 h-12 text-gray-400" />
+            <span className="text-gray-600">Click to upload CSV or Excel file</span>
+            <span className="text-sm text-gray-500">Maximum file size: 10MB</span>
+          </label>
+        </div>
+      </div>
+
+      {uploadedFile && (
+        <div className="mb-6">
+          <p className="text-sm text-gray-600 mb-2">Uploaded file: {uploadedFile.name}</p>
+          
+          {processing ? (
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+              <span>Processing file...</span>
+            </div>
+          ) : (
+            <div>
+              <h3 className="font-medium text-gray-900 mb-4">Preview ({preview.length} records)</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full border border-gray-200 rounded-lg">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Brand</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Model</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Storage</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">RAM</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Camera</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {preview.map((spec, index) => (
+                      <tr key={index}>
+                        <td className="px-4 py-2 text-sm text-gray-900">{spec.brand}</td>
+                        <td className="px-4 py-2 text-sm text-gray-900">{spec.model}</td>
+                        <td className="px-4 py-2 text-sm text-gray-900">{spec.storage.join(', ')}</td>
+                        <td className="px-4 py-2 text-sm text-gray-900">{spec.ram.join(', ')}</td>
+                        <td className="px-4 py-2 text-sm text-gray-900">{spec.camera}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div className="flex justify-end space-x-4 mt-6">
+                <button
+                  onClick={() => {
+                    setUploadedFile(null);
+                    setPreview([]);
+                  }}
+                  className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    const specsWithIds = preview.map(spec => ({
+                      id: Date.now().toString() + Math.random(),
+                      ...spec,
+                      specs: {
+                        storage: spec.storage,
+                        ram: spec.ram,
+                        camera: spec.camera,
+                        battery: spec.battery
+                      },
+                      created_at: new Date().toISOString().split('T')[0],
+                      updated_at: new Date().toISOString().split('T')[0]
+                    }));
+                    onUpload(specsWithIds);
+                  }}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Import {preview.length} Records
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 className="font-medium text-blue-900 mb-2">CSV Format Requirements:</h4>
+        <ul className="text-sm text-blue-800 space-y-1">
+          <li>• First row should contain column headers</li>
+          <li>• Use comma-separated values for multiple options (storage, RAM, colors)</li>
+          <li>• Ensure all required fields are filled</li>
+          <li>• Use consistent brand naming (e.g., "iPhone" not "Apple iPhone")</li>
+        </ul>
+      </div>
+    </div>
+  );
+};
