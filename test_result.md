@@ -298,11 +298,11 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: ["Brand-specific Search Pages"]
-  stuck_tasks: ["Compare Page", "Brand-specific Search Pages"]
+  current_focus: ["Admin Portal Login Functionality", "Brand-specific Search Pages"]
+  stuck_tasks: ["Admin Portal Login Functionality", "Compare Page", "Brand-specific Search Pages"]
   test_all: false
   test_priority: "high_first"
-  last_tested: "Brand-specific Search Pages"
+  last_tested: "Admin Portal Login Functionality"
 
 agent_communication:
   - agent: "testing"
