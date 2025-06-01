@@ -7254,12 +7254,7 @@ export const AdminPortalMain = ({ onBack }) => {
 
           {currentSection === 'phone-specs' && <PhoneSpecsManager />}
 
-          {currentSection === 'user-management' && (
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">User Management</h2>
-              <p className="text-gray-600">User management functionality coming soon...</p>
-            </div>
-          )}
+          {currentSection === 'user-management' && <UserManagement />}
 
           {currentSection === 'listings' && (
             <AdminListingsManager />
