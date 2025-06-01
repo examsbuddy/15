@@ -6528,7 +6528,8 @@ export const AdminHeader = ({ user, currentPage, setCurrentPage, onLogout, onBac
   );
 };
 
-  const brands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'];
+// Admin Portal - Simplified for Demo
+export const AdminPortal = ({ onBack }) => {
   const cities = ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta'];
   const priceRanges = [
     { label: 'Under ₨25,000', value: 'under-25k', min: 0, max: 25000 },
