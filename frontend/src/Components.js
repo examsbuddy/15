@@ -6819,84 +6819,180 @@ export const AdminPortalMain = ({ onBack }) => {
             </div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <div className="flex items-center">
-                <div className="p-3 bg-blue-100 rounded-full">
-                  <List className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">1,247</h3>
-                  <p className="text-gray-600">Total Listings</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <div className="flex items-center">
-                <div className="p-3 bg-green-100 rounded-full">
-                  <Users className="w-6 h-6 text-green-600" />
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">856</h3>
-                  <p className="text-gray-600">Active Users</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <div className="flex items-center">
-                <div className="p-3 bg-yellow-100 rounded-full">
-                  <AlertTriangle className="w-6 h-6 text-yellow-600" />
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">23</h3>
-                  <p className="text-gray-600">Pending Approvals</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <div className="flex items-center">
-                <div className="p-3 bg-purple-100 rounded-full">
-                  <Smartphone className="w-6 h-6 text-purple-600" />
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">342</h3>
-                  <p className="text-gray-600">Phone Models</p>
-                </div>
-              </div>
+          {/* Navigation */}
+          <div className="bg-white rounded-lg shadow-lg mb-8">
+            <div className="border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8 px-6">
+                <button
+                  onClick={() => setCurrentSection('dashboard')}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    currentSection === 'dashboard'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <BarChart2 className="w-5 h-5 inline mr-2" />
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => setCurrentSection('phone-specs')}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    currentSection === 'phone-specs'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Smartphone className="w-5 h-5 inline mr-2" />
+                  Phone Specs
+                </button>
+                <button
+                  onClick={() => setCurrentSection('user-management')}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    currentSection === 'user-management'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Users className="w-5 h-5 inline mr-2" />
+                  User Management
+                </button>
+                <button
+                  onClick={() => setCurrentSection('listings')}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    currentSection === 'listings'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <List className="w-5 h-5 inline mr-2" />
+                  Listings
+                </button>
+                <button
+                  onClick={() => setCurrentSection('security')}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    currentSection === 'security'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Shield className="w-5 h-5 inline mr-2" />
+                  Security
+                </button>
+              </nav>
             </div>
           </div>
 
-          {/* Features Overview */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Admin Portal Features</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-blue-50 rounded-lg p-4">
-                <Smartphone className="w-8 h-8 text-blue-600 mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">Phone Specs Manager</h3>
-                <p className="text-sm text-gray-600">Add, edit, and bulk upload phone specifications with CSV support</p>
+          {/* Content Area */}
+          {currentSection === 'dashboard' && (
+            <div>
+              {/* Stats Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-blue-100 rounded-full">
+                      <List className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-gray-900">{stats.totalListings}</h3>
+                      <p className="text-gray-600">Total Listings</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-green-100 rounded-full">
+                      <Users className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-gray-900">{stats.totalUsers}</h3>
+                      <p className="text-gray-600">Active Users</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-yellow-100 rounded-full">
+                      <AlertTriangle className="w-6 h-6 text-yellow-600" />
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-gray-900">{stats.pendingApprovals}</h3>
+                      <p className="text-gray-600">Pending Approvals</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-purple-100 rounded-full">
+                      <Smartphone className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-gray-900">{stats.phoneModels}</h3>
+                      <p className="text-gray-600">Phone Models</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              
-              <div className="bg-green-50 rounded-lg p-4">
-                <Users className="w-8 h-8 text-green-600 mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">User Management</h3>
-                <p className="text-sm text-gray-600">Monitor users, apply restrictions, and manage accounts</p>
+
+              {/* Quick Actions */}
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <button
+                    onClick={() => setCurrentSection('phone-specs')}
+                    className="bg-blue-50 rounded-lg p-4 text-left hover:bg-blue-100 transition-colors"
+                  >
+                    <Smartphone className="w-8 h-8 text-blue-600 mb-3" />
+                    <h3 className="font-semibold text-gray-900 mb-2">Manage Phone Specs</h3>
+                    <p className="text-sm text-gray-600">Add, edit, and manage phone specifications</p>
+                  </button>
+                  
+                  <button
+                    onClick={() => setCurrentSection('user-management')}
+                    className="bg-green-50 rounded-lg p-4 text-left hover:bg-green-100 transition-colors"
+                  >
+                    <Users className="w-8 h-8 text-green-600 mb-3" />
+                    <h3 className="font-semibold text-gray-900 mb-2">User Management</h3>
+                    <p className="text-sm text-gray-600">Monitor and manage user accounts</p>
+                  </button>
+                  
+                  <button
+                    onClick={() => setCurrentSection('listings')}
+                    className="bg-yellow-50 rounded-lg p-4 text-left hover:bg-yellow-100 transition-colors"
+                  >
+                    <List className="w-8 h-8 text-yellow-600 mb-3" />
+                    <h3 className="font-semibold text-gray-900 mb-2">Listings Moderation</h3>
+                    <p className="text-sm text-gray-600">Review and moderate user listings</p>
+                  </button>
+                </div>
               </div>
-              
-              <div className="bg-purple-50 rounded-lg p-4">
-                <BarChart2 className="w-8 h-8 text-purple-600 mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">Analytics Dashboard</h3>
-                <p className="text-sm text-gray-600">Track sales, traffic, and trends with exportable reports</p>
-              </div>
-              
-              <div className="bg-yellow-50 rounded-lg p-4">
-                <List className="w-8 h-8 text-yellow-600 mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">Listings Moderation</h3>
-                <p className="text-sm text-gray-600">Approve, flag, and manage user listings</p>
-              </div>
+            </div>
+          )}
+
+          {currentSection === 'phone-specs' && <PhoneSpecsManager />}
+
+          {currentSection === 'user-management' && (
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">User Management</h2>
+              <p className="text-gray-600">User management functionality coming soon...</p>
+            </div>
+          )}
+
+          {currentSection === 'listings' && (
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Listings Moderation</h2>
+              <p className="text-gray-600">Listings moderation functionality coming soon...</p>
+            </div>
+          )}
+
+          {currentSection === 'security' && (
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Security Settings</h2>
+              <p className="text-gray-600">Security settings functionality coming soon...</p>
+            </div>
+          )}
               
               <div className="bg-red-50 rounded-lg p-4">
                 <Shield className="w-8 h-8 text-red-600 mb-3" />
