@@ -1636,6 +1636,15 @@ export const Header = ({
                 <span className="sm:hidden">Post</span>
               </button>
 
+              {/* Temporary Admin Access Button */}
+              <button
+                onClick={() => setCurrentPage('admin')}
+                className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors flex items-center space-x-2"
+              >
+                <Shield className="w-4 h-4" />
+                <span>Admin</span>
+              </button>
+
               {/* Auth Buttons / User Menu */}
               {isLoggedIn ? (
                 <div className="relative">
