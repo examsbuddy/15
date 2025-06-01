@@ -1,15 +1,21 @@
 frontend:
   - task: "Admin Portal Login Functionality"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/Components.js"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "Admin portal login functionality is partially implemented but has a critical issue. The login process works up to the 2FA step, but after entering a valid 2FA code and clicking 'Verify & Login', an error occurs: 'AlertTriangle is not defined'. This prevents users from accessing the admin dashboard. The error occurs in the AdminPortalMain component. The login form validation works correctly, and the 'Back to Login' functionality from the 2FA page works as expected. The admin portal can be accessed via the red 'Admin' button in the header, but accessing via the user dropdown menu could not be tested due to issues with the sign-in modal."
+      - working: false
+        agent: "testing"
+        comment: "After fixing the AlertTriangle import issue, a new error was discovered: 'Upload is not defined'. The Upload component is used in the AdminPortalMain component at line 6433, but it was not included in the import list from 'lucide-react'."
+      - working: true
+        agent: "testing"
+        comment: "Admin portal login functionality is now working correctly after fixing both the AlertTriangle and Upload component imports. The login process works completely - users can enter their credentials (admin@phoneflip.pk/admin123 or moderator@phoneflip.pk/mod123), proceed to the 2FA page, enter a valid 2FA code (123456), and successfully access the admin dashboard. The dashboard displays correctly with user info (name and role) and stats cards. Both Super Admin and Moderator roles work properly. The only minor issue is that the logout button is not easily identifiable in the UI, but this doesn't affect core functionality."
 
   - task: "Compare Button Functionality"
     implemented: true
