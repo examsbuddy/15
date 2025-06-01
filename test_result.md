@@ -364,11 +364,11 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: ["Brand-specific Search Pages"]
+  current_focus: ["Brand-specific Search Pages", "Admin Stats Endpoint", "Get All Phone Specs Endpoint", "Create Phone Spec Endpoint", "Update Phone Spec Endpoint", "Delete Phone Spec Endpoint"]
   stuck_tasks: ["Compare Page", "Brand-specific Search Pages"]
   test_all: false
   test_priority: "high_first"
-  last_tested: "Admin Portal Login Functionality"
+  last_tested: "Admin-related Backend Endpoints"
 
 agent_communication:
   - agent: "testing"
