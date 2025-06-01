@@ -7114,7 +7114,7 @@ export const AdminPortalV2 = ({ onBack }) => {
 // The implementation includes 2FA authentication, bulk upload capabilities, and real-time sync.
 
 // Simplified AdminPortal for demo
-export const AdminPortal = ({ onBack }) => {
+export const AdminPortalDemo = ({ onBack }) => {
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-12">
       <div className="max-w-4xl mx-auto px-4">
