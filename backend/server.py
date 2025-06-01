@@ -1799,10 +1799,10 @@ async def get_featured_listings(limit: int = 4):
 async def get_recent_listings(limit: int = 8):
     """Get recent phone listings"""
     try:
-        # Get most recent listings sorted by date_posted
+        # Get most recent listings sorted by date_posted or created_at
         recent_cursor = db.phone_listings.find({
             "is_active": True
-        }).sort("date_posted", -1).limit(limit)
+        }).sort([("date_posted", -1), ("created_at", -1)]).limit(limit)
         
         recent_listings = await recent_cursor.to_list(length=limit)
         
