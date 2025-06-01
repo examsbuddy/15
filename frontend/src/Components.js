@@ -6344,6 +6344,65 @@ const PhoneSpecsManager = () => {
     spec.model?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Handle CSV file upload
+  const handleFileUpload = async () => {
+    if (!uploadFile) return;
+    
+    setUploadLoading(true);
+    setUploadResult(null);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', uploadFile);
+      
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/phone-specs/bulk-import`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setUploadResult(result);
+        await loadPhoneSpecs(); // Refresh the list
+        setUploadFile(null);
+      } else {
+        const error = await response.json();
+        setUploadResult({
+          success: false,
+          errors: [error.detail || 'Upload failed']
+        });
+      }
+    } catch (error) {
+      setUploadResult({
+        success: false,
+        errors: ['Network error: ' + error.message]
+      });
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  // Download CSV template
+  const downloadTemplate = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/phone-specs/csv-template`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'phone_specs_template.csv';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    } catch (error) {
+      console.error('Failed to download template:', error);
+    }
+  };
+
   useEffect(() => {
     loadPhoneSpecs();
   }, []);
