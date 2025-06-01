@@ -305,11 +305,12 @@ def test_create_listing():
         result = response.json()
         print(f"Listing creation result: {result}")
         
-        if result.get('success') and result.get('listing_id'):
-            print(f"Successfully created listing with ID: {result.get('listing_id')}")
+        # Check for either 'listing_id' or 'id' in the response
+        listing_id = result.get('listing_id') or result.get('id')
+        if result.get('success') and listing_id:
+            print(f"Successfully created listing with ID: {listing_id}")
             
             # Verify the listing was created by retrieving it
-            listing_id = result.get('listing_id')
             verify_response = requests.get(f"{API_URL}/listings/{listing_id}")
             
             if verify_response.status_code == 200:
