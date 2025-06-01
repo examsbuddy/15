@@ -1243,6 +1243,11 @@ def main():
     csv_bulk_import_result = test_csv_bulk_import()
     csv_error_handling_result = test_csv_bulk_import_errors()
     
+    # Run new admin user management tests
+    admin_user_management_result = test_admin_user_management()
+    pending_approvals_result = test_pending_approvals()
+    featured_shops_result = test_featured_shops()
+    
     # Print summary
     print("\n=== Test Summary ===")
     print(f"API Health Check: {'PASSED' if api_health_result else 'FAILED'}")
@@ -1261,6 +1266,9 @@ def main():
     print(f"CSV Template Download: {'PASSED' if csv_template_result else 'FAILED'}")
     print(f"CSV Bulk Import: {'PASSED' if csv_bulk_import_result else 'FAILED'}")
     print(f"CSV Error Handling: {'PASSED' if csv_error_handling_result else 'FAILED'}")
+    print(f"Admin User Management: {'PASSED' if admin_user_management_result else 'FAILED'}")
+    print(f"Pending Approvals: {'PASSED' if pending_approvals_result else 'FAILED'}")
+    print(f"Featured Shops: {'PASSED' if featured_shops_result else 'FAILED'}")
     
     # Overall result
     all_passed = (
@@ -1279,7 +1287,10 @@ def main():
         delete_phone_spec_result and
         csv_template_result and
         csv_bulk_import_result and
-        csv_error_handling_result
+        csv_error_handling_result and
+        admin_user_management_result and
+        pending_approvals_result and
+        featured_shops_result
     )
     
     if all_passed:
