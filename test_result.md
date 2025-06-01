@@ -461,6 +461,7 @@ backend:
       - working: true
         agent: "testing"
         comment: "The error handling for the CSV bulk import endpoint is working correctly. It properly rejects invalid file formats with a 400 status code, handles missing required fields by reporting them in the errors array, and prevents duplicate entries by checking if the brand and model combination already exists in the database. The error messages are helpful and provide clear information about what went wrong."
+metadata:
   created_by: "testing_agent"
   version: "1.0"
   test_sequence: 2
