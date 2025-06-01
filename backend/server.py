@@ -1777,6 +1777,13 @@ async def create_listing(listing: PhoneListingCreate):
     try:
         # Convert to dict and add metadata
         listing_dict = listing.dict()
+        
+        # Ensure photos field has at least one item (fix for frontend compatibility)
+        if not listing_dict.get("photos") or len(listing_dict["photos"]) == 0:
+            listing_dict["photos"] = [
+                "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            ]
+        
         listing_dict["created_at"] = datetime.utcnow()
         listing_dict["views"] = 0
         listing_dict["is_featured"] = False
@@ -1789,7 +1796,7 @@ async def create_listing(listing: PhoneListingCreate):
         return {
             "success": True,
             "message": "Listing created successfully!",
-            "listing_id": str(result.inserted_id)
+            "id": str(result.inserted_id)  # Changed from listing_id to id for consistency
         }
     except Exception as e:
         logger.error(f"Error creating listing: {str(e)}")
