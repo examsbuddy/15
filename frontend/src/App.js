@@ -23,7 +23,6 @@ import {
   SearchResultsPage,
   ShopOwnerDashboard,
   DetailedListingPage,
-  DedicatedSearchPage,
   BrandSearchPage
 } from './Components';
 
