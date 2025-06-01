@@ -297,6 +297,66 @@ backend:
         agent: "testing"
         comment: "Compare functionality endpoints (/api/phone-brands, /api/phone-models/{brand}, /api/phone-specs/{brand}/{model}) are working correctly. Users can retrieve phone brands, models, and specifications for comparison."
 
+  - task: "Admin Stats Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Admin stats endpoint (/api/stats) is working correctly. It returns the expected statistics including totalListings, totalUsers, pendingApprovals, and phoneModels. All required fields are present in the response."
+
+  - task: "Get All Phone Specs Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Get all phone specs endpoint (/api/phone-specs) is working correctly. It returns a list of phone specifications from the database. Initially the list was empty, but after creating a test spec, it returned the expected data."
+
+  - task: "Create Phone Spec Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Create phone spec endpoint (/api/phone-specs) is working correctly. It successfully creates a new phone specification in the database and returns the created spec with a valid ID."
+
+  - task: "Update Phone Spec Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Update phone spec endpoint (/api/phone-specs/{spec_id}) is working correctly. It successfully updates an existing phone specification in the database and returns the updated spec with the correct values."
+
+  - task: "Delete Phone Spec Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Delete phone spec endpoint (/api/phone-specs/{spec_id}) is working correctly. It successfully deletes a phone specification from the database and returns a success message. Verification confirmed the spec was actually deleted."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
