@@ -6382,27 +6382,6 @@ const PhoneSpecsManager = () => {
     }
   };
 
-  // Download CSV template
-  const downloadTemplate = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.REACT_APP_BACKEND_URL}/api/phone-specs/csv-template`);
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = 'phone_specs_template.csv';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      }
-    } catch (error) {
-      console.error('Failed to download template:', error);
-    }
-  };
-
   // Handle CSV file upload
   const handleFileUpload = async () => {
     if (!uploadFile) return;
