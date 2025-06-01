@@ -6174,7 +6174,347 @@ export const BrandSearchPage = ({ brand, onBack, onViewListing }) => {
   );
 };
 
-export const SearchResults = ({ onBack }) => {
+// Admin Portal Components
+export const AdminPortal = ({ onBack }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [currentAdminPage, setCurrentAdminPage] = useState('dashboard');
+
+  const handleAdminLogin = (user) => {
+    setCurrentUser(user);
+    setIsLoggedIn(true);
+  };
+
+  const handleAdminLogout = () => {
+    setCurrentUser(null);
+    setIsLoggedIn(false);
+    setCurrentAdminPage('dashboard');
+  };
+
+  if (!isLoggedIn) {
+    return <AdminLogin onLogin={handleAdminLogin} onBack={onBack} />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <AdminHeader 
+        user={currentUser}
+        currentPage={currentAdminPage}
+        setCurrentPage={setCurrentAdminPage}
+        onLogout={handleAdminLogout}
+        onBack={onBack}
+      />
+      
+      <div className="pt-16">
+        {currentAdminPage === 'dashboard' && <AdminDashboard user={currentUser} />}
+        {currentAdminPage === 'specs' && <SpecsManager user={currentUser} />}
+        {currentAdminPage === 'listings' && <ListingsModeration user={currentUser} />}
+        {currentAdminPage === 'users' && <UsersManagement user={currentUser} />}
+        {currentAdminPage === 'analytics' && <AnalyticsDashboard user={currentUser} />}
+        {currentAdminPage === 'logs' && <ActivityLogs user={currentUser} />}
+      </div>
+    </div>
+  );
+};
+
+// Admin Login Component
+export const AdminLogin = ({ onLogin, onBack }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Sample admin users for demo
+  const sampleAdmins = [
+    {
+      id: '1',
+      email: 'admin@phoneflip.pk',
+      password: 'admin123',
+      role: 'Super Admin',
+      name: 'Super Administrator',
+      permissions: ['all']
+    },
+    {
+      id: '2', 
+      email: 'moderator@phoneflip.pk',
+      password: 'mod123',
+      role: 'Moderator',
+      name: 'Content Moderator',
+      permissions: ['listings', 'users_view']
+    }
+  ];
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError('');
+
+    // Simulate login check
+    const admin = sampleAdmins.find(a => a.email === email && a.password === password);
+    
+    if (admin) {
+      if (!showTwoFactor) {
+        setShowTwoFactor(true);
+        setLoading(false);
+        return;
+      }
+      
+      // Simulate 2FA check (accept any 6-digit code for demo)
+      if (twoFactorCode.length === 6) {
+        setTimeout(() => {
+          onLogin(admin);
+          setLoading(false);
+        }, 1000);
+      } else {
+        setError('Invalid 2FA code');
+        setLoading(false);
+      }
+    } else {
+      setError('Invalid credentials');
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+      <div className="max-w-md mx-auto px-4">
+        <button
+          onClick={onBack}
+          className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors mb-6"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span>Back to Website</span>
+        </button>
+
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="text-center mb-8">
+            <Shield className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900">Admin Portal</h1>
+            <p className="text-gray-600 mt-2">Secure access to PhoneFlip management</p>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+          )}
+
+          <div className="space-y-6">
+            {!showTwoFactor ? (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Admin Email
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    placeholder="Enter admin email"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    placeholder="Enter password"
+                  />
+                </div>
+              </>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Two-Factor Authentication Code
+                </label>
+                <input
+                  type="text"
+                  value={twoFactorCode}
+                  onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-center text-2xl tracking-widest"
+                  placeholder="000000"
+                />
+                <p className="text-sm text-gray-600 mt-2">
+                  Enter any 6-digit code for demo (e.g., 123456)
+                </p>
+              </div>
+            )}
+
+            <button
+              onClick={handleLogin}
+              disabled={loading || (!showTwoFactor && (!email || !password)) || (showTwoFactor && twoFactorCode.length !== 6)}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 flex items-center justify-center space-x-2"
+            >
+              {loading ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              ) : (
+                <>
+                  <span>{showTwoFactor ? 'Verify & Login' : 'Continue'}</span>
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
+
+            {showTwoFactor && (
+              <button
+                onClick={() => {
+                  setShowTwoFactor(false);
+                  setTwoFactorCode('');
+                  setError('');
+                }}
+                className="w-full text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                Back to Login
+              </button>
+            )}
+          </div>
+
+          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+            <h3 className="font-medium text-gray-900 mb-2">Demo Credentials:</h3>
+            <div className="text-sm text-gray-600 space-y-1">
+              <p><strong>Super Admin:</strong> admin@phoneflip.pk / admin123</p>
+              <p><strong>Moderator:</strong> moderator@phoneflip.pk / mod123</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Admin Header Component
+export const AdminHeader = ({ user, currentPage, setCurrentPage, onLogout, onBack }) => {
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const menuItems = [
+    { key: 'dashboard', label: 'Dashboard', icon: BarChart2, permissions: ['all'] },
+    { key: 'specs', label: 'Phone Specs', icon: Smartphone, permissions: ['all', 'specs'] },
+    { key: 'listings', label: 'Listings', icon: List, permissions: ['all', 'listings'] },
+    { key: 'users', label: 'Users', icon: Users, permissions: ['all', 'users', 'users_view'] },
+    { key: 'analytics', label: 'Analytics', icon: TrendingUp, permissions: ['all', 'analytics'] },
+    { key: 'logs', label: 'Activity Logs', icon: FileText, permissions: ['all'] }
+  ];
+
+  const hasPermission = (requiredPermissions) => {
+    if (user.permissions.includes('all')) return true;
+    return requiredPermissions.some(permission => user.permissions.includes(permission));
+  };
+
+  return (
+    <header className="fixed top-0 left-0 right-0 bg-white shadow-lg z-50">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo & Back */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={onBack}
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="flex items-center space-x-2">
+              <Shield className="w-8 h-8 text-blue-600" />
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">Admin Portal</h1>
+                <p className="text-xs text-gray-600">PhoneFlip.PK</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <nav className="hidden md:flex space-x-1">
+            {menuItems.filter(item => hasPermission(item.permissions)).map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => setCurrentPage(item.key)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                    currentPage === item.key
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span className="text-sm font-medium">{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* User Menu */}
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                <p className="text-xs text-gray-600">{user.role}</p>
+              </div>
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm font-medium">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <ChevronDown className="w-4 h-4 text-gray-600" />
+            </button>
+
+            {showUserMenu && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
+                <button
+                  onClick={onLogout}
+                  className="w-full flex items-center space-x-2 px-4 py-2 text-left text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      <div className="md:hidden border-t border-gray-200 bg-white">
+        <div className="flex overflow-x-auto px-4 py-2 space-x-2">
+          {menuItems.filter(item => hasPermission(item.permissions)).map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <button
+                key={item.key}
+                onClick={() => setCurrentPage(item.key)}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                  currentPage === item.key
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <IconComponent className="w-4 h-4" />
+                <span className="text-sm font-medium">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Click outside to close user menu */}
+      {showUserMenu && (
+        <div 
+          className="fixed inset-0 z-10" 
+          onClick={() => setShowUserMenu(false)}
+        />
+      )}
+    </header>
+  );
+};
   const [searchQuery, setSearchQuery] = useState('');
   const [userLocation, setUserLocation] = useState('');
   const [locationLoading, setLocationLoading] = useState(true);
