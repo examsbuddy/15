@@ -7172,13 +7172,6 @@ export const AdminPortalDemo = ({ onBack }) => {
   );
 };
 
-
-          className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors mb-6"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back to Website</span>
-        </button>
-
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           <Shield className="w-16 h-16 text-blue-600 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Admin Portal</h1>
