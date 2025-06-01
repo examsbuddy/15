@@ -6187,7 +6187,7 @@ export const BrandSearchPage = ({ brand, onBack, onViewListing }) => {
 };
 
 // Admin Portal Components
-export const AdminPortal = ({ onBack }) => {
+export const AdminPortalMain = ({ onBack }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentAdminPage, setCurrentAdminPage] = useState('dashboard');
