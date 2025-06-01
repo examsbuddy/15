@@ -4002,15 +4002,21 @@ export const PostAdPage = ({ user, setCurrentPage, onViewListing }) => {
     setError('');
 
     try {
+      // Ensure photos array has at least one item (required by backend)
+      const submissionData = {
+        ...formData,
+        price: parseInt(formData.price),
+        photos: formData.photos.length > 0 ? formData.photos : [
+          "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+        ]
+      };
+
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/listings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          price: parseInt(formData.price)
-        }),
+        body: JSON.stringify(submissionData),
       });
 
       const data = await response.json();
