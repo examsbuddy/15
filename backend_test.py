@@ -933,6 +933,182 @@ def test_csv_bulk_import():
         print(f"Error testing CSV bulk import: {str(e)}")
         return False
 
+# Function to test admin user management endpoints
+def test_admin_user_management():
+    print("\n=== Testing Admin User Management Endpoints ===")
+    
+    # Test 1: GET /api/admin/users
+    print("\n--- Test 1: GET /api/admin/users ---")
+    try:
+        # Test with no filters
+        response = requests.get(f"{API_URL}/admin/users")
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Retrieved {result.get('total', 0)} users")
+        
+        # Check if the response has the expected structure
+        if 'users' not in result or 'total' not in result or 'offset' not in result or 'limit' not in result:
+            print("ERROR: Response missing required fields")
+            return False
+            
+        # Check if users have expected fields
+        if result.get('users'):
+            sample_user = result['users'][0]
+            print("Sample user fields:")
+            for key in ['_id', 'name', 'email', 'role', 'verification_status', 'created_at']:
+                if key in sample_user:
+                    print(f"  {key}: {sample_user[key]}")
+                else:
+                    print(f"  {key}: MISSING")
+            
+            # Check if password is NOT included (security check)
+            if 'password' in sample_user:
+                print("ERROR: User password is exposed in the response")
+                return False
+        
+        # Test with role filter
+        print("\n--- Testing role filter ---")
+        response = requests.get(f"{API_URL}/admin/users", params={"role": "shop_owner"})
+        response.raise_for_status()
+        
+        role_filtered = response.json()
+        print(f"Retrieved {role_filtered.get('total', 0)} shop owners")
+        
+        # Verify all users have the correct role
+        if role_filtered.get('users'):
+            all_correct_role = all(user.get('role') == 'shop_owner' for user in role_filtered['users'])
+            print(f"All users have correct role: {all_correct_role}")
+            
+            if not all_correct_role:
+                print("ERROR: Role filter not working correctly")
+        
+        # Test with verification status filter
+        print("\n--- Testing verification status filter ---")
+        response = requests.get(f"{API_URL}/admin/users", params={"verification_status": "pending"})
+        response.raise_for_status()
+        
+        status_filtered = response.json()
+        print(f"Retrieved {status_filtered.get('total', 0)} pending users")
+        
+        # Verify all users have the correct verification status
+        if status_filtered.get('users'):
+            all_correct_status = all(user.get('verification_status') == 'pending' for user in status_filtered['users'])
+            print(f"All users have correct verification status: {all_correct_status}")
+            
+            if not all_correct_status:
+                print("ERROR: Verification status filter not working correctly")
+        
+        # Test with pagination
+        print("\n--- Testing pagination ---")
+        response = requests.get(f"{API_URL}/admin/users", params={"limit": 2, "offset": 0})
+        response.raise_for_status()
+        
+        page1 = response.json()
+        print(f"Page 1: Retrieved {len(page1.get('users', []))} users")
+        
+        if page1.get('total', 0) > 2:
+            response = requests.get(f"{API_URL}/admin/users", params={"limit": 2, "offset": 2})
+            response.raise_for_status()
+            
+            page2 = response.json()
+            print(f"Page 2: Retrieved {len(page2.get('users', []))} users")
+            
+            # Check if pages have different users
+            if page1.get('users') and page2.get('users'):
+                page1_ids = [user.get('_id') for user in page1['users']]
+                page2_ids = [user.get('_id') for user in page2['users']]
+                
+                different_pages = all(id1 != id2 for id1 in page1_ids for id2 in page2_ids)
+                print(f"Pages contain different users: {different_pages}")
+                
+                if not different_pages:
+                    print("ERROR: Pagination not working correctly")
+        
+        return True
+    except Exception as e:
+        print(f"Error testing GET /api/admin/users: {str(e)}")
+        return False
+
+# Function to test pending approvals endpoint
+def test_pending_approvals():
+    print("\n=== Testing GET /api/admin/pending-approvals ===")
+    try:
+        response = requests.get(f"{API_URL}/admin/pending-approvals")
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Retrieved {result.get('count', 0)} pending approvals")
+        
+        # Check if the response has the expected structure
+        if 'pending_approvals' not in result or 'count' not in result:
+            print("ERROR: Response missing required fields")
+            return False
+            
+        # Check if pending approvals have expected fields and correct status
+        if result.get('pending_approvals'):
+            sample_approval = result['pending_approvals'][0]
+            print("Sample pending approval fields:")
+            for key in ['_id', 'name', 'email', 'role', 'verification_status', 'created_at', 'business_details']:
+                if key in sample_approval:
+                    print(f"  {key}: {sample_approval[key] if key != 'business_details' else 'Present'}")
+                else:
+                    print(f"  {key}: MISSING")
+            
+            # Verify all pending approvals have role=shop_owner and verification_status=pending
+            all_shop_owners = all(approval.get('role') == 'shop_owner' for approval in result['pending_approvals'])
+            all_pending = all(approval.get('verification_status') == 'pending' for approval in result['pending_approvals'])
+            
+            print(f"All are shop owners: {all_shop_owners}")
+            print(f"All are pending: {all_pending}")
+            
+            if not all_shop_owners or not all_pending:
+                print("ERROR: Pending approvals endpoint returning incorrect data")
+                return False
+        
+        return True
+    except Exception as e:
+        print(f"Error testing GET /api/admin/pending-approvals: {str(e)}")
+        return False
+
+# Function to test featured shops endpoint
+def test_featured_shops():
+    print("\n=== Testing GET /api/shops/featured ===")
+    try:
+        response = requests.get(f"{API_URL}/shops/featured")
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Retrieved {result.get('count', 0)} featured shops")
+        
+        # Check if the response has the expected structure
+        if 'featured_shops' not in result or 'count' not in result:
+            print("ERROR: Response missing required fields")
+            return False
+            
+        # Check if featured shops have expected fields
+        if result.get('featured_shops'):
+            sample_shop = result['featured_shops'][0]
+            print("Sample featured shop fields:")
+            for key in ['id', 'name', 'description', 'location', 'phone', 'email', 'businessType', 'rating', 'reviewCount', 'verificationStatus']:
+                if key in sample_shop:
+                    print(f"  {key}: {sample_shop[key]}")
+                else:
+                    print(f"  {key}: MISSING")
+            
+            # Verify all featured shops have verificationStatus=approved
+            all_approved = all(shop.get('verificationStatus') == 'approved' for shop in result['featured_shops'])
+            print(f"All shops are approved: {all_approved}")
+            
+            if not all_approved:
+                print("ERROR: Featured shops endpoint returning non-approved shops")
+                return False
+        
+        return True
+    except Exception as e:
+        print(f"Error testing GET /api/shops/featured: {str(e)}")
+        return False
+
 # Function to test error handling in CSV bulk import
 def test_csv_bulk_import_errors():
     print("\n=== Testing Error Handling in CSV Bulk Import ===")
