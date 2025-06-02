@@ -2048,27 +2048,15 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
             </p>
           </div>
 
-  // Fuzzy matching function
-  const fuzzyMatch = (query, items) => {
-    const lowerQuery = query.toLowerCase();
-    
-    // Handle common misspellings
-    const correctedQuery = lowerQuery
-      .replace(/iphne|ifone|iphon/g, 'iphone')
-      .replace(/samung|samsng/g, 'samsung')
-      .replace(/xiomi|xaomi/g, 'xiaomi')
-      .replace(/huwei|hauwei/g, 'huawei');
-    
-    return items.filter(item => {
-      const lowerItem = item.toLowerCase();
-      // Exact match
-      if (lowerItem.includes(correctedQuery)) return true;
-      
-      // Character similarity (allow 1-2 character differences)
-      const distance = levenshteinDistance(correctedQuery, lowerItem);
-      return distance <= 2 && correctedQuery.length > 2;
-    });
-  };
+          {/* Subtitle */}
+          <div className="space-y-3 md:space-y-4">
+            <div className="flex items-center justify-center space-x-2 md:space-x-3">
+              <div className="w-2 h-2 md:w-3 md:h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <p className="text-base md:text-lg lg:text-xl text-blue-100/90 font-medium">
+                🇵🇰 Pakistan's #1 Mobile Phone Marketplace
+              </p>
+            </div>
+          </div>
 
   // Simple Levenshtein distance implementation
   const levenshteinDistance = (str1, str2) => {
