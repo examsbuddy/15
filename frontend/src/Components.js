@@ -87,8 +87,7 @@ import {
   Play,
   Filter,
   Upload,
-  Store,
-  X
+  Store
 } from 'lucide-react';
 
 // Enhanced Sign In Modal
