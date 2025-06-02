@@ -6359,6 +6359,56 @@ const UserManagement = () => {
     }
   };
 
+  // Edit user functionality
+  const handleEditUser = (user) => {
+    setEditUserData({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      business_name: user.business_name || '',
+      business_address: user.business_address || '',
+      business_type: user.business_type || '',
+      business_description: user.business_description || '',
+      years_in_business: user.years_in_business || '',
+      cnic_number: user.cnic_number || ''
+    });
+    setSelectedUser(user);
+    setShowEditModal(true);
+  };
+
+  // Save edited user
+  const handleSaveUser = async () => {
+    if (!selectedUser) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/admin/users/${selectedUser._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editUserData),
+      });
+
+      if (!response.ok) throw new Error('Failed to update user');
+
+      alert('User updated successfully!');
+      
+      // Reset modal states
+      setShowEditModal(false);
+      setEditUserData({});
+      
+      // Refresh user list
+      fetchUsers(selectedFilter, statusFilter, pagination.offset);
+      
+    } catch (error) {
+      console.error('Error updating user:', error);
+      alert('Failed to update user. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Approve or reject shop owner
   const handleApprovalAction = async () => {
     if (!selectedUser) return;
