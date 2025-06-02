@@ -1636,7 +1636,7 @@ export const Header = ({
               {/* Post an Ad Button - Red Highlighted - Hidden on Mobile */}
               <button
                 onClick={handlePostAd}
-                className="hidden md:flex bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 items-center space-x-2 shadow-lg hover:shadow-xl"
+                className="hidden md:flex bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors items-center space-x-2"
               >
                 <Plus className="w-4 h-4" />
                 <span>Post an Ad</span>
