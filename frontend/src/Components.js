@@ -6755,26 +6755,26 @@ const UserManagement = () => {
                       </div>
                     </div>
                   )}
-                  {selectedUser.kyc_documents.tax_certificate && (
+                  {selectedUser.kyc_documents.cnic_front && (
                     <div>
-                      <span className="text-sm font-medium text-gray-500">Tax Certificate:</span>
+                      <span className="text-sm font-medium text-gray-500">CNIC Front:</span>
                       <div className="mt-1">
                         <img 
-                          src={selectedUser.kyc_documents.tax_certificate} 
-                          alt="Tax Certificate" 
+                          src={selectedUser.kyc_documents.cnic_front} 
+                          alt="CNIC Front" 
                           className="max-w-full h-auto rounded border"
                           style={{ maxHeight: '200px' }}
                         />
                       </div>
                     </div>
                   )}
-                  {selectedUser.kyc_documents.owner_id && (
+                  {selectedUser.kyc_documents.cnic_back && (
                     <div>
-                      <span className="text-sm font-medium text-gray-500">Owner ID:</span>
+                      <span className="text-sm font-medium text-gray-500">CNIC Back:</span>
                       <div className="mt-1">
                         <img 
-                          src={selectedUser.kyc_documents.owner_id} 
-                          alt="Owner ID" 
+                          src={selectedUser.kyc_documents.cnic_back} 
+                          alt="CNIC Back" 
                           className="max-w-full h-auto rounded border"
                           style={{ maxHeight: '200px' }}
                         />
