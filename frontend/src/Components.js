@@ -2100,31 +2100,6 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
             </div>
           </div>
 
-          {/* Feature Highlights - New Addition */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-8 md:mt-12">
-            <div className="text-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-4">
-                <Store className="w-8 h-8 md:w-10 md:h-10 text-white" />
-              </div>
-              <h3 className="text-lg md:text-xl font-semibold text-white mb-2">Compare Prices</h3>
-              <p className="text-blue-200 text-sm md:text-base">Find the best deals from verified sellers across Pakistan</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-4">
-                <Battery className="w-8 h-8 md:w-10 md:h-10 text-white" />
-              </div>
-              <h3 className="text-lg md:text-xl font-semibold text-white mb-2">Quality Assured</h3>
-              <p className="text-blue-200 text-sm md:text-base">All phones verified with detailed condition reports</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-4">
-                <Smartphone className="w-8 h-8 md:w-10 md:h-10 text-white" />
-              </div>
-              <h3 className="text-lg md:text-xl font-semibold text-white mb-2">Quick Delivery</h3>
-              <p className="text-blue-200 text-sm md:text-base">Fast and secure delivery to your doorstep</p>
-            </div>
-          </div>
-
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 md:gap-6 pt-6 md:pt-8">
             <button 
