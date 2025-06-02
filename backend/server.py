@@ -1361,29 +1361,70 @@ async def register_normal_user(user_data: UserRegistration):
         raise HTTPException(status_code=500, detail="Failed to register user")
 
 @api_router.post("/auth/register-shop-owner", response_model=dict)
-async def register_shop_owner(shop_data: ShopOwnerRegistration):
-    """Register a shop owner with business details and KYC"""
+async def register_shop_owner(
+    name: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    phone: str = Form(...),
+    city: str = Form(...),
+    businessName: str = Form(...),
+    businessAddress: str = Form(...),
+    businessType: str = Form(...),
+    yearsInBusiness: int = Form(...),
+    cnicNumber: str = Form(...),
+    businessLicense: UploadFile = File(...),
+    taxCertificate: UploadFile = File(None),
+    ownerId: UploadFile = File(None)
+):
+    """Register a shop owner with business details and KYC documents"""
     try:
         # Check if user already exists
-        existing_user = await db.users.find_one({"email": shop_data.email})
+        existing_user = await db.users.find_one({"email": email})
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered")
         
         # Hash password
-        hashed_password = hash_password(shop_data.password)
+        hashed_password = hash_password(password)
+        
+        # Process uploaded files (convert to base64)
+        kyc_documents = {}
+        
+        # Process business license (required)
+        if businessLicense:
+            business_license_content = await businessLicense.read()
+            business_license_b64 = base64.b64encode(business_license_content).decode('utf-8')
+            kyc_documents["business_license"] = f"data:{businessLicense.content_type};base64,{business_license_b64}"
+        
+        # Process tax certificate (optional)
+        if taxCertificate:
+            tax_cert_content = await taxCertificate.read()
+            tax_cert_b64 = base64.b64encode(tax_cert_content).decode('utf-8')
+            kyc_documents["tax_certificate"] = f"data:{taxCertificate.content_type};base64,{tax_cert_b64}"
+        
+        # Process owner ID (optional)
+        if ownerId:
+            owner_id_content = await ownerId.read()
+            owner_id_b64 = base64.b64encode(owner_id_content).decode('utf-8')
+            kyc_documents["owner_id"] = f"data:{ownerId.content_type};base64,{owner_id_b64}"
         
         # Create user document
         user_doc = {
-            "name": shop_data.name,
-            "email": shop_data.email,
+            "name": name,
+            "email": email,
             "password": hashed_password,
-            "phone": shop_data.phone,
+            "phone": phone,
             "role": UserRole.SHOP_OWNER,
             "created_at": datetime.utcnow(),
             "is_active": True,
-            "verification_status": VerificationStatus.UNDER_REVIEW,
-            "business_details": shop_data.business_details.dict(),
-            "kyc_documents": shop_data.kyc_documents.dict()
+            "verification_status": VerificationStatus.PENDING,
+            "business_name": businessName,
+            "business_address": businessAddress,
+            "business_type": businessType,
+            "business_description": f"Quality mobile phones and accessories. {yearsInBusiness} years of experience.",
+            "years_in_business": yearsInBusiness,
+            "cnic_number": cnicNumber,
+            "city": city,
+            "kyc_documents": kyc_documents
         }
         
         # Insert user
@@ -1394,6 +1435,7 @@ async def register_shop_owner(shop_data: ShopOwnerRegistration):
             "message": "Shop owner registration submitted successfully! Your account is under review and you will be notified once approved.",
             "user_id": str(result.inserted_id)
         }
+        
     except HTTPException:
         # Re-raise HTTP exceptions (like 400 for duplicate email)
         raise
