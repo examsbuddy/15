@@ -1636,17 +1636,16 @@ export const Header = ({
               {/* Post an Ad Button - Red Highlighted - Hidden on Mobile */}
               <button
                 onClick={handlePostAd}
-                className="hidden md:flex bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 items-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="hidden md:flex bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 items-center space-x-2 shadow-lg hover:shadow-xl"
               >
                 <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Post an Ad</span>
-                <span className="sm:hidden">Post</span>
+                <span>Post an Ad</span>
               </button>
 
               {/* Temporary Admin Access Button */}
               <button
                 onClick={() => setCurrentPage('admin')}
-                className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors flex items-center space-x-2"
+                className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors flex items-center space-x-2"
               >
                 <Shield className="w-4 h-4" />
                 <span>Admin</span>
