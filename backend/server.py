@@ -1206,6 +1206,31 @@ async def get_user_details(user_id: str):
         logger.error(f"Error fetching user details: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch user details")
 
+@api_router.put("/admin/users/{user_id}")
+async def update_user(user_id: str, update_data: dict):
+    """Update user information"""
+    try:
+        # Remove any empty strings and None values
+        cleaned_data = {k: v for k, v in update_data.items() if v is not None and v != ''}
+        
+        if not cleaned_data:
+            raise HTTPException(status_code=400, detail="No valid data provided for update")
+        
+        # Update user
+        result = await db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": cleaned_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {"message": "User updated successfully", "user_id": user_id}
+        
+    except Exception as e:
+        logger.error(f"Error updating user: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update user")
+
 @api_router.put("/admin/users/{user_id}/approve")
 async def approve_shop_owner(user_id: str, approval_data: dict = None):
     """Approve a shop owner account"""
