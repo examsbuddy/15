@@ -6610,12 +6610,7 @@ const UserManagement = () => {
                     >
                       View Details
                     </button>
-                    <button
-                      onClick={() => handleEditUser(user)}
-                      className="text-indigo-600 hover:text-indigo-900 ml-3"
-                    >
-                      Edit
-                    </button>
+
                     {user.role === 'shop_owner' && user.verification_status === 'pending' && (
                       <>
                         <button
