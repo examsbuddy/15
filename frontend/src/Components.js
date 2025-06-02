@@ -2032,6 +2032,13 @@ export const HeroSearchBar = ({ onSearch }) => {
 };
 
 export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) => {
+  return (
+    <section className="relative bg-gradient-to-b from-blue-900 via-blue-800 to-blue-700 py-12 md:py-20 lg:py-28 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center space-y-8 md:space-y-12">
+          {/* Main Heading - More Dynamic */}
+          <div className="space-y-4 md:space-y-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight md:leading-tight lg:leading-tight">
   const [searchFilters, setSearchFilters] = useState({
     query: '',
     brand: '',
