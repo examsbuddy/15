@@ -2021,30 +2021,10 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
             </div>
           </div>
 
-          {/* Enhanced Search Bar - Bigger and More Modern */}
+          {/* Enhanced Functional Search Bar */}
           <div className="bg-white/95 backdrop-blur-md rounded-2xl md:rounded-3xl shadow-2xl p-4 md:p-8 max-w-5xl mx-auto border border-white/20">
-            <div className="flex flex-col md:flex-row gap-3 md:gap-6">
-              {/* Main Search Input */}
-              <div className="flex-1 relative">
-                <Smartphone className="absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 w-5 h-5 md:w-6 md:h-6 text-gray-400 z-10" />
-                <input
-                  type="text"
-                  placeholder="Search phones, brands, or models... (e.g. iPhone 15, Samsung Galaxy)"
-                  onClick={() => onSearch && onSearch('dedicated-search')}
-                  readOnly
-                  className="w-full pl-12 md:pl-16 pr-4 md:pr-6 py-4 md:py-6 rounded-xl md:rounded-2xl text-base md:text-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-400/30 bg-white hover:bg-blue-50/30 transition-all duration-200 cursor-pointer font-medium shadow-inner"
-                />
-              </div>
-
-              {/* Enhanced Search Button */}
-              <button 
-                onClick={() => onSearch && onSearch('dedicated-search')}
-                className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white px-6 md:px-12 py-4 md:py-6 rounded-xl md:rounded-2xl font-bold text-base md:text-lg transition-all duration-200 flex items-center justify-center space-x-3 shadow-xl hover:shadow-2xl transform hover:scale-105"
-              >
-                <Search className="w-5 h-5 md:w-6 md:h-6" />
-                <span>Find Phones</span>
-              </button>
-            </div>
+            <HeroSearchBar onSearch={onSearch} />
+          </div>
             
             {/* Quick Stats */}
             <div className="flex flex-wrap justify-center gap-4 md:gap-8 mt-6 md:mt-8 pt-6 md:pt-8 border-t border-gray-200">
