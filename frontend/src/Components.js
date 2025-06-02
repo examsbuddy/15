@@ -2047,7 +2047,6 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
               Buy & Sell phones with confidence. From the latest flagship to budget-friendly options.
             </p>
           </div>
-  };
 
   // Fuzzy matching function
   const fuzzyMatch = (query, items) => {
