@@ -2039,15 +2039,10 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
           {/* Main Heading - More Dynamic */}
           <div className="space-y-4 md:space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight md:leading-tight lg:leading-tight">
-  const [searchFilters, setSearchFilters] = useState({
-    query: '',
-    brand: '',
-    city: '',
-    priceRange: '',
-    condition: '',
-    storage: '',
-    ram: ''
-  });
+              <span className="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
+                Find Your Dream Phone
+              </span>
+            </h1>
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
