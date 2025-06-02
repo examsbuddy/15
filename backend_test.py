@@ -368,7 +368,7 @@ def test_search_functionality():
             print(f"First few filtered results: {', '.join(first_filtered)}")
             
             # Verify filter was applied
-            all_match_brand = all(r.get('brand') == "Samsung" for r in filtered_results)
+            all_match_brand = all(r.get('brand', '').lower() == "samsung".lower() for r in filtered_results)
             all_in_price_range = all(50000 <= r.get('price', 0) <= 200000 for r in filtered_results)
             
             if all_match_brand and all_in_price_range:
@@ -393,6 +393,89 @@ def test_search_functionality():
             print(f"First few prices: {[r.get('price') for r in sorted_results[:5]]}")
         else:
             print("Not enough results to verify sorting")
+            
+        # Test quick search suggestion buttons
+        print("\n--- Testing quick search suggestion buttons ---")
+        
+        # Test iPhone suggestion
+        print("\nTesting 'iPhone' quick search suggestion:")
+        response = requests.get(f"{API_URL}/listings", params={"search": "iPhone"})
+        response.raise_for_status()
+        iphone_results = response.json()
+        print(f"iPhone search returned {len(iphone_results)} results")
+        if iphone_results:
+            iphone_match = any("iphone" in r.get('brand', '').lower() or "iphone" in r.get('model', '').lower() for r in iphone_results)
+            print(f"iPhone search results contain iPhone models: {iphone_match}")
+        
+        # Test Samsung suggestion
+        print("\nTesting 'Samsung' quick search suggestion:")
+        response = requests.get(f"{API_URL}/listings", params={"search": "Samsung"})
+        response.raise_for_status()
+        samsung_results = response.json()
+        print(f"Samsung search returned {len(samsung_results)} results")
+        if samsung_results:
+            samsung_match = any("samsung" in r.get('brand', '').lower() for r in samsung_results)
+            print(f"Samsung search results contain Samsung models: {samsung_match}")
+        
+        # Test Xiaomi suggestion
+        print("\nTesting 'Xiaomi' quick search suggestion:")
+        response = requests.get(f"{API_URL}/listings", params={"search": "Xiaomi"})
+        response.raise_for_status()
+        xiaomi_results = response.json()
+        print(f"Xiaomi search returned {len(xiaomi_results)} results")
+        if xiaomi_results:
+            xiaomi_match = any("xiaomi" in r.get('brand', '').lower() for r in xiaomi_results)
+            print(f"Xiaomi search results contain Xiaomi models: {xiaomi_match}")
+        
+        # Test Under 50k suggestion
+        print("\nTesting 'Under 50k' quick search suggestion:")
+        response = requests.get(f"{API_URL}/listings", params={"max_price": 50000})
+        response.raise_for_status()
+        under_50k_results = response.json()
+        print(f"Under 50k search returned {len(under_50k_results)} results")
+        if under_50k_results:
+            price_match = all(r.get('price', 0) <= 50000 for r in under_50k_results)
+            print(f"All Under 50k search results are priced under 50,000: {price_match}")
+        
+        # Test fuzzy search matching
+        print("\n--- Testing fuzzy search matching ---")
+        
+        # Test common misspellings
+        misspellings = [
+            ("iphne", "iPhone"),  # Missing 'o'
+            ("samung", "Samsung"),  # Missing 's'
+            ("xiomi", "Xiaomi")  # Missing 'a'
+        ]
+        
+        for misspelled, correct in misspellings:
+            print(f"\nTesting misspelled search term '{misspelled}':")
+            response = requests.get(f"{API_URL}/listings", params={"search": misspelled})
+            response.raise_for_status()
+            fuzzy_results = response.json()
+            print(f"Fuzzy search for '{misspelled}' returned {len(fuzzy_results)} results")
+            
+            if fuzzy_results:
+                correct_brand_match = any(correct.lower() in r.get('brand', '').lower() for r in fuzzy_results)
+                print(f"Fuzzy search results contain correct brand '{correct}': {correct_brand_match}")
+        
+        # Test combined search and filters
+        print("\n--- Testing combined search and filters ---")
+        combined_params = {
+            "search": "iPhone",
+            "min_price": 100000,
+            "max_price": 200000
+        }
+        
+        response = requests.get(f"{API_URL}/listings", params=combined_params)
+        response.raise_for_status()
+        combined_results = response.json()
+        print(f"Combined search returned {len(combined_results)} results")
+        
+        if combined_results:
+            iphone_match = all("iphone" in r.get('brand', '').lower() or "iphone" in r.get('model', '').lower() for r in combined_results)
+            price_match = all(100000 <= r.get('price', 0) <= 200000 for r in combined_results)
+            print(f"Combined search results match iPhone: {iphone_match}")
+            print(f"Combined search results match price range: {price_match}")
         
         return True
     except Exception as e:
