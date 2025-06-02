@@ -1373,8 +1373,8 @@ async def register_shop_owner(
     yearsInBusiness: int = Form(...),
     cnicNumber: str = Form(...),
     businessLicense: UploadFile = File(...),
-    taxCertificate: UploadFile = File(None),
-    ownerId: UploadFile = File(None)
+    cnicFront: UploadFile = File(None),
+    cnicBack: UploadFile = File(None)
 ):
     """Register a shop owner with business details and KYC documents"""
     try:
@@ -1395,17 +1395,17 @@ async def register_shop_owner(
             business_license_b64 = base64.b64encode(business_license_content).decode('utf-8')
             kyc_documents["business_license"] = f"data:{businessLicense.content_type};base64,{business_license_b64}"
         
-        # Process tax certificate (optional)
-        if taxCertificate:
-            tax_cert_content = await taxCertificate.read()
-            tax_cert_b64 = base64.b64encode(tax_cert_content).decode('utf-8')
-            kyc_documents["tax_certificate"] = f"data:{taxCertificate.content_type};base64,{tax_cert_b64}"
+        # Process CNIC front (optional)
+        if cnicFront:
+            cnic_front_content = await cnicFront.read()
+            cnic_front_b64 = base64.b64encode(cnic_front_content).decode('utf-8')
+            kyc_documents["cnic_front"] = f"data:{cnicFront.content_type};base64,{cnic_front_b64}"
         
-        # Process owner ID (optional)
-        if ownerId:
-            owner_id_content = await ownerId.read()
-            owner_id_b64 = base64.b64encode(owner_id_content).decode('utf-8')
-            kyc_documents["owner_id"] = f"data:{ownerId.content_type};base64,{owner_id_b64}"
+        # Process CNIC back (optional)
+        if cnicBack:
+            cnic_back_content = await cnicBack.read()
+            cnic_back_b64 = base64.b64encode(cnic_back_content).decode('utf-8')
+            kyc_documents["cnic_back"] = f"data:{cnicBack.content_type};base64,{cnic_back_b64}"
         
         # Create user document
         user_doc = {
