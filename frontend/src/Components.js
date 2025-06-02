@@ -2038,14 +2038,11 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
         <div className="text-center space-y-8 md:space-y-12">
           {/* Main Heading */}
           <div className="space-y-4 md:space-y-6">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight md:leading-tight lg:leading-tight">
-              <span className="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
-                Find Your Dream Phone
-              </span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight md:leading-tight lg:leading-tight text-white">
+              Where Pakistan<br />
+              Buys, Sells & Talks<br />
+              Phones
             </h1>
-            <p className="text-lg md:text-xl lg:text-2xl text-blue-100 font-medium leading-relaxed max-w-3xl mx-auto">
-              Buy & Sell phones with confidence. From the latest flagship to budget-friendly options.
-            </p>
           </div>
           
           {/* Subtitle */}
