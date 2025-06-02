@@ -6297,6 +6297,8 @@ const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showUserModal, setShowUserModal] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editUserData, setEditUserData] = useState({});
   const [approvalAction, setApprovalAction] = useState('');
   const [approvalNotes, setApprovalNotes] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
