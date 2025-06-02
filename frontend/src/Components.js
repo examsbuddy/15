@@ -2033,14 +2033,14 @@ export const HeroSearchBar = ({ onSearch }) => {
 
 export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) => {
   return (
-    <section className="relative bg-gradient-to-b from-blue-900 via-blue-800 to-blue-700 py-12 md:py-20 lg:py-28 overflow-hidden">
+    <section className="relative bg-gradient-to-b from-blue-900 via-blue-800 to-blue-700 py-6 md:py-12 lg:py-16 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-8 md:space-y-12">
           {/* Main Heading */}
           <div className="space-y-4 md:space-y-6">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight md:leading-tight lg:leading-tight text-white">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight leading-tight md:leading-tight lg:leading-tight text-white">
               Where Pakistan<br />
-              Buys, Sells & Talks<br />
+              <span className="text-green-400">Buys, Sells & Talks</span><br />
               Phones
             </h1>
           </div>
