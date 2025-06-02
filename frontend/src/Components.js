@@ -4853,6 +4853,10 @@ export const ShopOwnerDashboard = ({ user, setCurrentPage }) => {
         </div>
 
         {/* Header */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
               <p className="text-gray-600 mt-1">Welcome back, {user?.businessName || user?.name}</p>
             </div>
             <div className="flex space-x-3">
