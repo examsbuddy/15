@@ -4902,11 +4902,55 @@ export const ShopOwnerDashboard = ({ user, setCurrentPage }) => {
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4">
+        {/* Mobile Search Bar */}
+        <div className="lg:hidden mb-6">
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                value={activeFilters.search || ''}
+                onChange={(e) => setActiveFilters({ ...activeFilters, search: e.target.value })}
+                className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+                placeholder="Search phones, brands, models..."
+              />
+              {activeFilters.search && (
+                <button
+                  onClick={() => setActiveFilters({ ...activeFilters, search: '' })}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+            
+            {/* Mobile Quick Filters */}
+            <div className="mt-3 flex space-x-2 overflow-x-auto">
+              {['iPhone', 'Samsung', 'Under 50k', 'New'].map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => {
+                    if (filter === 'Under 50k') {
+                      setActiveFilters({ ...activeFilters, priceRange: 'Under ₨50,000' });
+                    } else if (filter === 'New') {
+                      setActiveFilters(prev => ({ 
+                        ...prev, 
+                        condition: prev.condition.includes('New') ? prev.condition.filter(c => c !== 'New') : [...prev.condition, 'New']
+                      }));
+                    } else {
+                      setActiveFilters({ ...activeFilters, search: filter });
+                    }
+                  }}
+                  className="flex-shrink-0 px-3 py-1.5 text-sm bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 rounded-full transition-colors whitespace-nowrap"
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Shop Owner Dashboard</h1>
               <p className="text-gray-600 mt-1">Welcome back, {user?.businessName || user?.name}</p>
             </div>
             <div className="flex space-x-3">
