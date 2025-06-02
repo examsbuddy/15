@@ -1727,7 +1727,7 @@ export const Header = ({
                 <div className="hidden md:flex items-center space-x-2">
                   <button
                     onClick={() => setShowSignInModal(true)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg"
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shadow-lg"
                   >
                     Sign In
                   </button>
