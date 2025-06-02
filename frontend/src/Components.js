@@ -2043,21 +2043,10 @@ export const HeroSection = ({ onCompareClick, onPriceAlertsClick, onSearch }) =>
                 Find Your Dream Phone
               </span>
             </h1>
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-
-  // Auto-suggest data
-  const autoSuggestData = {
-    brands: ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'Realme', 'OnePlus', 'Huawei', 'Nothing', 'Google'],
-    models: [
-      'iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14',
-      'Galaxy S24 Ultra', 'Galaxy S24 Plus', 'Galaxy S24', 'Galaxy A54', 'Galaxy Note',
-      'Xiaomi 13 Pro', 'Redmi Note 13 Pro', 'Mi 11', 'Poco X6',
-      'OnePlus 12', 'OnePlus 11', 'Nord CE', 'Oppo Reno 11 Pro',
-      'Vivo V30 Pro', 'Pixel 8 Pro'
-    ],
-    cities: ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta']
+            <p className="text-lg md:text-xl lg:text-2xl text-blue-100 font-medium leading-relaxed max-w-3xl mx-auto">
+              Buy & Sell phones with confidence. From the latest flagship to budget-friendly options.
+            </p>
+          </div>
   };
 
   // Fuzzy matching function
