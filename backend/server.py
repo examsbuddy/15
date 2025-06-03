@@ -1564,10 +1564,12 @@ async def sync_popular_brands():
                         })
                         
                         if existing_phone:
-                            # Update existing phone
+                            # Update existing phone (exclude _id from the update)
+                            update_doc = {k: v for k, v in db_document.items() if k != '_id'}
+                            update_doc['updated_at'] = datetime.utcnow()
                             await db.phone_specs.update_one(
                                 {"_id": existing_phone["_id"]},
-                                {"$set": db_document}
+                                {"$set": update_doc}
                             )
                         else:
                             # Insert new phone
