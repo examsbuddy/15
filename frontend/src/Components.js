@@ -7528,7 +7528,42 @@ const PhoneSpecsManager = () => {
         </div>
         <div className="flex space-x-3">
           <button
-            onClick={() => alert('Button works!')}
+            onClick={async () => {
+              const choice = prompt('Enter "popular" to sync Apple/Samsung/Google, or enter a brand name (Apple, Samsung, Google, OnePlus, Xiaomi):');
+              
+              if (!choice) return;
+              
+              setSyncLoading(true);
+              
+              try {
+                let response;
+                if (choice.toLowerCase() === 'popular') {
+                  response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/popular-brands`, {
+                    method: 'POST'
+                  });
+                } else {
+                  response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/brand/${choice}`, {
+                    method: 'POST'
+                  });
+                }
+                
+                if (response.ok) {
+                  const data = await response.json();
+                  if (data.success) {
+                    await loadPhoneSpecs();
+                    alert(`✅ Success! Synced ${data.successful_imports} phones. Check the list below.`);
+                  } else {
+                    alert(`❌ Sync failed: ${data.errors?.[0] || 'Unknown error'}`);
+                  }
+                } else {
+                  alert('❌ Network error - please try again');
+                }
+              } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+              } finally {
+                setSyncLoading(false);
+              }
+            }}
             disabled={syncLoading}
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
           >
