@@ -532,6 +532,173 @@ def test_compare_functionality():
         print(f"Error testing compare functionality: {str(e)}")
         return False
 
+# Function to test the Phone Specifications API integration
+def test_phone_api_integration():
+    print("\n=== Testing Phone Specifications API Integration ===")
+    
+    # Test 1: GET /api/phone-api/brands
+    print("\n--- Test 1: GET /api/phone-api/brands ---")
+    try:
+        response = requests.get(f"{API_URL}/phone-api/brands")
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Response: {result}")
+        
+        if not result.get('success'):
+            print("ERROR: API call was not successful")
+            return False
+            
+        brands = result.get('brands', [])
+        print(f"Retrieved {len(brands)} brands")
+        
+        if not brands:
+            print("ERROR: No brands returned")
+            return False
+            
+        # Print a few brands for verification
+        for i, brand in enumerate(brands[:3]):
+            print(f"Brand {i+1}: {brand.get('brand_name')} - {brand.get('device_count')} devices")
+            
+        # Test 2: GET /api/phone-api/brands/{brand_name}/phones
+        print("\n--- Test 2: GET /api/phone-api/brands/{brand_name}/phones ---")
+        
+        # Use Apple as the test brand
+        test_brand = "Apple"
+        response = requests.get(f"{API_URL}/phone-api/brands/{test_brand}/phones")
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Response: {result}")
+        
+        if not result.get('success'):
+            print(f"ERROR: Failed to get phones for brand {test_brand}")
+            return False
+            
+        phones = result.get('phones', [])
+        print(f"Retrieved {len(phones)} phones for {test_brand}")
+        
+        if not phones:
+            print(f"ERROR: No phones returned for {test_brand}")
+            return False
+            
+        # Print a few phones for verification
+        for i, phone in enumerate(phones[:3]):
+            print(f"Phone {i+1}: {phone.get('DeviceName')}")
+            
+        # Test 3: GET /api/phone-api/phones/{phone_name}
+        print("\n--- Test 3: GET /api/phone-api/phones/{phone_name} ---")
+        
+        # Use the first phone from the previous test
+        test_phone = phones[0].get('DeviceName')
+        encoded_phone_name = requests.utils.quote(test_phone)
+        response = requests.get(f"{API_URL}/phone-api/phones/{encoded_phone_name}")
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Response success: {result.get('success')}")
+        
+        if not result.get('success'):
+            print(f"ERROR: Failed to get details for phone {test_phone}")
+            return False
+            
+        phone_details = result.get('phone', {})
+        print(f"Retrieved details for {phone_details.get('DeviceName')}")
+        
+        # Print some key specifications for verification
+        print(f"Brand: {phone_details.get('Brand')}")
+        print(f"Technology: {phone_details.get('technology')}")
+        print(f"Dimensions: {phone_details.get('dimensions')}")
+        print(f"Weight: {phone_details.get('weight')}")
+        print(f"Display: {phone_details.get('type')} - {phone_details.get('size')}")
+        print(f"OS: {phone_details.get('os')}")
+        print(f"Chipset: {phone_details.get('chipset')}")
+        print(f"CPU: {phone_details.get('cpu')}")
+        print(f"Main Camera: {phone_details.get('main_camera')}")
+        
+        # Test 4: POST /api/phone-api/sync/brand/{brand_name}
+        print("\n--- Test 4: POST /api/phone-api/sync/brand/{brand_name} ---")
+        
+        # Use Apple as the test brand for syncing
+        test_brand = "Apple"
+        response = requests.post(f"{API_URL}/phone-api/sync/brand/{test_brand}")
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Response: {result}")
+        
+        if not result.get('success'):
+            print(f"ERROR: Failed to sync brand {test_brand}")
+            return False
+            
+        print(f"Successfully synced {result.get('successful_imports')} phones for {test_brand}")
+        
+        # Test 5: POST /api/phone-api/sync/popular-brands
+        print("\n--- Test 5: POST /api/phone-api/sync/popular-brands ---")
+        
+        response = requests.post(f"{API_URL}/phone-api/sync/popular-brands")
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Response: {result}")
+        
+        if not result.get('success'):
+            print("ERROR: Failed to sync popular brands")
+            return False
+            
+        print(f"Successfully synced {result.get('successful_imports')} phones from {result.get('total_brands')} popular brands")
+        
+        # Test 6: GET /api/phone-api/sync/status
+        print("\n--- Test 6: GET /api/phone-api/sync/status ---")
+        
+        response = requests.get(f"{API_URL}/phone-api/sync/status")
+        response.raise_for_status()
+        
+        result = response.json()
+        print(f"Response: {result}")
+        
+        if not result.get('success'):
+            print("ERROR: Failed to get sync status")
+            return False
+            
+        stats = result.get('stats', {})
+        print(f"Total phones: {stats.get('total_phones')}")
+        print(f"API phones: {stats.get('api_phones')}")
+        print(f"Manual phones: {stats.get('manual_phones')}")
+        print(f"Last sync: {stats.get('last_sync')}")
+        
+        # Verify that phones were actually synced to the database
+        print("\n--- Verifying synced phones in database ---")
+        
+        response = requests.get(f"{API_URL}/phone-specs")
+        response.raise_for_status()
+        
+        all_specs = response.json()
+        print(f"Total phone specs in database: {len(all_specs)}")
+        
+        # Check for phones with source = "phone_specs_api"
+        api_phones = [spec for spec in all_specs if spec.get('source') == "phone_specs_api"]
+        print(f"Found {len(api_phones)} phones with source = 'phone_specs_api'")
+        
+        if not api_phones:
+            print("ERROR: No phones with source = 'phone_specs_api' found in database")
+            return False
+            
+        # Print a few synced phones for verification
+        for i, phone in enumerate(api_phones[:3]):
+            print(f"\nSynced Phone {i+1}: {phone.get('brand')} {phone.get('model')}")
+            print(f"OS: {phone.get('os')}")
+            print(f"Chipset: {phone.get('chipset')}")
+            print(f"CPU: {phone.get('cpu')}")
+            print(f"Display: {phone.get('display_size')} - {phone.get('display_technology')}")
+            print(f"Main Camera: {phone.get('main_camera')}")
+            print(f"Source: {phone.get('source')}")
+            
+        return True
+    except Exception as e:
+        print(f"Error testing Phone Specifications API integration: {str(e)}")
+        return False
+
 # Function to populate sample data if needed
 def populate_sample_data():
     print("\n=== Populating sample data ===")
