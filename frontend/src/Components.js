@@ -7550,8 +7550,11 @@ const PhoneSpecsManager = () => {
                 if (response.ok) {
                   const data = await response.json();
                   if (data.success) {
-                    await loadPhoneSpecs();
-                    alert(`✅ Success! Synced ${data.successful_imports} phones. Check the list below.`);
+                    // Force refresh with delay to ensure backend updates are complete
+                    setTimeout(async () => {
+                      await loadPhoneSpecs();
+                    }, 1000);
+                    alert(`✅ Success! Synced ${data.successful_imports} phones. Refreshing list...`);
                   } else {
                     alert(`❌ Sync failed: ${data.errors?.[0] || 'Unknown error'}`);
                   }
