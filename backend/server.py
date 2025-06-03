@@ -1401,64 +1401,62 @@ async def get_external_brands():
         logger.error(f"Error fetching external brands: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch brands from external API")
 
-@api_router.get("/phone-api/brands/{brand_slug}/phones")
-async def get_external_brand_phones(brand_slug: str):
+@api_router.get("/phone-api/brands/{brand_name}/phones")
+async def get_external_brand_phones(brand_name: str):
     """Get all phones for a specific brand from Phone Specifications API"""
     try:
-        phones = await phone_api_client.get_brand_phones(brand_slug)
-        return {"success": True, "brand": brand_slug, "phones": phones, "count": len(phones)}
+        phones = await phone_api_client.get_brand_phones(brand_name)
+        return {"success": True, "brand": brand_name, "phones": phones, "count": len(phones)}
     except Exception as e:
-        logger.error(f"Error fetching phones for brand {brand_slug}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to fetch phones for brand {brand_slug}")
+        logger.error(f"Error fetching phones for brand {brand_name}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch phones for brand {brand_name}")
 
-@api_router.get("/phone-api/phones/{phone_slug}")
-async def get_external_phone_details(phone_slug: str):
+@api_router.get("/phone-api/phones/{phone_name}")
+async def get_external_phone_details(phone_name: str):
     """Get detailed specifications for a specific phone from Phone Specifications API"""
     try:
-        phone_details = await phone_api_client.get_phone_details(phone_slug)
+        phone_details = await phone_api_client.get_phone_details(phone_name)
         return {"success": True, "phone": phone_details}
     except Exception as e:
-        logger.error(f"Error fetching phone details for {phone_slug}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to fetch phone details for {phone_slug}")
+        logger.error(f"Error fetching phone details for {phone_name}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch phone details for {phone_name}")
 
-@api_router.post("/phone-api/sync/brand/{brand_slug}", response_model=BrandSyncResponse)
-async def sync_brand_from_api(brand_slug: str):
+@api_router.post("/phone-api/sync/brand/{brand_name}", response_model=BrandSyncResponse)
+async def sync_brand_from_api(brand_name: str):
     """Sync all phones for a specific brand from Phone Specifications API"""
     try:
         # Get all phones for the brand
-        phones = await phone_api_client.get_brand_phones(brand_slug)
+        phones = await phone_api_client.get_brand_phones(brand_name)
         
         if not phones:
             return BrandSyncResponse(
                 success=False,
-                brand=brand_slug,
+                brand=brand_name,
                 total_phones=0,
                 successful_imports=0,
                 failed_imports=0,
-                errors=[f"No phones found for brand {brand_slug}"]
+                errors=[f"No phones found for brand {brand_name}"]
             )
         
         successful_imports = 0
         failed_imports = 0
         errors = []
         
-        # Process each phone (limit to first 10 to avoid timeout)
-        phones_to_process = phones[:10]  # Limit for initial implementation
-        
-        for phone in phones_to_process:
+        # Process each phone
+        for phone in phones:
             try:
-                phone_slug = phone.get("slug", "")
-                if not phone_slug:
+                device_name = phone.get("DeviceName", "")
+                if not device_name:
                     failed_imports += 1
-                    errors.append(f"Phone {phone.get('phone_name', 'Unknown')} has no slug")
+                    errors.append(f"Phone has no device name")
                     continue
                 
-                # Get detailed specifications
-                phone_details = await phone_api_client.get_phone_details(phone_slug)
+                # Get detailed specifications (for mock API, we already have the data)
+                phone_details = await phone_api_client.get_phone_details(device_name)
                 
                 if not phone_details:
                     failed_imports += 1
-                    errors.append(f"Failed to fetch details for {phone.get('phone_name', 'Unknown')}")
+                    errors.append(f"Failed to fetch details for {device_name}")
                     continue
                 
                 # Transform to our database format
@@ -1466,7 +1464,7 @@ async def sync_brand_from_api(brand_slug: str):
                 
                 if not db_document:
                     failed_imports += 1
-                    errors.append(f"Failed to transform {phone.get('phone_name', 'Unknown')}")
+                    errors.append(f"Failed to transform {device_name}")
                     continue
                 
                 # Check if phone already exists
@@ -1488,31 +1486,31 @@ async def sync_brand_from_api(brand_slug: str):
                 successful_imports += 1
                 
                 # Add small delay to avoid overwhelming the API
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(0.1)
                 
             except Exception as e:
                 failed_imports += 1
-                errors.append(f"Error processing {phone.get('phone_name', 'Unknown')}: {str(e)}")
-                logger.error(f"Error processing phone {phone.get('phone_name', 'Unknown')}: {str(e)}")
+                errors.append(f"Error processing {phone.get('DeviceName', 'Unknown')}: {str(e)}")
+                logger.error(f"Error processing phone {phone.get('DeviceName', 'Unknown')}: {str(e)}")
         
         return BrandSyncResponse(
             success=successful_imports > 0,
-            brand=brand_slug,
-            total_phones=len(phones_to_process),
+            brand=brand_name,
+            total_phones=len(phones),
             successful_imports=successful_imports,
             failed_imports=failed_imports,
             errors=errors[:10]  # Limit error messages
         )
         
     except Exception as e:
-        logger.error(f"Error syncing brand {brand_slug}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to sync brand {brand_slug}")
+        logger.error(f"Error syncing brand {brand_name}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to sync brand {brand_name}")
 
 @api_router.post("/phone-api/sync/popular-brands", response_model=PhoneAPISyncResponse)
 async def sync_popular_brands():
     """Sync phones from popular brands (Apple, Samsung, Google, OnePlus, Xiaomi)"""
     try:
-        popular_brands = ["apple", "samsung", "google", "oneplus", "xiaomi"]
+        popular_brands = ["Apple", "Samsung", "Google"]  # Start with fewer brands for testing
         
         total_brands = len(popular_brands)
         total_phones = 0
@@ -1521,32 +1519,30 @@ async def sync_popular_brands():
         errors = []
         imported_phones = []
         
-        for brand_slug in popular_brands:
+        for brand_name in popular_brands:
             try:
-                logger.info(f"Syncing brand: {brand_slug}")
+                logger.info(f"Syncing brand: {brand_name}")
                 
                 # Get phones for this brand
-                phones = await phone_api_client.get_brand_phones(brand_slug)
+                phones = await phone_api_client.get_brand_phones(brand_name)
                 
                 if not phones:
-                    errors.append(f"No phones found for brand {brand_slug}")
+                    errors.append(f"No phones found for brand {brand_name}")
                     continue
                 
-                # Process first 5 phones per brand to avoid timeout
-                phones_to_process = phones[:5]
-                total_phones += len(phones_to_process)
+                # Process all phones for the brand
+                total_phones += len(phones)
                 
-                for phone in phones_to_process:
+                for phone in phones:
                     try:
-                        phone_slug = phone.get("slug", "")
-                        phone_name = phone.get("phone_name", "Unknown")
+                        device_name = phone.get("DeviceName", "Unknown")
                         
-                        if not phone_slug:
+                        if not device_name or device_name == "Unknown":
                             failed_imports += 1
                             continue
                         
                         # Get detailed specifications
-                        phone_details = await phone_api_client.get_phone_details(phone_slug)
+                        phone_details = await phone_api_client.get_phone_details(device_name)
                         
                         if not phone_details:
                             failed_imports += 1
@@ -1579,18 +1575,18 @@ async def sync_popular_brands():
                         imported_phones.append(f"{db_document['brand']} {db_document['model']}")
                         
                         # Small delay between requests
-                        await asyncio.sleep(0.3)
+                        await asyncio.sleep(0.1)
                         
                     except Exception as e:
                         failed_imports += 1
-                        logger.error(f"Error processing phone {phone_name}: {str(e)}")
+                        logger.error(f"Error processing phone {device_name}: {str(e)}")
                 
                 # Delay between brands
-                await asyncio.sleep(1)
+                await asyncio.sleep(0.5)
                 
             except Exception as e:
-                errors.append(f"Error syncing brand {brand_slug}: {str(e)}")
-                logger.error(f"Error syncing brand {brand_slug}: {str(e)}")
+                errors.append(f"Error syncing brand {brand_name}: {str(e)}")
+                logger.error(f"Error syncing brand {brand_name}: {str(e)}")
         
         return PhoneAPISyncResponse(
             success=successful_imports > 0,
