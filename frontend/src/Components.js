@@ -7030,6 +7030,12 @@ const PhoneSpecsManager = () => {
   const [uploadFile, setUploadFile] = useState(null);
   const [uploadLoading, setUploadLoading] = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
+  const [showPhoneSync, setShowPhoneSync] = useState(false);
+  const [syncLoading, setSyncLoading] = useState(false);
+  const [syncResult, setSyncResult] = useState(null);
+  const [availableBrands, setAvailableBrands] = useState([]);
+  const [selectedBrand, setSelectedBrand] = useState('');
+  const [syncStatus, setSyncStatus] = useState(null);
   const [newSpec, setNewSpec] = useState({
     brand: '',
     model: '',
