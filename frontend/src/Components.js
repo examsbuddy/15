@@ -3811,6 +3811,8 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
   };
 
   const handleSearchChange = (query, index) => {
+    console.log('handleSearchChange called with query:', query, 'index:', index);
+    
     const newQueries = [...searchQueries];
     newQueries[index] = query;
     setSearchQueries(newQueries);
