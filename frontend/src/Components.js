@@ -7484,6 +7484,35 @@ const PhoneSpecsManager = () => {
     }
   };
 
+  const syncSpecificBrand = async (brandName) => {
+    setSyncLoading(true);
+    setSyncResult(null);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/brand/${brandName}`, {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSyncResult(data);
+        if (data.success) {
+          await loadPhoneSpecs();
+          alert(`Successfully synced ${data.successful_imports} phones from ${brandName}!`);
+        } else {
+          alert(`Sync failed: ${data.errors?.[0] || 'Unknown error'}`);
+        }
+      } else {
+        alert(`Failed to sync ${brandName}`);
+      }
+    } catch (error) {
+      console.error(`Failed to sync ${brandName}:`, error);
+      alert(`Error: ${error.message}`);
+    } finally {
+      setSyncLoading(false);
+    }
+  };
+
+
   useEffect(() => {
     loadPhoneSpecs();
     loadSyncStatus();
