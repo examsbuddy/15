@@ -3610,6 +3610,51 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
     };
   };
 
+  // Transform phone specs data to component format
+  const transformPhoneData = (phoneSpec) => {
+    return {
+      _id: phoneSpec._id,
+      brand: phoneSpec.brand,
+      model: phoneSpec.model,
+      price: phoneSpec.price_range_min || 0,
+      photos: ['/api/placeholder/300/200'], // Default placeholder since we don't have photos in specs
+      storage: phoneSpec.storage_gb ? `${phoneSpec.storage_gb}GB` : phoneSpec.storage || 'N/A',
+      ram: phoneSpec.ram_gb ? `${phoneSpec.ram_gb}GB` : phoneSpec.ram || 'N/A',
+      battery: phoneSpec.battery_mah ? `${phoneSpec.battery_mah} mAh` : phoneSpec.battery_capacity || 'N/A',
+      camera: phoneSpec.camera_mp ? `${phoneSpec.camera_mp}` : phoneSpec.main_camera || 'N/A',
+      screen_size: phoneSpec.display_size || 'N/A',
+      processor: phoneSpec.processor || phoneSpec.chipset || 'N/A',
+      operating_system: phoneSpec.operating_system || phoneSpec.os || 'N/A',
+      network: phoneSpec.network_5g === 'Yes' ? '5G' : '4G',
+      condition: 'Excellent', // Default since this is specs data
+      pta_approved: true, // Default since this is specs data
+      warranty_months: 12, // Default
+      purchase_year: phoneSpec.release_year || 2023,
+      weight: phoneSpec.weight || 'N/A',
+      dimensions: phoneSpec.dimensions || 'N/A',
+      display_type: phoneSpec.display_technology || 'OLED',
+      refresh_rate: '60Hz', // Default since not in our specs
+      chipset: phoneSpec.chipset || phoneSpec.processor || 'N/A',
+      gpu: phoneSpec.gpu || 'N/A',
+      main_camera: phoneSpec.camera_mp ? `${phoneSpec.camera_mp}` : phoneSpec.main_camera || 'N/A',
+      selfie_camera: phoneSpec.front_camera || '8MP',
+      video_recording: '4K@30fps', // Default
+      wireless_charging: false, // Default
+      fast_charging: phoneSpec.charging || 'Standard',
+      water_resistance: 'IP54', // Default
+      fingerprint: 'Yes', // Default
+      nfc: phoneSpec.nfc === 'Yes' ? true : false,
+      bluetooth: phoneSpec.bluetooth || '5.0',
+      usb: phoneSpec.usb || 'USB-C',
+      audio_jack: false, // Default for modern phones
+      sensors: phoneSpec.sensors || 'Standard sensors',
+      // Price information
+      price_range: phoneSpec.price_range_min && phoneSpec.price_range_max ? 
+        `PKR ${phoneSpec.price_range_min.toLocaleString()} - ${phoneSpec.price_range_max.toLocaleString()}` : 
+        'Price not available'
+    };
+  };
+
   // Sample phone data if no phones provided
   const samplePhones = [
     {
