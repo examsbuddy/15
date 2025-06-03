@@ -7506,6 +7506,81 @@ const PhoneSpecsManager = () => {
     }
   };
 
+  // Phone API Sync Functions
+  const loadAvailableBrands = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/brands`);
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableBrands(data.brands || []);
+      }
+    } catch (error) {
+      console.error('Failed to load available brands:', error);
+    }
+  };
+
+  const syncPopularBrands = async () => {
+    setSyncLoading(true);
+    setSyncResult(null);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/popular-brands`, {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSyncResult(data);
+        if (data.success) {
+          await loadPhoneSpecs(); // Refresh the phone specs list
+        }
+      } else {
+        setSyncResult({ success: false, error: 'Failed to sync popular brands' });
+      }
+    } catch (error) {
+      console.error('Failed to sync popular brands:', error);
+      setSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncLoading(false);
+    }
+  };
+
+  const syncSpecificBrand = async (brandName) => {
+    setSyncLoading(true);
+    setSyncResult(null);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/brand/${brandName}`, {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSyncResult(data);
+        if (data.success) {
+          await loadPhoneSpecs(); // Refresh the phone specs list
+        }
+      } else {
+        setSyncResult({ success: false, error: `Failed to sync ${brandName}` });
+      }
+    } catch (error) {
+      console.error(`Failed to sync ${brandName}:`, error);
+      setSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncLoading(false);
+    }
+  };
+
+  const loadSyncStatus = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/status`);
+      if (response.ok) {
+        const data = await response.json();
+        setSyncStatus(data.stats);
+      }
+    } catch (error) {
+      console.error('Failed to load sync status:', error);
+    }
+  };
+
 
   useEffect(() => {
     loadPhoneSpecs();
