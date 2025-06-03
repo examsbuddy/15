@@ -3770,6 +3770,11 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
   console.log('ComparisonPage allPhones:', allPhones.length);
   console.log('ComparisonPage transformedPhones:', transformedPhones.length);
   console.log('ComparisonPage phonesToUse:', phonesToUse.length);
+  
+  // Debug logging
+  console.log('ComparisonPage allPhones:', allPhones.length);
+  console.log('ComparisonPage transformedPhones:', transformedPhones.length);
+  console.log('ComparisonPage phonesToUse:', phonesToUse.length);
 
   // Filter phones based on search query
   const getFilteredPhones = (query, excludeId = null) => {
