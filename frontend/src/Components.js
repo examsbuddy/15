@@ -7529,7 +7529,7 @@ const PhoneSpecsManager = () => {
         <div className="flex space-x-3">
           <button
             onClick={async () => {
-              const choice = prompt('Enter "popular" to sync Apple/Samsung/Google, or enter a brand name (Apple, Samsung, Google, OnePlus, Xiaomi):');
+              const choice = prompt('Enter "popular" to sync Apple/Samsung/Google, or enter a brand name (Apple, Samsung, Google):');
               
               if (!choice) return;
               
@@ -7550,11 +7550,13 @@ const PhoneSpecsManager = () => {
                 if (response.ok) {
                   const data = await response.json();
                   if (data.success) {
-                    // Force refresh with delay to ensure backend updates are complete
-                    setTimeout(async () => {
-                      await loadPhoneSpecs();
-                    }, 1000);
-                    alert(`✅ Success! Synced ${data.successful_imports} phones. Refreshing list...`);
+                    // Immediate refresh
+                    await loadPhoneSpecs();
+                    // Force a page refresh as backup
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 2000);
+                    alert(`✅ Success! Synced ${data.successful_imports} phones. Page will refresh in 2 seconds.`);
                   } else {
                     alert(`❌ Sync failed: ${data.errors?.[0] || 'Unknown error'}`);
                   }
