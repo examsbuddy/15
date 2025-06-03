@@ -36,6 +36,7 @@ function App() {
   const [showSignUpModal, setShowSignUpModal] = useState(false);
   const [signUpType, setSignUpType] = useState('normal');
   const [compareList, setCompareList] = useState([]);
+  const [allPhoneSpecs, setAllPhoneSpecs] = useState([]);
   const [searchFilters, setSearchFilters] = useState(null);
   const [currentListingId, setCurrentListingId] = useState(null);
 
