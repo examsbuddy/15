@@ -1,4 +1,16 @@
 backend:
+  - task: "Phone Specs Compare Endpoint"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "The GET /api/phone-specs/compare endpoint is not working correctly. The endpoint is implemented in the code but returns an empty array instead of the expected phone data. Testing shows that while the endpoint itself doesn't throw errors, it's not returning any phone data for comparison. The issue appears to be that the phone specifications are being stored in the database but the compare endpoint is not retrieving them correctly. The database contains 145+ phone specifications, but the compare endpoint returns 0 phones."
+
   - task: "Admin Stats Endpoint"
     implemented: true
     working: true
