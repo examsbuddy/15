@@ -601,196 +601,141 @@ def transform_api_phone_to_db_format(api_phone_data: Dict) -> Dict:
             phone_lower = phone_name.lower()
             brand_lower = brand.lower()
             
+            # Extract year from phone name
+            year = 2023  # default
+            if "2024" in phone_name or any(x in phone_lower for x in ["15", "s24", "14 ultra", "x100"]):
+                year = 2024
+            elif "2023" in phone_name or any(x in phone_lower for x in ["14", "s23", "13 ultra", "8 pro"]):
+                year = 2023
+            elif "2022" in phone_name or any(x in phone_lower for x in ["13", "s22", "12 ultra"]):
+                year = 2022
+            elif "2021" in phone_name or any(x in phone_lower for x in ["12", "s21", "11 pro"]):
+                year = 2021
+            elif "2020" in phone_name or any(x in phone_lower for x in ["11", "s20", "note 20"]):
+                year = 2020
+            
+            # Determine if it's a flagship, mid-range, or budget phone
+            is_flagship = any(x in phone_lower for x in ["pro", "ultra", "max", "plus", "fold", "flip"])
+            is_budget = any(x in phone_lower for x in ["a", "lite", "mini", "se", "y", "c", "m"])
+            is_midrange = not is_flagship and not is_budget
+            
             # iPhone specifications
             if "iphone" in phone_lower or brand_lower == "apple":
-                if "15 pro" in phone_lower:
-                    return {
-                        "display_size": "6.1 inches",
-                        "camera_mp": "48 MP",
-                        "battery_mah": "3274 mAh",
-                        "storage_gb": "128",
-                        "ram_gb": "8",
-                        "processor": "Apple A17 Pro",
-                        "os": "iOS 17",
-                        "price_min": 150000,
-                        "price_max": 250000
-                    }
-                elif "15" in phone_lower:
-                    return {
-                        "display_size": "6.1 inches", 
-                        "camera_mp": "48 MP",
-                        "battery_mah": "3349 mAh",
-                        "storage_gb": "128",
-                        "ram_gb": "6",
-                        "processor": "Apple A16 Bionic",
-                        "os": "iOS 17",
-                        "price_min": 120000,
-                        "price_max": 180000
-                    }
-                elif "14 pro" in phone_lower:
-                    return {
-                        "display_size": "6.1 inches",
-                        "camera_mp": "48 MP", 
-                        "battery_mah": "3200 mAh",
-                        "storage_gb": "128",
-                        "ram_gb": "6",
-                        "processor": "Apple A16 Bionic",
-                        "os": "iOS 16",
-                        "price_min": 110000,
-                        "price_max": 170000
-                    }
-                else:
-                    return {
-                        "display_size": "6.1 inches",
-                        "camera_mp": "12 MP",
-                        "battery_mah": "3095 mAh", 
-                        "storage_gb": "64",
-                        "ram_gb": "4",
-                        "processor": "Apple A15 Bionic",
-                        "os": "iOS 15",
-                        "price_min": 80000,
-                        "price_max": 140000
-                    }
+                if "15" in phone_lower:
+                    if "pro max" in phone_lower:
+                        return {"display_size": "6.7 inches", "camera_mp": "48 MP", "battery_mah": "4441 mAh", "storage_gb": "256", "ram_gb": "8", "processor": "Apple A17 Pro", "os": "iOS 17", "price_min": 180000, "price_max": 300000}
+                    elif "pro" in phone_lower:
+                        return {"display_size": "6.1 inches", "camera_mp": "48 MP", "battery_mah": "3274 mAh", "storage_gb": "128", "ram_gb": "8", "processor": "Apple A17 Pro", "os": "iOS 17", "price_min": 150000, "price_max": 250000}
+                    elif "plus" in phone_lower:
+                        return {"display_size": "6.7 inches", "camera_mp": "48 MP", "battery_mah": "4383 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Apple A16 Bionic", "os": "iOS 17", "price_min": 130000, "price_max": 190000}
+                    else:
+                        return {"display_size": "6.1 inches", "camera_mp": "48 MP", "battery_mah": "3349 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Apple A16 Bionic", "os": "iOS 17", "price_min": 120000, "price_max": 180000}
+                elif "14" in phone_lower:
+                    if "pro max" in phone_lower:
+                        return {"display_size": "6.7 inches", "camera_mp": "48 MP", "battery_mah": "4323 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Apple A16 Bionic", "os": "iOS 16", "price_min": 140000, "price_max": 210000}
+                    elif "pro" in phone_lower:
+                        return {"display_size": "6.1 inches", "camera_mp": "48 MP", "battery_mah": "3200 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Apple A16 Bionic", "os": "iOS 16", "price_min": 110000, "price_max": 170000}
+                    elif "plus" in phone_lower:
+                        return {"display_size": "6.7 inches", "camera_mp": "12 MP", "battery_mah": "4325 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Apple A15 Bionic", "os": "iOS 16", "price_min": 100000, "price_max": 150000}
+                    else:
+                        return {"display_size": "6.1 inches", "camera_mp": "12 MP", "battery_mah": "3279 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Apple A15 Bionic", "os": "iOS 16", "price_min": 90000, "price_max": 140000}
+                elif "se" in phone_lower:
+                    return {"display_size": "4.7 inches", "camera_mp": "12 MP", "battery_mah": "1821 mAh", "storage_gb": "64", "ram_gb": "3", "processor": "Apple A15 Bionic", "os": "iOS 15", "price_min": 60000, "price_max": 90000}
+                else:  # iPhone 13, 12, 11
+                    if "pro max" in phone_lower:
+                        return {"display_size": "6.7 inches", "camera_mp": "12 MP", "battery_mah": "4352 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Apple A15 Bionic", "os": "iOS 15", "price_min": 120000, "price_max": 180000}
+                    elif "pro" in phone_lower:
+                        return {"display_size": "6.1 inches", "camera_mp": "12 MP", "battery_mah": "3095 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Apple A15 Bionic", "os": "iOS 15", "price_min": 100000, "price_max": 150000}
+                    elif "mini" in phone_lower:
+                        return {"display_size": "5.4 inches", "camera_mp": "12 MP", "battery_mah": "2438 mAh", "storage_gb": "128", "ram_gb": "4", "processor": "Apple A15 Bionic", "os": "iOS 15", "price_min": 80000, "price_max": 120000}
+                    else:
+                        return {"display_size": "6.1 inches", "camera_mp": "12 MP", "battery_mah": "3240 mAh", "storage_gb": "128", "ram_gb": "4", "processor": "Apple A15 Bionic", "os": "iOS 15", "price_min": 85000, "price_max": 130000}
             
             # Samsung Galaxy specifications  
             elif "galaxy" in phone_lower or brand_lower == "samsung":
-                if "s24 ultra" in phone_lower:
-                    return {
-                        "display_size": "6.8 inches",
-                        "camera_mp": "200 MP",
-                        "battery_mah": "5000 mAh",
-                        "storage_gb": "256", 
-                        "ram_gb": "12",
-                        "processor": "Snapdragon 8 Gen 3",
-                        "os": "Android 14",
-                        "price_min": 140000,
-                        "price_max": 220000
-                    }
-                elif "s24" in phone_lower:
-                    return {
-                        "display_size": "6.2 inches",
-                        "camera_mp": "50 MP",
-                        "battery_mah": "4000 mAh",
-                        "storage_gb": "128",
-                        "ram_gb": "8", 
-                        "processor": "Snapdragon 8 Gen 3",
-                        "os": "Android 14",
-                        "price_min": 90000,
-                        "price_max": 140000
-                    }
-                elif "s23 ultra" in phone_lower:
-                    return {
-                        "display_size": "6.8 inches",
-                        "camera_mp": "200 MP",
-                        "battery_mah": "5000 mAh",
-                        "storage_gb": "256",
-                        "ram_gb": "12",
-                        "processor": "Snapdragon 8 Gen 2", 
-                        "os": "Android 13",
-                        "price_min": 120000,
-                        "price_max": 180000
-                    }
+                if "s24" in phone_lower:
+                    if "ultra" in phone_lower:
+                        return {"display_size": "6.8 inches", "camera_mp": "200 MP", "battery_mah": "5000 mAh", "storage_gb": "256", "ram_gb": "12", "processor": "Snapdragon 8 Gen 3", "os": "Android 14", "price_min": 140000, "price_max": 220000}
+                    elif "plus" in phone_lower:
+                        return {"display_size": "6.7 inches", "camera_mp": "50 MP", "battery_mah": "4900 mAh", "storage_gb": "256", "ram_gb": "12", "processor": "Snapdragon 8 Gen 3", "os": "Android 14", "price_min": 110000, "price_max": 160000}
+                    else:
+                        return {"display_size": "6.2 inches", "camera_mp": "50 MP", "battery_mah": "4000 mAh", "storage_gb": "128", "ram_gb": "8", "processor": "Snapdragon 8 Gen 3", "os": "Android 14", "price_min": 90000, "price_max": 140000}
+                elif "s23" in phone_lower:
+                    if "ultra" in phone_lower:
+                        return {"display_size": "6.8 inches", "camera_mp": "200 MP", "battery_mah": "5000 mAh", "storage_gb": "256", "ram_gb": "12", "processor": "Snapdragon 8 Gen 2", "os": "Android 13", "price_min": 120000, "price_max": 180000}
+                    elif "plus" in phone_lower:
+                        return {"display_size": "6.6 inches", "camera_mp": "50 MP", "battery_mah": "4700 mAh", "storage_gb": "256", "ram_gb": "8", "processor": "Snapdragon 8 Gen 2", "os": "Android 13", "price_min": 95000, "price_max": 140000}
+                    else:
+                        return {"display_size": "6.1 inches", "camera_mp": "50 MP", "battery_mah": "3900 mAh", "storage_gb": "128", "ram_gb": "8", "processor": "Snapdragon 8 Gen 2", "os": "Android 13", "price_min": 80000, "price_max": 120000}
+                elif "fold" in phone_lower:
+                    return {"display_size": "7.6 inches", "camera_mp": "50 MP", "battery_mah": "4400 mAh", "storage_gb": "256", "ram_gb": "12", "processor": "Snapdragon 8 Gen 2", "os": "Android 13", "price_min": 200000, "price_max": 350000}
+                elif "flip" in phone_lower:
+                    return {"display_size": "6.7 inches", "camera_mp": "12 MP", "battery_mah": "3700 mAh", "storage_gb": "256", "ram_gb": "8", "processor": "Snapdragon 8 Gen 2", "os": "Android 13", "price_min": 120000, "price_max": 180000}
                 elif "note 20" in phone_lower:
-                    return {
-                        "display_size": "6.7 inches",
-                        "camera_mp": "64 MP",
-                        "battery_mah": "4300 mAh",
-                        "storage_gb": "128",
-                        "ram_gb": "8",
-                        "processor": "Snapdragon 865+",
-                        "os": "Android 11",
-                        "price_min": 70000,
-                        "price_max": 110000
-                    }
-                else:  # A54 and other Samsung phones
-                    return {
-                        "display_size": "6.4 inches",
-                        "camera_mp": "50 MP", 
-                        "battery_mah": "5000 mAh",
-                        "storage_gb": "128",
-                        "ram_gb": "6",
-                        "processor": "Exynos 1380",
-                        "os": "Android 13",
-                        "price_min": 45000,
-                        "price_max": 65000
-                    }
+                    if "ultra" in phone_lower:
+                        return {"display_size": "6.9 inches", "camera_mp": "108 MP", "battery_mah": "4500 mAh", "storage_gb": "256", "ram_gb": "12", "processor": "Snapdragon 865+", "os": "Android 11", "price_min": 80000, "price_max": 120000}
+                    else:
+                        return {"display_size": "6.7 inches", "camera_mp": "64 MP", "battery_mah": "4300 mAh", "storage_gb": "128", "ram_gb": "8", "processor": "Snapdragon 865+", "os": "Android 11", "price_min": 70000, "price_max": 100000}
+                elif any(x in phone_lower for x in ["a54", "a34", "a24", "a14", "a04"]):  # A series (budget)
+                    if "54" in phone_lower:
+                        return {"display_size": "6.4 inches", "camera_mp": "50 MP", "battery_mah": "5000 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Exynos 1380", "os": "Android 13", "price_min": 45000, "price_max": 65000}
+                    else:
+                        return {"display_size": "6.5 inches", "camera_mp": "48 MP", "battery_mah": "5000 mAh", "storage_gb": "128", "ram_gb": "4", "processor": "Exynos 1280", "os": "Android 12", "price_min": 25000, "price_max": 45000}
+                elif "m" in phone_lower:  # M series (mid-range)
+                    return {"display_size": "6.7 inches", "camera_mp": "108 MP", "battery_mah": "6000 mAh", "storage_gb": "128", "ram_gb": "8", "processor": "Exynos 1380", "os": "Android 13", "price_min": 35000, "price_max": 55000}
+                else:  # Generic Samsung
+                    return {"display_size": "6.4 inches", "camera_mp": "50 MP", "battery_mah": "4500 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Exynos 2200", "os": "Android 12", "price_min": 40000, "price_max": 70000}
             
             # Google Pixel specifications
             elif "pixel" in phone_lower or brand_lower == "google":
-                if "8 pro" in phone_lower:
-                    return {
-                        "display_size": "6.7 inches",
-                        "camera_mp": "50 MP",
-                        "battery_mah": "5050 mAh", 
-                        "storage_gb": "128",
-                        "ram_gb": "12",
-                        "processor": "Google Tensor G3",
-                        "os": "Android 14",
-                        "price_min": 85000,
-                        "price_max": 130000
-                    }
-                elif "8" in phone_lower:
-                    return {
-                        "display_size": "6.2 inches",
-                        "camera_mp": "50 MP",
-                        "battery_mah": "4575 mAh",
-                        "storage_gb": "128", 
-                        "ram_gb": "8",
-                        "processor": "Google Tensor G3",
-                        "os": "Android 14", 
-                        "price_min": 65000,
-                        "price_max": 95000
-                    }
-                elif "7 pro" in phone_lower:
-                    return {
-                        "display_size": "6.7 inches",
-                        "camera_mp": "50 MP",
-                        "battery_mah": "5003 mAh",
-                        "storage_gb": "128",
-                        "ram_gb": "12",
-                        "processor": "Google Tensor G2",
-                        "os": "Android 13",
-                        "price_min": 75000,
-                        "price_max": 115000
-                    }
-                elif "6a" in phone_lower:
-                    return {
-                        "display_size": "6.1 inches", 
-                        "camera_mp": "12.2 MP",
-                        "battery_mah": "4410 mAh",
-                        "storage_gb": "128",
-                        "ram_gb": "6",
-                        "processor": "Google Tensor",
-                        "os": "Android 12",
-                        "price_min": 35000,
-                        "price_max": 50000
-                    }
+                if "8" in phone_lower:
+                    if "pro" in phone_lower:
+                        return {"display_size": "6.7 inches", "camera_mp": "50 MP", "battery_mah": "5050 mAh", "storage_gb": "128", "ram_gb": "12", "processor": "Google Tensor G3", "os": "Android 14", "price_min": 85000, "price_max": 130000}
+                    else:
+                        return {"display_size": "6.2 inches", "camera_mp": "50 MP", "battery_mah": "4575 mAh", "storage_gb": "128", "ram_gb": "8", "processor": "Google Tensor G3", "os": "Android 14", "price_min": 65000, "price_max": 95000}
+                elif "7" in phone_lower:
+                    if "pro" in phone_lower:
+                        return {"display_size": "6.7 inches", "camera_mp": "50 MP", "battery_mah": "5003 mAh", "storage_gb": "128", "ram_gb": "12", "processor": "Google Tensor G2", "os": "Android 13", "price_min": 75000, "price_max": "115000"}
+                    else:
+                        return {"display_size": "6.3 inches", "camera_mp": "50 MP", "battery_mah": "4614 mAh", "storage_gb": "128", "ram_gb": "8", "processor": "Google Tensor G2", "os": "Android 13", "price_min": 55000, "price_max": 85000}
+                elif "6a" in phone_lower or "a" in phone_lower:
+                    return {"display_size": "6.1 inches", "camera_mp": "12.2 MP", "battery_mah": "4410 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Google Tensor", "os": "Android 12", "price_min": 35000, "price_max": 50000}
                 else:
-                    return {
-                        "display_size": "6.3 inches",
-                        "camera_mp": "50 MP",
-                        "battery_mah": "4614 mAh",
-                        "storage_gb": "128", 
-                        "ram_gb": "8",
-                        "processor": "Google Tensor G2",
-                        "os": "Android 13",
-                        "price_min": 55000,
-                        "price_max": 85000
-                    }
+                    return {"display_size": "6.0 inches", "camera_mp": "12.2 MP", "battery_mah": "4080 mAh", "storage_gb": "128", "ram_gb": "8", "processor": "Google Tensor G2", "os": "Android 13", "price_min": 60000, "price_max": 90000}
             
-            # Default specifications for unknown phones
+            # OnePlus specifications
+            elif "oneplus" in phone_lower or brand_lower == "oneplus":
+                if is_flagship:
+                    return {"display_size": "6.7 inches", "camera_mp": "50 MP", "battery_mah": "5400 mAh", "storage_gb": "256", "ram_gb": "12", "processor": "Snapdragon 8 Gen 3", "os": "Android 14", "price_min": 70000, "price_max": 120000}
+                elif "nord" in phone_lower or is_midrange:
+                    return {"display_size": "6.4 inches", "camera_mp": "50 MP", "battery_mah": "4500 mAh", "storage_gb": "128", "ram_gb": "8", "processor": "Snapdragon 7 Gen 3", "os": "Android 13", "price_min": 35000, "price_max": 55000}
+                else:
+                    return {"display_size": "6.7 inches", "camera_mp": "48 MP", "battery_mah": "5000 mAh", "storage_gb": "128", "ram_gb": "8", "processor": "Snapdragon 8 Gen 2", "os": "Android 13", "price_min": 60000, "price_max": 90000}
+            
+            # Xiaomi specifications
+            elif "xiaomi" in phone_lower or "redmi" in phone_lower or "poco" in phone_lower or brand_lower == "xiaomi":
+                if "14" in phone_lower and "ultra" in phone_lower:
+                    return {"display_size": "6.73 inches", "camera_mp": "50 MP", "battery_mah": "4860 mAh", "storage_gb": "256", "ram_gb": "12", "processor": "Snapdragon 8 Gen 3", "os": "Android 14", "price_min": 80000, "price_max": 130000}
+                elif "poco" in phone_lower:
+                    if "f" in phone_lower:  # POCO F series (flagship)
+                        return {"display_size": "6.67 inches", "camera_mp": "64 MP", "battery_mah": "5160 mAh", "storage_gb": "256", "ram_gb": "12", "processor": "Snapdragon 8 Gen 2", "os": "Android 13", "price_min": 50000, "price_max": 80000}
+                    else:  # POCO X series (mid-range)
+                        return {"display_size": "6.67 inches", "camera_mp": "48 MP", "battery_mah": "5100 mAh", "storage_gb": "128", "ram_gb": "8", "processor": "Snapdragon 7s Gen 2", "os": "Android 13", "price_min": 30000, "price_max": 50000}
+                elif "redmi note" in phone_lower:
+                    return {"display_size": "6.67 inches", "camera_mp": "108 MP", "battery_mAh": "5000 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Snapdragon 685", "os": "Android 13", "price_min": 25000, "price_max": 40000}
+                elif is_flagship:
+                    return {"display_size": "6.73 inches", "camera_mp": "50 MP", "battery_mah": "4600 mAh", "storage_gb": "256", "ram_gb": "12", "processor": "Snapdragon 8 Gen 2", "os": "Android 13", "price_min": 60000, "price_max": 100000}
+                else:
+                    return {"display_size": "6.43 inches", "camera_mp": "48 MP", "battery_mah": "4500 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Snapdragon 695", "os": "Android 12", "price_min": 20000, "price_max": 35000}
+            
+            # Default specifications for other brands based on category
             else:
-                return {
-                    "display_size": "6.0 inches",
-                    "camera_mp": "12 MP",
-                    "battery_mah": "3000 mAh",
-                    "storage_gb": "64",
-                    "ram_gb": "4", 
-                    "processor": "Snapdragon 660",
-                    "os": "Android 11",
-                    "price_min": 25000,
-                    "price_max": 45000
-                }
+                if is_flagship:
+                    return {"display_size": "6.7 inches", "camera_mp": "50 MP", "battery_mah": "4500 mAh", "storage_gb": "256", "ram_gb": "8", "processor": "Snapdragon 8 Gen 2", "os": "Android 13", "price_min": 60000, "price_max": 120000}
+                elif is_budget:
+                    return {"display_size": "6.5 inches", "camera_mp": "13 MP", "battery_mah": "4000 mAh", "storage_gb": "64", "ram_gb": "4", "processor": "Snapdragon 460", "os": "Android 11", "price_min": 15000, "price_max": 30000}
+                else:  # mid-range
+                    return {"display_size": "6.4 inches", "camera_mp": "48 MP", "battery_mah": "4500 mAh", "storage_gb": "128", "ram_gb": "6", "processor": "Snapdragon 7 Gen 1", "os": "Android 12", "price_min": 30000, "price_max": 60000}
         
         # Get realistic specs for this phone
         specs = get_realistic_specs(phone_name, brand)
