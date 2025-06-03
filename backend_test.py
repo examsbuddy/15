@@ -1477,6 +1477,9 @@ def main():
     search_result = test_search_functionality()
     compare_result = test_compare_functionality()
     
+    # Run Phone Specifications API integration tests
+    phone_api_integration_result = test_phone_api_integration()
+    
     # Run admin-related tests
     admin_stats_result = test_admin_stats()
     get_all_phone_specs_result = test_get_all_phone_specs()
@@ -1509,6 +1512,7 @@ def main():
     print(f"Create Listing: {'PASSED' if create_listing_result else 'FAILED'}")
     print(f"Search Functionality: {'PASSED' if search_result else 'FAILED'}")
     print(f"Compare Functionality: {'PASSED' if compare_result else 'FAILED'}")
+    print(f"Phone API Integration: {'PASSED' if phone_api_integration_result else 'FAILED'}")
     print(f"Admin Stats: {'PASSED' if admin_stats_result else 'FAILED'}")
     print(f"Get All Phone Specs: {'PASSED' if get_all_phone_specs_result else 'FAILED'}")
     print(f"Create Phone Spec: {'PASSED' if create_phone_spec_result else 'FAILED'}")
@@ -1531,6 +1535,7 @@ def main():
         create_listing_result and 
         search_result and 
         compare_result and
+        phone_api_integration_result and
         admin_stats_result and
         get_all_phone_specs_result and
         create_phone_spec_result and
