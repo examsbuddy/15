@@ -527,6 +527,88 @@ def test_compare_functionality():
             else:
                 print(f"  {key}: {value}")
         
+        # Test the phone specs compare endpoint
+        print("\n--- Testing GET /api/phone-specs/compare ---")
+        response = requests.get(f"{API_URL}/phone-specs/compare")
+        response.raise_for_status()
+        
+        compare_phones = response.json()
+        print(f"Retrieved {len(compare_phones)} phones for comparison")
+        
+        if not compare_phones:
+            print("ERROR: No phones found for comparison")
+            return False
+        
+        # Check if we have a substantial number of phones (should be 682+ phones from 20 brands)
+        if len(compare_phones) < 682:
+            print(f"WARNING: Expected at least 682 phones, but found {len(compare_phones)}")
+        else:
+            print(f"PASSED: Found {len(compare_phones)} phones (expected at least 682)")
+        
+        # Count unique brands
+        unique_brands = set(phone.get('brand', '') for phone in compare_phones)
+        print(f"Found {len(unique_brands)} unique brands: {', '.join(list(unique_brands)[:10])}...")
+        
+        if len(unique_brands) < 20:
+            print(f"WARNING: Expected at least 20 brands, but found {len(unique_brands)}")
+        else:
+            print(f"PASSED: Found {len(unique_brands)} brands (expected at least 20)")
+        
+        # Check for major brands
+        major_brands = ['Apple', 'Samsung', 'Google', 'OnePlus', 'Xiaomi', 'Huawei', 'Nokia', 'Sony']
+        missing_major_brands = [brand for brand in major_brands if brand not in unique_brands]
+        
+        if missing_major_brands:
+            print(f"WARNING: Missing major brands: {', '.join(missing_major_brands)}")
+        else:
+            print(f"PASSED: All major brands are present")
+        
+        # Check required fields in the first few phones
+        print("\n--- Checking required fields in phone data ---")
+        required_fields = ['_id', 'brand', 'model', 'displayName', 'price', 'storage', 'ram', 
+                          'battery', 'camera', 'screen_size', 'processor', 'operating_system']
+        
+        sample_phones = compare_phones[:5]
+        for i, phone in enumerate(sample_phones):
+            print(f"\nSample Phone {i+1}: {phone.get('displayName', 'Unknown')}")
+            missing_fields = [field for field in required_fields if field not in phone]
+            
+            if missing_fields:
+                print(f"WARNING: Missing required fields: {', '.join(missing_fields)}")
+            else:
+                print("PASSED: All required fields are present")
+            
+            # Print some key fields for verification
+            print(f"  Brand: {phone.get('brand', 'N/A')}")
+            print(f"  Model: {phone.get('model', 'N/A')}")
+            print(f"  Storage: {phone.get('storage', 'N/A')}")
+            print(f"  RAM: {phone.get('ram', 'N/A')}")
+            print(f"  Battery: {phone.get('battery', 'N/A')}")
+            print(f"  Camera: {phone.get('camera', 'N/A')}")
+            print(f"  Screen Size: {phone.get('screen_size', 'N/A')}")
+            print(f"  Processor: {phone.get('processor', 'N/A')}")
+            print(f"  OS: {phone.get('operating_system', 'N/A')}")
+        
+        # Verify data transformation is working correctly
+        print("\n--- Checking data transformation ---")
+        transformation_issues = []
+        
+        for phone in sample_phones:
+            # Check storage format (e.g., "256GB")
+            if phone.get('storage') and not phone.get('storage', '').endswith('GB'):
+                transformation_issues.append(f"Storage format issue in {phone.get('displayName')}: {phone.get('storage')}")
+            
+            # Check battery format (e.g., "4000 mAh")
+            if phone.get('battery') and not phone.get('battery', '').endswith('mAh'):
+                transformation_issues.append(f"Battery format issue in {phone.get('displayName')}: {phone.get('battery')}")
+        
+        if transformation_issues:
+            print("WARNING: Data transformation issues found:")
+            for issue in transformation_issues:
+                print(f"  - {issue}")
+        else:
+            print("PASSED: Data transformation is working correctly")
+        
         return True
     except Exception as e:
         print(f"Error testing compare functionality: {str(e)}")
