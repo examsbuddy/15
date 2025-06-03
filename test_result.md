@@ -193,11 +193,13 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Phone Specs Compare Endpoint"
     - "Admin User Management Endpoints"
     - "Pending Approvals Endpoint"
     - "Featured Shops Endpoint"
     - "Search API Functionality"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Phone Specs Compare Endpoint"
   test_all: false
   test_priority: "high_first"
 
