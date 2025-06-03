@@ -3766,6 +3766,17 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
   console.log('ComparisonPage: allPhones count:', allPhones.length);
   if (allPhones.length > 0) {
     console.log('Sample phone data:', allPhones[0]);
+    
+    // Log all unique brands to see what we have
+    const brands = [...new Set(allPhones.map(phone => phone.brand))];
+    console.log('Available brands:', brands);
+    
+    // Look for Samsung specifically
+    const samsungPhones = allPhones.filter(phone => phone.brand.toLowerCase().includes('samsung'));
+    console.log('Samsung phones found:', samsungPhones.length);
+    if (samsungPhones.length > 0) {
+      console.log('First Samsung phone:', samsungPhones[0]);
+    }
   }
   
   // For the compare endpoint, the data is already in the right format, no transformation needed
