@@ -3807,7 +3807,9 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
     }
   ];
 
-  const phonesToUse = allPhones.length > 0 ? allPhones : samplePhones;
+  // Transform all phone specs data to component format
+  const transformedPhones = allPhones.map(transformPhoneData);
+  const phonesToUse = transformedPhones.length > 0 ? transformedPhones : samplePhones;
 
   // Filter phones based on search query
   const getFilteredPhones = (query, excludeId = null) => {
