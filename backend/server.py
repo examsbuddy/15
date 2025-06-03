@@ -17,6 +17,10 @@ from enum import Enum
 import base64
 import csv
 import io
+import requests
+import asyncio
+import aiohttp
+from concurrent.futures import ThreadPoolExecutor
 
 # Configure logging first
 logging.basicConfig(
