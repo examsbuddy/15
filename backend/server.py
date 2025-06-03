@@ -1117,12 +1117,20 @@ async def get_phone_specs_for_compare():
     try:
         phone_specs = []
         async for phone in db.phone_specs.find():
+            # Extract brand and model correctly
+            brand = phone.get("brand", "Unknown")
+            model = phone.get("model", "Unknown")
+            
+            # Remove brand name from model if it's duplicated
+            if model.startswith(brand):
+                model = model[len(brand):].strip()
+            
             # Transform to compare-friendly format
             compare_phone = {
-                "_id": phone.get("_id"),
-                "brand": phone.get("brand", "Unknown"),
-                "model": phone.get("model", "Unknown"),
-                "displayName": f"{phone.get('brand', 'Unknown')} {phone.get('model', 'Unknown')}",
+                "_id": str(phone.get("_id")),
+                "brand": brand,
+                "model": model,
+                "displayName": f"{brand} {model}",
                 "price": phone.get("price_range_min", 0),
                 "photos": ['/api/placeholder/300/200'],
                 "storage": f"{phone.get('storage_gb', 'N/A')}GB" if phone.get('storage_gb') else 'N/A',
@@ -1133,7 +1141,7 @@ async def get_phone_specs_for_compare():
                 "processor": phone.get('processor', 'N/A'),
                 "operating_system": phone.get('operating_system', 'N/A'),
                 "network": "5G" if phone.get('network_5g') == 'Yes' else "4G",
-                "price_range": f"PKR {phone.get('price_range_min', 0):,} - {phone.get('price_range_max', 0):,}" if phone.get('price_range_min') else 'Price not available'
+                "price_range": f"PKR {phone.get('price_range_min', 0)} - {phone.get('price_range_max', 0)}" if phone.get('price_range_min') else 'Price not available'
             }
             phone_specs.append(compare_phone)
         
