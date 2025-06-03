@@ -3765,6 +3765,11 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
   // Transform all phone specs data to component format
   const transformedPhones = allPhones.map(transformPhoneData);
   const phonesToUse = transformedPhones.length > 0 ? transformedPhones : samplePhones;
+  
+  // Debug logging
+  console.log('ComparisonPage allPhones:', allPhones.length);
+  console.log('ComparisonPage transformedPhones:', transformedPhones.length);
+  console.log('ComparisonPage phonesToUse:', phonesToUse.length);
 
   // Filter phones based on search query
   const getFilteredPhones = (query, excludeId = null) => {
