@@ -201,8 +201,7 @@ test_plan:
     - "Pending Approvals Endpoint"
     - "Featured Shops Endpoint"
     - "Search API Functionality"
-  stuck_tasks:
-    - "Phone Specs Compare Endpoint"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
