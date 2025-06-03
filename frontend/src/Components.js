@@ -7528,7 +7528,8 @@ const PhoneSpecsManager = () => {
         </div>
         <div className="flex space-x-3">
           <button
-            onClick={async () => {
+            onClick={() => {
+              alert('Button clicked! This means the button is working.');
               const brands = ['Apple', 'Samsung', 'Google'];
               const choice = prompt(`Choose sync option:
 1. Sync Popular Brands (Apple, Samsung, Google) - Enter: popular
@@ -7537,29 +7538,27 @@ const PhoneSpecsManager = () => {
               if (choice === 'popular') {
                 // Sync popular brands
                 setSyncLoading(true);
-                try {
-                  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/popular-brands`, {
-                    method: 'POST'
-                  });
-                  if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                      await loadPhoneSpecs();
-                      alert(`Successfully synced ${data.successful_imports} phones from ${data.total_brands} brands!`);
-                    } else {
-                      alert(`Sync failed: ${data.errors?.[0] || 'Unknown error'}`);
-                    }
+                fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/popular-brands`, {
+                  method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.success) {
+                    loadPhoneSpecs();
+                    alert(`Successfully synced ${data.successful_imports} phones from ${data.total_brands} brands!`);
                   } else {
-                    alert('Failed to sync popular brands');
+                    alert(`Sync failed: ${data.errors?.[0] || 'Unknown error'}`);
                   }
-                } catch (error) {
+                })
+                .catch(error => {
                   alert(`Error: ${error.message}`);
-                } finally {
+                })
+                .finally(() => {
                   setSyncLoading(false);
-                }
+                });
               } else if (brands.includes(choice)) {
                 // Sync specific brand
-                await syncSpecificBrand(choice);
+                syncSpecificBrand(choice);
               } else if (choice) {
                 alert('Invalid choice. Please enter "popular" or a valid brand name.');
               }
