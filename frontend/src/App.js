@@ -243,7 +243,7 @@ function App() {
             addToCompare={addToCompare}
             removeFromCompare={removeFromCompare}
             onBack={handleBackToHome}
-            allPhones={[]} // You can pass actual phone data here if available
+            allPhones={allPhoneSpecs}
           />
         )}
 
