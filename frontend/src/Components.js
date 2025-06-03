@@ -7528,42 +7528,7 @@ const PhoneSpecsManager = () => {
         </div>
         <div className="flex space-x-3">
           <button
-            onClick={async () => {
-              const brands = ['Apple', 'Samsung', 'Google'];
-              const choice = prompt(`Choose sync option:
-1. Sync Popular Brands (Apple, Samsung, Google) - Enter: popular
-2. Sync Specific Brand - Enter brand name: ${brands.join(', ')}`);
-              
-              if (choice === 'popular') {
-                // Sync popular brands
-                setSyncLoading(true);
-                try {
-                  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/popular-brands`, {
-                    method: 'POST'
-                  });
-                  if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                      await loadPhoneSpecs();
-                      alert(`Successfully synced ${data.successful_imports} phones from ${data.total_brands} brands!`);
-                    } else {
-                      alert(`Sync failed: ${data.errors?.[0] || 'Unknown error'}`);
-                    }
-                  } else {
-                    alert('Failed to sync popular brands');
-                  }
-                } catch (error) {
-                  alert(`Error: ${error.message}`);
-                } finally {
-                  setSyncLoading(false);
-                }
-              } else if (brands.includes(choice)) {
-                // Sync specific brand
-                await syncSpecificBrand(choice);
-              } else if (choice) {
-                alert('Invalid choice. Please enter "popular" or a valid brand name.');
-              }
-            }}
+            onClick={() => alert('Button works!')}
             disabled={syncLoading}
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
           >
