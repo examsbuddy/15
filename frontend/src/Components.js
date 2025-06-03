@@ -3764,6 +3764,9 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
 
   // Transform all phone specs data to component format
   console.log('ComparisonPage: allPhones count:', allPhones.length);
+  if (allPhones.length > 0) {
+    console.log('Sample phone data:', allPhones[0]);
+  }
   
   // For the compare endpoint, the data is already in the right format, no transformation needed
   const phonesToUse = allPhones.length > 0 ? allPhones : samplePhones;
