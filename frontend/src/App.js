@@ -95,6 +95,24 @@ function App() {
     setCompareList(compareList.filter(p => p._id !== phoneId));
   };
 
+  // Load all phone specs for comparison
+  const loadAllPhoneSpecs = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-specs`);
+      if (response.ok) {
+        const phoneSpecs = await response.json();
+        setAllPhoneSpecs(phoneSpecs);
+      }
+    } catch (error) {
+      console.error('Error loading phone specs:', error);
+    }
+  };
+
+  // Load phone specs on mount
+  useEffect(() => {
+    loadAllPhoneSpecs();
+  }, []);
+
   // Mobile view detection
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
