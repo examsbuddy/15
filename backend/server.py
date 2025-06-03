@@ -357,6 +357,89 @@ class CSVUploadResponse(BaseModel):
     errors: List[str] = []
     imported_specs: List[str] = []  # List of "Brand Model" names that were imported
 
+# Phone API Sync Models
+class PhoneAPISyncResponse(BaseModel):
+    success: bool
+    total_brands: int
+    total_phones: int
+    successful_imports: int
+    failed_imports: int
+    errors: List[str] = []
+    imported_phones: List[str] = []
+    status: str  # "in_progress", "completed", "failed"
+
+class BrandSyncResponse(BaseModel):
+    success: bool
+    brand: str
+    total_phones: int
+    successful_imports: int
+    failed_imports: int
+    errors: List[str] = []
+
+# Phone Specifications API Client
+class PhoneSpecsAPIClient:
+    def __init__(self):
+        self.base_url = "https://phone-specs-api.azharimm.dev"
+        self.session = None
+        
+    async def get_session(self):
+        if self.session is None:
+            self.session = aiohttp.ClientSession()
+        return self.session
+        
+    async def close_session(self):
+        if self.session:
+            await self.session.close()
+            self.session = None
+    
+    async def get_brands(self) -> List[Dict]:
+        """Get all available phone brands"""
+        try:
+            session = await self.get_session()
+            async with session.get(f"{self.base_url}/brands") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data.get("data", [])
+                else:
+                    logger.error(f"API request failed with status {response.status}")
+                    return []
+        except Exception as e:
+            logger.error(f"Error fetching brands: {str(e)}")
+            return []
+    
+    async def get_brand_phones(self, brand_slug: str) -> List[Dict]:
+        """Get all phones for a specific brand"""
+        try:
+            session = await self.get_session()
+            async with session.get(f"{self.base_url}/brands/{brand_slug}") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data.get("data", {}).get("phones", [])
+                else:
+                    logger.error(f"API request failed for brand {brand_slug} with status {response.status}")
+                    return []
+        except Exception as e:
+            logger.error(f"Error fetching phones for brand {brand_slug}: {str(e)}")
+            return []
+    
+    async def get_phone_details(self, phone_slug: str) -> Dict:
+        """Get detailed specifications for a specific phone"""
+        try:
+            session = await self.get_session()
+            async with session.get(f"{self.base_url}/phones/{phone_slug}") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data.get("data", {})
+                else:
+                    logger.error(f"API request failed for phone {phone_slug} with status {response.status}")
+                    return {}
+        except Exception as e:
+            logger.error(f"Error fetching phone details for {phone_slug}: {str(e)}")
+            return {}
+
+# Global API client instance
+phone_api_client = PhoneSpecsAPIClient()
+
 # Admin Stats Response Model
 class AdminStats(BaseModel):
     totalListings: int
