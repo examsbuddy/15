@@ -3852,6 +3852,10 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
       console.log('First match:', filtered[0]);
     }
     return filtered;
+    if (filtered.length > 0) {
+      console.log('First match:', filtered[0]);
+    }
+    return filtered;
   };
 
   const handlePhoneSelect = (phone, index) => {
