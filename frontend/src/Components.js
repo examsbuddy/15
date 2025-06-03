@@ -7529,7 +7529,7 @@ const PhoneSpecsManager = () => {
         <div className="flex space-x-3">
           <button
             onClick={async () => {
-              const choice = prompt('Enter sync option:\n"popular" = Apple/Samsung/Google (15 phones)\n"all" = ALL BRANDS (1000+ phones)\nOr enter specific brand name (Apple, Samsung, Google, OnePlus, Xiaomi, Huawei, etc.):');
+              const choice = prompt('Enter "popular" to sync Apple/Samsung/Google, or enter a brand name (Apple, Samsung, Google):');
               
               if (!choice) return;
               
@@ -7539,10 +7539,6 @@ const PhoneSpecsManager = () => {
                 let response;
                 if (choice.toLowerCase() === 'popular') {
                   response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/popular-brands`, {
-                    method: 'POST'
-                  });
-                } else if (choice.toLowerCase() === 'all') {
-                  response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/all-brands`, {
                     method: 'POST'
                   });
                 } else {
@@ -7559,8 +7555,8 @@ const PhoneSpecsManager = () => {
                     // Force a page refresh as backup
                     setTimeout(() => {
                       window.location.reload();
-                    }, 3000);
-                    alert(`✅ SUCCESS! Synced ${data.successful_imports} phones from ${data.total_brands || 1} brand(s). Page will refresh in 3 seconds to show all phones.`);
+                    }, 2000);
+                    alert(`✅ Success! Synced ${data.successful_imports} phones. Page will refresh in 2 seconds.`);
                   } else {
                     alert(`❌ Sync failed: ${data.errors?.[0] || 'Unknown error'}`);
                   }
