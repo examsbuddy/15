@@ -514,139 +514,81 @@ phone_api_client = PhoneSpecsAPIClient()
 def transform_api_phone_to_db_format(api_phone_data: Dict) -> Dict:
     """Transform phone data from API format to our database format"""
     try:
-        specifications = api_phone_data.get("specifications", [])
-        
-        # Helper function to extract spec value by key
-        def get_spec_value(spec_key: str) -> str:
-            for spec_group in specifications:
-                if isinstance(spec_group, dict):
-                    specs = spec_group.get("specs", [])
-                    for spec in specs:
-                        if isinstance(spec, dict) and spec.get("key", "").lower() == spec_key.lower():
-                            return spec.get("val", [""])[0] if isinstance(spec.get("val"), list) else str(spec.get("val", ""))
-            return ""
-        
-        # Helper function to get nested spec value
-        def get_nested_spec(category: str, key: str) -> str:
-            for spec_group in specifications:
-                if isinstance(spec_group, dict) and spec_group.get("category", "").lower() == category.lower():
-                    specs = spec_group.get("specs", [])
-                    for spec in specs:
-                        if isinstance(spec, dict) and spec.get("key", "").lower() == key.lower():
-                            val = spec.get("val", [""])
-                            return val[0] if isinstance(val, list) and val else str(val) if val else ""
-            return ""
-        
         # Extract basic information
-        phone_name = api_phone_data.get("phone_name", "")
-        brand = api_phone_data.get("brand", "")
+        phone_name = api_phone_data.get("DeviceName", "")
+        brand = api_phone_data.get("Brand", "")
         
-        # Extract detailed specs from the specifications array
-        dimensions = get_nested_spec("body", "dimensions") or get_spec_value("dimensions")
-        weight = get_nested_spec("body", "weight") or get_spec_value("weight")
-        sim = get_nested_spec("body", "sim") or get_spec_value("sim")
-        
-        # Display specs
-        display_type = get_nested_spec("display", "type") or get_spec_value("display type")
-        display_size = get_nested_spec("display", "size") or get_spec_value("size")
-        display_resolution = get_nested_spec("display", "resolution") or get_spec_value("resolution")
-        
-        # Platform/OS specs  
-        os = get_nested_spec("platform", "os") or get_spec_value("os")
-        chipset = get_nested_spec("platform", "chipset") or get_spec_value("chipset")
-        cpu = get_nested_spec("platform", "cpu") or get_spec_value("cpu")
-        gpu = get_nested_spec("platform", "gpu") or get_spec_value("gpu")
-        
-        # Memory specs
-        card_slot = get_nested_spec("memory", "card slot") or get_spec_value("card slot")
-        internal_storage = get_nested_spec("memory", "internal") or get_spec_value("internal")
-        
-        # Camera specs
-        main_camera = get_nested_spec("main camera", "single") or get_nested_spec("main camera", "dual") or get_nested_spec("main camera", "triple") or get_nested_spec("main camera", "quad") or get_spec_value("main camera")
-        front_camera = get_nested_spec("selfie camera", "single") or get_nested_spec("selfie camera", "dual") or get_spec_value("selfie camera")
-        
-        # Battery specs
-        battery = get_nested_spec("battery", "type") or get_spec_value("battery")
-        charging = get_nested_spec("battery", "charging") or get_spec_value("charging")
-        
-        # Network specs
-        network_2g = get_nested_spec("network", "2g bands") or get_spec_value("2g bands")
-        network_3g = get_nested_spec("network", "3g bands") or get_spec_value("3g bands")
-        network_4g = get_nested_spec("network", "4g bands") or get_spec_value("4g bands")
-        network_5g = get_nested_spec("network", "5g bands") or get_spec_value("5g bands")
-        
-        # Connectivity
-        wlan = get_nested_spec("comms", "wlan") or get_spec_value("wlan")
-        bluetooth = get_nested_spec("comms", "bluetooth") or get_spec_value("bluetooth")
-        gps = get_nested_spec("comms", "positioning") or get_spec_value("gps")
-        nfc = get_nested_spec("comms", "nfc") or get_spec_value("nfc")
-        usb = get_nested_spec("comms", "usb") or get_spec_value("usb")
-        
-        # Features
-        sensors = get_nested_spec("features", "sensors") or get_spec_value("sensors")
-        
-        # Create the database document
+        # Create the database document with direct field mapping
         db_document = {
             "_id": str(uuid.uuid4()),
             "brand": brand,
             "model": phone_name,
             
             # Build Information
-            "os": os or None,
-            "dimensions": dimensions or None,
-            "weight": weight or None,
-            "sim": sim or None,
+            "os": api_phone_data.get("os", None),
+            "dimensions": api_phone_data.get("dimensions", None),
+            "weight": api_phone_data.get("weight", None),
+            "sim": api_phone_data.get("sim", None),
             
             # Display
-            "display_technology": display_type or None,
-            "display_size": display_size or None,
-            "display_resolution": display_resolution or None,
+            "display_technology": api_phone_data.get("type", None),
+            "display_size": api_phone_data.get("size", None),
+            "display_resolution": api_phone_data.get("resolution", None),
+            "display_protection": api_phone_data.get("protection", None),
             
             # Processor
-            "cpu": cpu or None,
-            "chipset": chipset or None,
-            "gpu": gpu or None,
+            "cpu": api_phone_data.get("cpu", None),
+            "chipset": api_phone_data.get("chipset", None),
+            "gpu": api_phone_data.get("gpu", None),
             
             # Memory
-            "storage": internal_storage or None,
-            "card_slot": card_slot or None,
+            "storage": api_phone_data.get("internal", None),
+            "card_slot": api_phone_data.get("card_slot", None),
             
             # Camera
-            "main_camera": main_camera or None,
-            "front_camera": front_camera or None,
+            "main_camera": api_phone_data.get("main_camera", None),
+            "front_camera": api_phone_data.get("front_camera", None),
             
             # Connectivity
-            "wlan": wlan or None,
-            "bluetooth": bluetooth or None,
-            "gps": gps or None,
-            "nfc": nfc or None,
-            "usb": usb or None,
+            "wlan": api_phone_data.get("wlan", None),
+            "bluetooth": api_phone_data.get("bluetooth", None),
+            "gps": api_phone_data.get("positioning", None),
+            "nfc": api_phone_data.get("nfc", None),
+            "usb": api_phone_data.get("usb", None),
+            "radio": api_phone_data.get("radio", None),
             
             # Network
-            "network_2g": network_2g or None,
-            "network_3g": network_3g or None,
-            "network_4g": network_4g or None,
-            "network_5g": network_5g or None,
+            "network_technology": api_phone_data.get("technology", None),
+            "network_2g": api_phone_data.get("2g_bands", None),
+            "network_3g": api_phone_data.get("3g_bands", None),
+            "network_4g": api_phone_data.get("4g_bands", None),
+            "network_5g": api_phone_data.get("5g_bands", None),
             
             # Battery
-            "battery_capacity": battery or None,
-            "charging": charging or None,
+            "battery_capacity": api_phone_data.get("battery", None),
+            "charging": api_phone_data.get("charging", None),
             
             # Features
-            "sensors": sensors or None,
+            "sensors": api_phone_data.get("sensors", None),
+            "loudspeaker": api_phone_data.get("loudspeaker", None),
+            "audio_jack": api_phone_data.get("3_5mm_jack", None),
+            "colors": api_phone_data.get("colors", None),
+            
+            # Additional Info
+            "announced": api_phone_data.get("announced", None),
+            "status": api_phone_data.get("status", None),
             
             # Legacy fields for backward compatibility
-            "display_size_legacy": display_size or None,
-            "processor": chipset or cpu or None,
-            "operating_system": os or None,
+            "display_size_legacy": api_phone_data.get("size", None),
+            "processor": api_phone_data.get("chipset") or api_phone_data.get("cpu", None),
+            "operating_system": api_phone_data.get("os", None),
             "release_year": datetime.now().year,
             
             # Metadata
             "created_at": datetime.utcnow(),
             "updated_at": datetime.utcnow(),
             "source": "phone_specs_api",
-            "api_slug": api_phone_data.get("slug", ""),
-            "api_image": api_phone_data.get("phone_images", [None])[0] if api_phone_data.get("phone_images") else None
+            "api_device_name": api_phone_data.get("DeviceName", "")
         }
         
         return db_document
