@@ -37,7 +37,7 @@ async def fix_compare_endpoint():
             "processor": phone.get('processor', 'N/A'),
             "operating_system": phone.get('operating_system', 'N/A'),
             "network": "5G" if phone.get('network_5g') == 'Yes' else "4G",
-            "price_range": f"PKR {phone.get('price_range_min', 0):,} - {phone.get('price_range_max', 0):,}" if phone.get('price_range_min') else 'Price not available'
+            "price_range": f"PKR {phone.get('price_range_min', 0)} - {phone.get('price_range_max', 0)}" if phone.get('price_range_min') else 'Price not available'
         }
         phone_specs.append(compare_phone)
     
