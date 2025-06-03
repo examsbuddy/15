@@ -218,3 +218,5 @@ agent_communication:
     message: "Enhanced search experience on SearchResultsPage with improved search input design, mobile-responsive search bar, quick search suggestions, and better UX. All improvements maintain existing functionality while providing better visual design and usability."
   - agent: "main" 
     message: "Added professional test data to make the website look realistic and professional: 15+ new phone listings with realistic photos, professional shop accounts, featured listings, and diverse price ranges (₨45,000 to ₨520,000). All listings include detailed specifications, realistic descriptions, and high-quality product images from reputable sources."
+  - agent: "testing"
+    message: "I've tested the phone specs compare functionality and found an issue with the GET /api/phone-specs/compare endpoint. The endpoint is implemented but returns an empty array instead of the expected phone data. The database contains 145+ phone specifications, but the compare endpoint returns 0 phones. This suggests there might be an issue with how the endpoint is querying the database or transforming the data."
