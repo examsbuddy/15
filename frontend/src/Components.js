@@ -3801,6 +3801,7 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
     // Add brand aliases
     if (queryLower.includes('samsung')) {
       searchTerms.push('galaxy');
+      console.log('Samsung detected - adding Galaxy to search terms');
     }
     if (queryLower.includes('galaxy')) {
       searchTerms.push('samsung');
@@ -3820,22 +3821,36 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
     
     console.log('Search terms:', searchTerms);
     
+    // Debug: show some Galaxy phones to verify they exist
+    if (queryLower.includes('samsung')) {
+      const galaxyPhones = phonesToUse.filter(phone => phone.brand && phone.brand.toLowerCase().includes('galaxy'));
+      console.log('Available Galaxy phones:', galaxyPhones.length);
+      if (galaxyPhones.length > 0) {
+        console.log('First Galaxy phone:', galaxyPhones[0]);
+      }
+    }
+    
     const filtered = phonesToUse.filter(phone => {
       if (phone._id === excludeId) return false;
       
       const phoneText = `${phone.brand} ${phone.model}`.toLowerCase();
-      const brandLower = phone.brand.toLowerCase();
-      const modelLower = phone.model.toLowerCase();
+      const brandLower = phone.brand ? phone.brand.toLowerCase() : '';
+      const modelLower = phone.model ? phone.model.toLowerCase() : '';
       
       // Check if any search term matches
-      return searchTerms.some(term => 
+      const matches = searchTerms.some(term => 
         phoneText.includes(term) ||
         brandLower.includes(term) ||
         modelLower.includes(term)
       );
+      
+      return matches;
     });
     
     console.log('Query:', query, '- found', filtered.length, 'phones');
+    if (filtered.length > 0) {
+      console.log('First match:', filtered[0]);
+    }
     return filtered;
   };
 
