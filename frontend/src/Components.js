@@ -7481,6 +7481,57 @@ const PhoneSpecsManager = () => {
     }
   };
 
+  // Phone API Sync Functions
+  const syncPopularBrands = async () => {
+    setSyncLoading(true);
+    setSyncResult(null);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/popular-brands`, {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSyncResult(data);
+        if (data.success) {
+          await loadPhoneSpecs(); // Refresh the phone specs list
+        }
+      } else {
+        setSyncResult({ success: false, error: 'Failed to sync popular brands' });
+      }
+    } catch (error) {
+      console.error('Failed to sync popular brands:', error);
+      setSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncLoading(false);
+    }
+  };
+
+  const syncSpecificBrand = async (brandName) => {
+    setSyncLoading(true);
+    setSyncResult(null);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/sync/brand/${brandName}`, {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSyncResult(data);
+        if (data.success) {
+          await loadPhoneSpecs(); // Refresh the phone specs list
+        }
+      } else {
+        setSyncResult({ success: false, error: `Failed to sync ${brandName}` });
+      }
+    } catch (error) {
+      console.error(`Failed to sync ${brandName}:`, error);
+      setSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     loadPhoneSpecs();
