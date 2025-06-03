@@ -4063,30 +4063,35 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
                   {/* Dropdown */}
                   {showDropdowns[index] && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
-                      {getFilteredPhones(searchQueries[index], selectedPhones[1-index]?._id).slice(0, 8).map((phone) => (
-                        <button
-                          key={phone._id}
-                          onClick={() => handlePhoneSelect(phone, index)}
-                          className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left border-b border-gray-100 last:border-b-0"
-                        >
-                          <img
-                            src={phone.photos?.[0] || '/api/placeholder/40/30'}
-                            alt={`${phone.brand} ${phone.model}`}
-                            className="w-10 h-8 object-cover rounded"
-                          />
-                          <div>
-                            <div className="font-medium text-gray-900">
-                              {phone.brand} {phone.model}
+                      {(() => {
+                        const filteredPhones = getFilteredPhones(searchQueries[index], selectedPhones[1-index]?._id);
+                        const displayPhones = filteredPhones.slice(0, 20); // Show up to 20 phones instead of 8
+                        console.log(`Dropdown for index ${index}: ${filteredPhones.length} filtered, showing ${displayPhones.length}`);
+                        return displayPhones.map((phone) => (
+                          <button
+                            key={phone._id}
+                            onClick={() => handlePhoneSelect(phone, index)}
+                            className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left border-b border-gray-100 last:border-b-0"
+                          >
+                            <img
+                              src={phone.photos?.[0] || '/api/placeholder/40/30'}
+                              alt={`${phone.brand} ${phone.model}`}
+                              className="w-10 h-8 object-cover rounded"
+                            />
+                            <div>
+                              <div className="font-medium text-gray-900">
+                                {phone.brand} {phone.model}
+                              </div>
+                              <div className="text-sm text-blue-600 font-semibold">
+                                ₨{phone.price?.toLocaleString()}
+                              </div>
                             </div>
-                            <div className="text-sm text-blue-600 font-semibold">
-                              ₨{phone.price?.toLocaleString()}
+                            <div className="ml-auto">
+                              {phone.pta_approved ? '✅' : '❌'}
                             </div>
-                          </div>
-                          <div className="ml-auto">
-                            {phone.pta_approved ? '✅' : '❌'}
-                          </div>
-                        </button>
-                      ))}
+                          </button>
+                        ));
+                      })()}
                       
                       {getFilteredPhones(searchQueries[index], selectedPhones[1-index]?._id).length === 0 && (
                         <div className="px-4 py-3 text-gray-500 text-center">
