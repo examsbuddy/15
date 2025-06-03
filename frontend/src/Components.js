@@ -3794,12 +3794,46 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
       return filtered;
     }
     
-    const filtered = phonesToUse.filter(phone => 
-      phone._id !== excludeId && 
-      (`${phone.brand} ${phone.model}`.toLowerCase().includes(query.toLowerCase()) ||
-       phone.brand.toLowerCase().includes(query.toLowerCase()) ||
-       phone.model.toLowerCase().includes(query.toLowerCase()))
-    );
+    // Handle brand aliases
+    const queryLower = query.toLowerCase();
+    let searchTerms = [queryLower];
+    
+    // Add brand aliases
+    if (queryLower.includes('samsung')) {
+      searchTerms.push('galaxy');
+    }
+    if (queryLower.includes('galaxy')) {
+      searchTerms.push('samsung');
+    }
+    if (queryLower.includes('apple')) {
+      searchTerms.push('iphone');
+    }
+    if (queryLower.includes('iphone')) {
+      searchTerms.push('apple');
+    }
+    if (queryLower.includes('google')) {
+      searchTerms.push('pixel');
+    }
+    if (queryLower.includes('pixel')) {
+      searchTerms.push('google');
+    }
+    
+    console.log('Search terms:', searchTerms);
+    
+    const filtered = phonesToUse.filter(phone => {
+      if (phone._id === excludeId) return false;
+      
+      const phoneText = `${phone.brand} ${phone.model}`.toLowerCase();
+      const brandLower = phone.brand.toLowerCase();
+      const modelLower = phone.model.toLowerCase();
+      
+      // Check if any search term matches
+      return searchTerms.some(term => 
+        phoneText.includes(term) ||
+        brandLower.includes(term) ||
+        modelLower.includes(term)
+      );
+    });
     
     console.log('Query:', query, '- found', filtered.length, 'phones');
     return filtered;
