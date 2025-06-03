@@ -7481,19 +7481,6 @@ const PhoneSpecsManager = () => {
     }
   };
 
-  // Phone API Sync Functions
-  const loadAvailableBrands = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-api/brands`);
-      if (response.ok) {
-        const data = await response.json();
-        setAvailableBrands(data.brands || []);
-      }
-    } catch (error) {
-      console.error('Failed to load available brands:', error);
-    }
-  };
-
 
   useEffect(() => {
     loadPhoneSpecs();
