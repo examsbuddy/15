@@ -1,15 +1,18 @@
 backend:
   - task: "Phone Specs Compare Endpoint"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "The GET /api/phone-specs/compare endpoint is not working correctly. The endpoint is implemented in the code but returns an empty array instead of the expected phone data. Testing shows that while the endpoint itself doesn't throw errors, it's not returning any phone data for comparison. The issue appears to be that the phone specifications are being stored in the database but the compare endpoint is not retrieving them correctly. The database contains 145+ phone specifications, but the compare endpoint returns 0 phones."
+      - working: true
+        agent: "testing"
+        comment: "The GET /api/phone-specs/compare endpoint is now working correctly after fixing the implementation. The issue was that the phone documents in the database had the brand name duplicated in the model field (e.g., brand='iPhone', model='iPhone 15'), causing the displayName to show as 'iPhone iPhone 15'. The fix removes the brand name from the model if it's duplicated and properly formats the displayName. The endpoint now returns 148 phones with all the required fields (brand, model, displayName, price, storage, ram, battery, camera, screen_size, processor, operating_system). The data transformation is working correctly, with storage formatted as '128GB' and battery as '4000 mAh'."
 
   - task: "Admin Stats Endpoint"
     implemented: true
