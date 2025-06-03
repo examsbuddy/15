@@ -2026,6 +2026,233 @@ export const HeroSearchBar = ({ onSearch }) => {
           )}
         </div>
       )}
+
+      {/* Phone API Sync Modal */}
+      {showPhoneSync && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-medium text-gray-900">Sync Phone Data from API</h3>
+                <button
+                  onClick={() => {
+                    setShowPhoneSync(false);
+                    setSyncResult(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {syncStatus && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <h4 className="font-medium text-blue-900 mb-2">Current Database Status:</h4>
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div className="text-center">
+                      <div className="text-xl font-semibold text-blue-600">{syncStatus.total_phones || 0}</div>
+                      <div className="text-blue-800">Total Phones</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xl font-semibold text-green-600">{syncStatus.api_phones || 0}</div>
+                      <div className="text-blue-800">API Synced</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xl font-semibold text-gray-600">{syncStatus.manual_phones || 0}</div>
+                      <div className="text-blue-800">Manual Entry</div>
+                    </div>
+                  </div>
+                  {syncStatus.last_sync && (
+                    <div className="mt-2 text-sm text-blue-800">
+                      Last Sync: {new Date(syncStatus.last_sync).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {!syncResult ? (
+                <div className="space-y-6">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h4 className="font-medium text-yellow-900 mb-2">Phone Specifications API</h4>
+                    <p className="text-sm text-yellow-800 mb-3">
+                      Sync comprehensive phone specifications from our external API database. 
+                      This includes detailed specs for popular brands like Apple, Samsung, Google, and more.
+                    </p>
+                    <ul className="text-sm text-yellow-800 space-y-1">
+                      <li>• Comprehensive specs: Display, Camera, Battery, Processor, Memory</li>
+                      <li>• Network connectivity: 2G/3G/4G/5G bands, WiFi, Bluetooth</li>
+                      <li>• Physical specs: Dimensions, Weight, Colors</li>
+                      <li>• Latest phone models with accurate specifications</li>
+                    </ul>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Quick Sync Popular Brands */}
+                    <div className="border border-gray-200 rounded-lg p-4">
+                      <h5 className="font-medium text-gray-900 mb-3">Quick Sync - Popular Brands</h5>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Sync phones from Apple, Samsung, and Google (recommended for quick setup)
+                      </p>
+                      <button
+                        onClick={syncPopularBrands}
+                        disabled={syncLoading}
+                        className="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                      >
+                        {syncLoading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            <span>Syncing...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Globe className="w-4 h-4" />
+                            <span>Sync Popular Brands</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Individual Brand Sync */}
+                    <div className="border border-gray-200 rounded-lg p-4">
+                      <h5 className="font-medium text-gray-900 mb-3">Sync Specific Brand</h5>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Choose a specific brand to sync all available phone models
+                      </p>
+                      <div className="space-y-3">
+                        <select
+                          value={selectedBrand}
+                          onChange={(e) => setSelectedBrand(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                        >
+                          <option value="">Select a brand</option>
+                          <option value="Apple">Apple</option>
+                          <option value="Samsung">Samsung</option>
+                          <option value="Google">Google</option>
+                          <option value="OnePlus">OnePlus</option>
+                          <option value="Xiaomi">Xiaomi</option>
+                          <option value="Huawei">Huawei</option>
+                          <option value="Nokia">Nokia</option>
+                          <option value="Sony">Sony</option>
+                          <option value="LG">LG</option>
+                          <option value="Motorola">Motorola</option>
+                        </select>
+                        <button
+                          onClick={() => selectedBrand && syncSpecificBrand(selectedBrand)}
+                          disabled={!selectedBrand || syncLoading}
+                          className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                        >
+                          {syncLoading ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              <span>Syncing...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Download className="w-4 h-4" />
+                              <span>Sync {selectedBrand || 'Brand'}</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h5 className="font-medium text-gray-900 mb-2">Important Notes:</h5>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>• Existing phones with the same brand and model will be updated</li>
+                      <li>• The sync process may take a few minutes depending on the number of phones</li>
+                      <li>• All synced data includes comprehensive specifications and latest information</li>
+                      <li>• You can run multiple syncs - duplicates will be automatically handled</li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className={`p-4 rounded-lg ${syncResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                    <div className="flex items-center">
+                      {syncResult.success ? (
+                        <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+                      ) : (
+                        <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
+                      )}
+                      <h4 className={`font-medium ${syncResult.success ? 'text-green-900' : 'text-red-900'}`}>
+                        {syncResult.success ? 'Sync Completed Successfully' : 'Sync Failed'}
+                      </h4>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {syncResult.total_brands && (
+                      <div className="bg-blue-50 p-3 rounded-lg text-center">
+                        <div className="text-xl font-semibold text-blue-600">{syncResult.total_brands}</div>
+                        <div className="text-sm text-gray-600">Brands</div>
+                      </div>
+                    )}
+                    <div className="bg-gray-50 p-3 rounded-lg text-center">
+                      <div className="text-xl font-semibold text-gray-900">{syncResult.total_phones || 0}</div>
+                      <div className="text-sm text-gray-600">Total Phones</div>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg text-center">
+                      <div className="text-xl font-semibold text-green-600">{syncResult.successful_imports || 0}</div>
+                      <div className="text-sm text-gray-600">Imported</div>
+                    </div>
+                    <div className="bg-red-50 p-3 rounded-lg text-center">
+                      <div className="text-xl font-semibold text-red-600">{syncResult.failed_imports || 0}</div>
+                      <div className="text-sm text-gray-600">Failed</div>
+                    </div>
+                  </div>
+
+                  {syncResult.imported_phones && syncResult.imported_phones.length > 0 && (
+                    <div>
+                      <h5 className="font-medium text-gray-900 mb-2">Successfully Imported Phones:</h5>
+                      <div className="bg-green-50 p-3 rounded-lg max-h-40 overflow-y-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                          {syncResult.imported_phones.map((phone, index) => (
+                            <div key={index} className="text-sm text-green-800">• {phone}</div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {syncResult.errors && syncResult.errors.length > 0 && (
+                    <div>
+                      <h5 className="font-medium text-gray-900 mb-2">Errors:</h5>
+                      <div className="bg-red-50 p-3 rounded-lg max-h-32 overflow-y-auto">
+                        {syncResult.errors.map((error, index) => (
+                          <div key={index} className="text-sm text-red-800">• {error}</div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      onClick={() => {
+                        setSyncResult(null);
+                        loadSyncStatus(); // Refresh status
+                      }}
+                      className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                    >
+                      Sync More
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowPhoneSync(false);
+                        setSyncResult(null);
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
