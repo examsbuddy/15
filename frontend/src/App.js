@@ -99,10 +99,10 @@ function App() {
   const loadAllPhoneSpecs = async () => {
     try {
       console.log('Loading phone specs for comparison...');
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-specs`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/phone-specs/compare`);
       if (response.ok) {
         const phoneSpecs = await response.json();
-        console.log('Loaded phone specs:', phoneSpecs.length, 'phones');
+        console.log('Loaded phone specs for comparison:', phoneSpecs.length, 'phones');
         setAllPhoneSpecs(phoneSpecs);
       }
     } catch (error) {
