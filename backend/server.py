@@ -384,7 +384,14 @@ class PhoneSpecsAPIClient:
         
     async def get_session(self):
         if self.session is None:
-            self.session = aiohttp.ClientSession()
+            # Create session with proper SSL configuration
+            import ssl
+            ssl_context = ssl.create_default_context()
+            ssl_context.check_hostname = False  # For development/testing
+            ssl_context.verify_mode = ssl.CERT_NONE  # For development/testing
+            
+            connector = aiohttp.TCPConnector(ssl=ssl_context)
+            self.session = aiohttp.ClientSession(connector=connector)
         return self.session
         
     async def close_session(self):
