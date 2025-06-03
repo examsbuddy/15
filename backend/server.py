@@ -1111,6 +1111,37 @@ async def get_phone_brands():
         raise HTTPException(status_code=500, detail="Failed to fetch phone brands")
 
 # Admin Phone Specs Management Endpoints
+@api_router.get("/phone-specs/compare")
+async def get_phone_specs_for_compare():
+    """Get phone specs formatted specifically for the compare function"""
+    try:
+        phone_specs = []
+        async for phone in db.phone_specs.find():
+            # Transform to compare-friendly format
+            compare_phone = {
+                "_id": phone.get("_id"),
+                "brand": phone.get("brand", "Unknown"),
+                "model": phone.get("model", "Unknown"),
+                "displayName": f"{phone.get('brand', 'Unknown')} {phone.get('model', 'Unknown')}",
+                "price": phone.get("price_range_min", 0),
+                "photos": ['/api/placeholder/300/200'],
+                "storage": f"{phone.get('storage_gb', 'N/A')}GB" if phone.get('storage_gb') else 'N/A',
+                "ram": f"{phone.get('ram_gb', 'N/A')}GB" if phone.get('ram_gb') else 'N/A',
+                "battery": f"{phone.get('battery_mah', 'N/A')} mAh" if phone.get('battery_mah') else 'N/A',
+                "camera": phone.get('camera_mp', 'N/A'),
+                "screen_size": phone.get('display_size', 'N/A'),
+                "processor": phone.get('processor', 'N/A'),
+                "operating_system": phone.get('operating_system', 'N/A'),
+                "network": "5G" if phone.get('network_5g') == 'Yes' else "4G",
+                "price_range": f"PKR {phone.get('price_range_min', 0):,} - {phone.get('price_range_max', 0):,}" if phone.get('price_range_min') else 'Price not available'
+            }
+            phone_specs.append(compare_phone)
+        
+        return phone_specs
+    except Exception as e:
+        logger.error(f"Error getting phone specs for compare: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get phone specs")
+
 @api_router.get("/phone-specs", response_model=List[PhoneSpec])
 async def get_all_phone_specs():
     """Get all phone specifications for admin management"""
