@@ -1019,7 +1019,7 @@ export const SignUpModal = ({ isOpen, onClose, onSignup, signUpType, setSignUpTy
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://1cb3114c-ebbd-42d7-93d9-ef191a51a4ab.preview.emergentagent.com';
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://3e373ba3-1ebd-4970-8ff5-5def2ceca9f6.preview.emergentagent.com';
         const response = await fetch(`${backendUrl}/api/auth/register-shop-owner`, {
           method: 'POST',
           body: formData,
