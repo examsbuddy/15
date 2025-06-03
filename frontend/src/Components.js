@@ -3763,16 +3763,12 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
   ];
 
   // Transform all phone specs data to component format
-  const transformedPhones = allPhones.length > 0 ? allPhones.map(phoneSpec => {
-    try {
-      return transformPhoneData(phoneSpec);
-    } catch (error) {
-      console.error('Error transforming phone:', phoneSpec.brand, phoneSpec.model, error);
-      return null;
-    }
-  }).filter(phone => phone !== null) : [];
+  console.log('ComparisonPage: allPhones count:', allPhones.length);
   
-  const phonesToUse = transformedPhones.length > 0 ? transformedPhones : samplePhones;
+  // For the compare endpoint, the data is already in the right format, no transformation needed
+  const phonesToUse = allPhones.length > 0 ? allPhones : samplePhones;
+  
+  console.log('ComparisonPage: using', phonesToUse.length, 'phones for comparison');
 
   // Filter phones based on search query
   const getFilteredPhones = (query, excludeId = null) => {
