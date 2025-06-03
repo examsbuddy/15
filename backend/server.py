@@ -1378,6 +1378,252 @@ async def download_csv_template():
         logger.error(f"Error generating CSV template: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to generate CSV template")
 
+# Phone Specifications API Integration Endpoints
+@api_router.get("/phone-api/brands")
+async def get_external_brands():
+    """Get all available brands from Phone Specifications API"""
+    try:
+        brands = await phone_api_client.get_brands()
+        return {"success": True, "brands": brands, "count": len(brands)}
+    except Exception as e:
+        logger.error(f"Error fetching external brands: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch brands from external API")
+
+@api_router.get("/phone-api/brands/{brand_slug}/phones")
+async def get_external_brand_phones(brand_slug: str):
+    """Get all phones for a specific brand from Phone Specifications API"""
+    try:
+        phones = await phone_api_client.get_brand_phones(brand_slug)
+        return {"success": True, "brand": brand_slug, "phones": phones, "count": len(phones)}
+    except Exception as e:
+        logger.error(f"Error fetching phones for brand {brand_slug}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch phones for brand {brand_slug}")
+
+@api_router.get("/phone-api/phones/{phone_slug}")
+async def get_external_phone_details(phone_slug: str):
+    """Get detailed specifications for a specific phone from Phone Specifications API"""
+    try:
+        phone_details = await phone_api_client.get_phone_details(phone_slug)
+        return {"success": True, "phone": phone_details}
+    except Exception as e:
+        logger.error(f"Error fetching phone details for {phone_slug}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch phone details for {phone_slug}")
+
+@api_router.post("/phone-api/sync/brand/{brand_slug}", response_model=BrandSyncResponse)
+async def sync_brand_from_api(brand_slug: str):
+    """Sync all phones for a specific brand from Phone Specifications API"""
+    try:
+        # Get all phones for the brand
+        phones = await phone_api_client.get_brand_phones(brand_slug)
+        
+        if not phones:
+            return BrandSyncResponse(
+                success=False,
+                brand=brand_slug,
+                total_phones=0,
+                successful_imports=0,
+                failed_imports=0,
+                errors=[f"No phones found for brand {brand_slug}"]
+            )
+        
+        successful_imports = 0
+        failed_imports = 0
+        errors = []
+        
+        # Process each phone (limit to first 10 to avoid timeout)
+        phones_to_process = phones[:10]  # Limit for initial implementation
+        
+        for phone in phones_to_process:
+            try:
+                phone_slug = phone.get("slug", "")
+                if not phone_slug:
+                    failed_imports += 1
+                    errors.append(f"Phone {phone.get('phone_name', 'Unknown')} has no slug")
+                    continue
+                
+                # Get detailed specifications
+                phone_details = await phone_api_client.get_phone_details(phone_slug)
+                
+                if not phone_details:
+                    failed_imports += 1
+                    errors.append(f"Failed to fetch details for {phone.get('phone_name', 'Unknown')}")
+                    continue
+                
+                # Transform to our database format
+                db_document = transform_api_phone_to_db_format(phone_details)
+                
+                if not db_document:
+                    failed_imports += 1
+                    errors.append(f"Failed to transform {phone.get('phone_name', 'Unknown')}")
+                    continue
+                
+                # Check if phone already exists
+                existing_phone = await db.phone_specs.find_one({
+                    "brand": db_document["brand"],
+                    "model": db_document["model"]
+                })
+                
+                if existing_phone:
+                    # Update existing phone
+                    await db.phone_specs.update_one(
+                        {"_id": existing_phone["_id"]},
+                        {"$set": db_document}
+                    )
+                else:
+                    # Insert new phone
+                    await db.phone_specs.insert_one(db_document)
+                
+                successful_imports += 1
+                
+                # Add small delay to avoid overwhelming the API
+                await asyncio.sleep(0.5)
+                
+            except Exception as e:
+                failed_imports += 1
+                errors.append(f"Error processing {phone.get('phone_name', 'Unknown')}: {str(e)}")
+                logger.error(f"Error processing phone {phone.get('phone_name', 'Unknown')}: {str(e)}")
+        
+        return BrandSyncResponse(
+            success=successful_imports > 0,
+            brand=brand_slug,
+            total_phones=len(phones_to_process),
+            successful_imports=successful_imports,
+            failed_imports=failed_imports,
+            errors=errors[:10]  # Limit error messages
+        )
+        
+    except Exception as e:
+        logger.error(f"Error syncing brand {brand_slug}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to sync brand {brand_slug}")
+
+@api_router.post("/phone-api/sync/popular-brands", response_model=PhoneAPISyncResponse)
+async def sync_popular_brands():
+    """Sync phones from popular brands (Apple, Samsung, Google, OnePlus, Xiaomi)"""
+    try:
+        popular_brands = ["apple", "samsung", "google", "oneplus", "xiaomi"]
+        
+        total_brands = len(popular_brands)
+        total_phones = 0
+        successful_imports = 0
+        failed_imports = 0
+        errors = []
+        imported_phones = []
+        
+        for brand_slug in popular_brands:
+            try:
+                logger.info(f"Syncing brand: {brand_slug}")
+                
+                # Get phones for this brand
+                phones = await phone_api_client.get_brand_phones(brand_slug)
+                
+                if not phones:
+                    errors.append(f"No phones found for brand {brand_slug}")
+                    continue
+                
+                # Process first 5 phones per brand to avoid timeout
+                phones_to_process = phones[:5]
+                total_phones += len(phones_to_process)
+                
+                for phone in phones_to_process:
+                    try:
+                        phone_slug = phone.get("slug", "")
+                        phone_name = phone.get("phone_name", "Unknown")
+                        
+                        if not phone_slug:
+                            failed_imports += 1
+                            continue
+                        
+                        # Get detailed specifications
+                        phone_details = await phone_api_client.get_phone_details(phone_slug)
+                        
+                        if not phone_details:
+                            failed_imports += 1
+                            continue
+                        
+                        # Transform to our database format
+                        db_document = transform_api_phone_to_db_format(phone_details)
+                        
+                        if not db_document:
+                            failed_imports += 1
+                            continue
+                        
+                        # Check if phone already exists
+                        existing_phone = await db.phone_specs.find_one({
+                            "brand": db_document["brand"],
+                            "model": db_document["model"]
+                        })
+                        
+                        if existing_phone:
+                            # Update existing phone
+                            await db.phone_specs.update_one(
+                                {"_id": existing_phone["_id"]},
+                                {"$set": db_document}
+                            )
+                        else:
+                            # Insert new phone
+                            await db.phone_specs.insert_one(db_document)
+                        
+                        successful_imports += 1
+                        imported_phones.append(f"{db_document['brand']} {db_document['model']}")
+                        
+                        # Small delay between requests
+                        await asyncio.sleep(0.3)
+                        
+                    except Exception as e:
+                        failed_imports += 1
+                        logger.error(f"Error processing phone {phone_name}: {str(e)}")
+                
+                # Delay between brands
+                await asyncio.sleep(1)
+                
+            except Exception as e:
+                errors.append(f"Error syncing brand {brand_slug}: {str(e)}")
+                logger.error(f"Error syncing brand {brand_slug}: {str(e)}")
+        
+        return PhoneAPISyncResponse(
+            success=successful_imports > 0,
+            total_brands=total_brands,
+            total_phones=total_phones,
+            successful_imports=successful_imports,
+            failed_imports=failed_imports,
+            errors=errors[:10],
+            imported_phones=imported_phones[:20],  # Limit response size
+            status="completed"
+        )
+        
+    except Exception as e:
+        logger.error(f"Error syncing popular brands: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to sync popular brands")
+
+@api_router.get("/phone-api/sync/status")
+async def get_sync_status():
+    """Get current sync status and statistics"""
+    try:
+        # Count phones by source
+        api_phones_count = await db.phone_specs.count_documents({"source": "phone_specs_api"})
+        manual_phones_count = await db.phone_specs.count_documents({"source": {"$ne": "phone_specs_api"}})
+        total_phones_count = await db.phone_specs.count_documents({})
+        
+        # Get latest sync date
+        latest_sync = await db.phone_specs.find_one(
+            {"source": "phone_specs_api"},
+            sort=[("created_at", -1)]
+        )
+        
+        return {
+            "success": True,
+            "stats": {
+                "total_phones": total_phones_count,
+                "api_phones": api_phones_count,
+                "manual_phones": manual_phones_count,
+                "last_sync": latest_sync.get("created_at") if latest_sync else None
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting sync status: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get sync status")
+
 # Admin User Management Endpoints
 @api_router.get("/admin/users")
 async def get_admin_users(
