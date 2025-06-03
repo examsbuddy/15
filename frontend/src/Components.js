@@ -3565,8 +3565,7 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
     }
   }, [compareList]);
 
-  // Transform phone specs data to component format
-  const transformPhoneData = (phoneSpec) => {
+
     return {
       _id: phoneSpec._id,
       brand: phoneSpec.brand,
