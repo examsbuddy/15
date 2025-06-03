@@ -3974,8 +3974,12 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
                   <input
                     type="text"
                     value={searchQueries[index]}
-                    onChange={(e) => handleSearchChange(e.target.value, index)}
+                    onChange={(e) => {
+                      console.log('Input onChange triggered:', e.target.value, 'index:', index);
+                      handleSearchChange(e.target.value, index);
+                    }}
                     onFocus={() => {
+                      console.log('Input onFocus triggered for index:', index);
                       const newDropdowns = [...showDropdowns];
                       newDropdowns[index] = true;
                       setShowDropdowns(newDropdowns);
