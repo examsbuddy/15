@@ -87,6 +87,7 @@ import {
   Play,
   Filter,
   Upload,
+  Download,
   Store
 } from 'lucide-react';
 
