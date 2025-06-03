@@ -3763,18 +3763,16 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
   ];
 
   // Transform all phone specs data to component format
-  const transformedPhones = allPhones.map(transformPhoneData);
+  const transformedPhones = allPhones.length > 0 ? allPhones.map(phoneSpec => {
+    try {
+      return transformPhoneData(phoneSpec);
+    } catch (error) {
+      console.error('Error transforming phone:', phoneSpec.brand, phoneSpec.model, error);
+      return null;
+    }
+  }).filter(phone => phone !== null) : [];
+  
   const phonesToUse = transformedPhones.length > 0 ? transformedPhones : samplePhones;
-  
-  // Debug logging
-  console.log('ComparisonPage allPhones:', allPhones.length);
-  console.log('ComparisonPage transformedPhones:', transformedPhones.length);
-  console.log('ComparisonPage phonesToUse:', phonesToUse.length);
-  
-  // Debug logging
-  console.log('ComparisonPage allPhones:', allPhones.length);
-  console.log('ComparisonPage transformedPhones:', transformedPhones.length);
-  console.log('ComparisonPage phonesToUse:', phonesToUse.length);
 
   // Filter phones based on search query
   const getFilteredPhones = (query, excludeId = null) => {
