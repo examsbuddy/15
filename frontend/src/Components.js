@@ -3772,14 +3772,23 @@ export const ComparisonPage = ({ compareList, addToCompare, removeFromCompare, o
 
   // Filter phones based on search query
   const getFilteredPhones = (query, excludeId = null) => {
-    if (!query) return phonesToUse.filter(phone => phone._id !== excludeId);
+    console.log('getFilteredPhones called with query:', query, 'total phones:', phonesToUse.length);
     
-    return phonesToUse.filter(phone => 
+    if (!query) {
+      const filtered = phonesToUse.filter(phone => phone._id !== excludeId);
+      console.log('No query - returning', filtered.length, 'phones');
+      return filtered;
+    }
+    
+    const filtered = phonesToUse.filter(phone => 
       phone._id !== excludeId && 
       (`${phone.brand} ${phone.model}`.toLowerCase().includes(query.toLowerCase()) ||
        phone.brand.toLowerCase().includes(query.toLowerCase()) ||
        phone.model.toLowerCase().includes(query.toLowerCase()))
     );
+    
+    console.log('Query:', query, '- found', filtered.length, 'phones');
+    return filtered;
   };
 
   const handlePhoneSelect = (phone, index) => {
